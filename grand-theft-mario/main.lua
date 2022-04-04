@@ -1,5 +1,5 @@
 -- name: Grand Theft Mario
--- description: Grand Theft Mario / Gun Mod\nBy: \\#ff7f00\\Agent X\\#ffffff\\\n\nThis mod adds guns to sm64ex-coop. You can give yourself a gun and shoot it by pressing [\\#3040ff\\Y\\#ffffff\\].
+-- description: Grand Theft Mario v1.0.1\nBy: \\#ff7f00\\Agent X\\#ffffff\\\n\nThis mod adds guns to sm64ex-coop. You can give yourself a gun and shoot it by pressing [\\#3040ff\\Y\\#ffffff\\].
 
 E_MODEL_GUN = smlua_model_util_get_id("gun_geo")
 gGlobalSyncTable.dmg = 3
@@ -14,19 +14,6 @@ shootTime = 8
 shootTimer = 8
 function mario_update_local(m)
     if gun ~= nil then
-        if m.action ~= ACT_FLYING and (m.action & ACT_FLAG_SWIMMING) == 0 then
-            gun.oPosX = get_hand_foot_pos_x(m, 0)
-            gun.oPosY = get_hand_foot_pos_y(m, 0)
-            gun.oPosZ = get_hand_foot_pos_z(m, 0)
-        else
-            gun.oPosX = m.pos.x
-            gun.oPosY = m.pos.y
-            gun.oPosZ = m.pos.z
-        end
-        gun.oFaceAnglePitch = 0
-        gun.oFaceAngleYaw = m.faceAngle.y
-        gun.oFaceAngleRoll = 0
-
         if m.health == 0xff or m.action == ACT_IN_CANNON or m.action == ACT_SLEEPING then -- dead
             despawn_gun()
             return
@@ -79,7 +66,9 @@ function mario_update_local(m)
                     id_bhvGun,
                     E_MODEL_GUN,
                     get_hand_foot_pos_x(m, 0), get_hand_foot_pos_y(m, 0), get_hand_foot_pos_z(m, 0),
-                    nil
+                    function (obj)
+                        obj.oGunOwner = gNetworkPlayers[0].globalIndex
+                    end
                 )
             end
         end
