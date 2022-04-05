@@ -11,6 +11,18 @@ function active_player(m)
     if not np.connected then
         return false
     end
+    if np.currCourseNum ~= gNetworkPlayers[0].currCourseNum then
+        return false
+    end
+    if np.currActNum ~= gNetworkPlayers[0].currActNum then
+        return false
+    end
+    if np.currLevelNum ~= gNetworkPlayers[0].currLevelNum then
+        return false
+    end
+    if np.currAreaIndex ~= gNetworkPlayers[0].currAreaIndex then
+        return false
+    end
     return is_player_active(m)
 end
 
@@ -51,16 +63,6 @@ function bhv_gun_loop(obj)
     obj.oFaceAnglePitch = 0
     obj.oFaceAngleYaw = m.faceAngle.y
     obj.oFaceAngleRoll = 0
-
-    if obj.oPosX == obj.header.gfx.prevPos.x and obj.oPosY == obj.header.gfx.prevPos.y and (m.action & ACT_FLAG_SWIMMING) == 0 and obj.oPosZ == obj.header.gfx.prevPos.z then
-        obj.oGunTimer = obj.oGunTimer - 1
-    else
-        obj.oGunTimer = 60
-    end
-
-    if obj.oGunTimer == 0 then
-        obj_mark_for_deletion(obj)
-    end
 end
 
 id_bhvGun = hook_behavior(nil, OBJ_LIST_GENACTOR, true, bhv_gun_init, bhv_gun_loop)
