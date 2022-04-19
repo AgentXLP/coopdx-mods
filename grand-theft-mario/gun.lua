@@ -1,5 +1,29 @@
+E_MODEL_USP = smlua_model_util_get_id("gun_geo")
+E_MODEL_MAGNUM = smlua_model_util_get_id("magnum_geo")
+
+GUN_USP = 0
+GUN_MAGNUM = 1
+
+gunTable = {
+    [GUN_USP] = {
+        model = E_MODEL_USP,
+        dmg = 3,
+        maxAmmo = 18,
+        reloadTime = 75,
+        shootTime = 6,
+        sound = SOUND_GENERAL2_BOBOMB_EXPLOSION
+    },
+    [GUN_MAGNUM] = {
+        model = E_MODEL_MAGNUM,
+        dmg = 6,
+        maxAmmo = 12,
+        reloadTime = 85,
+        shootTime = 24,
+        sound = SOUND_GENERAL2_BOBOMB_EXPLOSION
+    }
+}
+
 define_custom_obj_fields({
-    oGunTimer = 'u32',
     oGunOwner = 'u32',
 })
 
@@ -33,8 +57,6 @@ function bhv_gun_init(obj)
     obj.hitboxRadius = 0
     obj.hitboxHeight = 0
 
-    obj.oGunTimer = 300 -- 10 second wait until automatic gun deletion occurs
-
     network_init_object(obj, true, { 'oGunOwner' })
 end
 
@@ -51,7 +73,7 @@ function bhv_gun_loop(obj)
         return
     end
  
-    if m.action ~= ACT_FLYING and (m.action & ACT_FLAG_SWIMMING) == 0 then
+    if m.action ~= ACT_FLYING or (m.action & ACT_FLAG_SWIMMING) ~= 0 then
         obj.oPosX = get_hand_foot_pos_x(m, 0)
         obj.oPosY = get_hand_foot_pos_y(m, 0)
         obj.oPosZ = get_hand_foot_pos_z(m, 0)

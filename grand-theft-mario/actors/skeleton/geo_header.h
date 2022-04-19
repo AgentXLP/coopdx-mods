@@ -1,0 +1,10 @@
+extern const GeoLayout skeleton_geo[];
+extern Lights1 skeleton_skele_lights;
+extern u8 skeleton_bones_ci8[];
+extern u8 skeleton_bones_ci8_pal_rgba16[];
+extern Vtx skeleton_bones_mesh_layer_1_vtx_0[648];
+extern Gfx skeleton_bones_mesh_layer_1_tri_0[];
+extern Gfx mat_skeleton_skele[];
+extern Gfx mat_revert_skeleton_skele[];
+extern Gfx skeleton_bones_mesh_layer_1[];
+extern Gfx skeleton_material_revert_render_settings[];
