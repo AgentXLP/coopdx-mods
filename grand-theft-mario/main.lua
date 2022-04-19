@@ -66,7 +66,6 @@ function mario_update_local(m)
                     m.pos.x, m.pos.y + 50, m.pos.z,
                     function (o)
                         o.oDamageOrCoinValue = gunTable[localGun].dmg
-                        o.oBulletOwner = gNetworkPlayers[0].globalIndex
                     end
                 )
 

@@ -73,7 +73,7 @@ function bhv_gun_loop(obj)
         return
     end
  
-    if m.action ~= ACT_FLYING or (m.action & ACT_FLAG_SWIMMING) ~= 0 then
+    if m.action ~= ACT_FLYING and (m.action & ACT_FLAG_SWIMMING) == 0 then
         obj.oPosX = get_hand_foot_pos_x(m, 0)
         obj.oPosY = get_hand_foot_pos_y(m, 0)
         obj.oPosZ = get_hand_foot_pos_z(m, 0)
