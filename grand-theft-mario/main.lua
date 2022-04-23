@@ -1,5 +1,5 @@
 -- name: Grand Theft Mario
--- description: Grand Theft Mario v1.1\nBy: \\#ff7f00\\Agent X\\#ffffff\\\n\nThis mod adds guns to sm64ex-coop. You can give yourself a gun and shoot it by pressing [\\#3040ff\\Y\\#ffffff\\] and swap between the USP and the magnum with DPad Up.
+-- description: Grand Theft Mario v1.1.2\nBy: \\#ff7f00\\Agent X\\#ffffff\\\n\nThis mod adds guns to sm64ex-coop. You can give yourself a gun and shoot it by pressing [\\#3040ff\\Y\\#ffffff\\] and swap between the USP and the magnum with DPad Up.
 
 E_MODEL_CORPSE = smlua_model_util_get_id("skeleton_geo")
 
