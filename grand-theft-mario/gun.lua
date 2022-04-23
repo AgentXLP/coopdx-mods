@@ -74,12 +74,16 @@ function bhv_gun_loop(obj)
     end
  
     if m.action ~= ACT_FLYING and (m.action & ACT_FLAG_SWIMMING) == 0 then
-        obj.oPosX = get_hand_foot_pos_x(m, 0)
-        obj.oPosY = get_hand_foot_pos_y(m, 0)
-        obj.oPosZ = get_hand_foot_pos_z(m, 0)
+        obj.oPosX = get_hand_foot_pos_x(m, 0) + m.vel.x
+        if m.action ~= ACT_JUMP then
+            obj.oPosY = get_hand_foot_pos_y(m, 0) + m.vel.y
+        else
+            obj.oPosY = get_hand_foot_pos_y(m, 0) + m.vel.y + 25
+        end
+        obj.oPosZ = get_hand_foot_pos_z(m, 0) + m.vel.z
     else
         obj.oPosX = m.pos.x
-        obj.oPosY = m.pos.y
+        obj.oPosY = m.pos.y + 50
         obj.oPosZ = m.pos.z
     end
     obj.oFaceAnglePitch = 0

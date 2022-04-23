@@ -3,7 +3,7 @@ E_MODEL_GORDON = smlua_model_util_get_id("gordon_geo")
 function on_infammo_command(msg)
     if not network_is_server() then
         djui_chat_message_create("You need to be the host!")
-        return true
+        return false
     end
 
     if msg == "on" then
@@ -13,13 +13,13 @@ function on_infammo_command(msg)
         gGlobalSyncTable.infAmmo = false
         djui_chat_message_create("Infinite ammo off")
     end
-    return false
+    return true
 end
 
 function on_warpammo_command(msg)
     if not network_is_server() then
         djui_chat_message_create("You need to be the host!")
-        return true
+        return false
     end
 
     if msg == "on" then
@@ -29,24 +29,24 @@ function on_warpammo_command(msg)
         gGlobalSyncTable.warpAmmo = false
         djui_chat_message_create("Regenerate ammo on warp off")
     end
-    return false
+    return true
 end
 
 function on_kill_command()
     gMarioStates[0].health = 0xff
-    return false
+    return true
 end
 
 function on_reload_command()
     reloadTimer = reloadTimer - get_ammo(gMarioStates[0])
     set_ammo(gMarioStates[0], 0)
-    return false
+    return true
 end
 
 function on_gordon_command(msg)
     if not network_is_server() then
         djui_chat_message_create("You need to be the host!")
-        return true
+        return false
     end
 
     if msg == "on" then
@@ -54,7 +54,7 @@ function on_gordon_command(msg)
     else
         gPlayerSyncTable[0].modelId = nil
     end
-    return false
+    return true
 end
 
 hook_chat_command("infammo", "[on|off] turn infinite ammo on or off", on_infammo_command)
