@@ -1,5 +1,5 @@
 -- name: Grand Theft Mario
--- description: Grand Theft Mario v1.1.2\nBy: \\#ff7f00\\Agent X\\#ffffff\\\n\nThis mod adds guns to sm64ex-coop. You can give yourself a gun and shoot it by pressing [\\#3040ff\\Y\\#ffffff\\] and swap between the USP and the magnum with DPad Up.
+-- description: Grand Theft Mario v1.1.3\nBy: \\#ff7f00\\Agent X\\#ffffff\\\n\nThis mod adds guns to sm64ex-coop. You can give yourself a gun and shoot it by pressing [\\#3040ff\\Y\\#ffffff\\] and swap between the USP and the magnum with DPad Up.
 
 E_MODEL_CORPSE = smlua_model_util_get_id("skeleton_geo")
 
@@ -141,7 +141,7 @@ function mario_update_local(m)
         if reloadTimer == 0 then
             set_ammo(m, gunTable[localGun].maxAmmo)
             play_sound(SOUND_MENU_POWER_METER, m.marioObj.header.gfx.cameraToObject)
-            reloadTimer = gGlobalSyncTable.reloadTime
+            reloadTimer = gunTable[gPlayerSyncTable[m.playerIndex].gun].reloadTime
         end
     end
 
