@@ -1,12 +1,25 @@
 -- name: Climb the Tower
--- description: Climb the Tower!\nBy: \\#ff7f00\\Agent X\\#ffffff\\\n\nThis gamemode revolves around getting the fastest time and getting to the top of the tower the fastest, you can view the scores with /scoreboard\nIf you wish to play another gamemode on this map (e.g. manhunt / hide and seek) then run /ctt off on host.\n\n\\#ffff00\\Warning\\#ffffff\\: Poor performance on Windows is expected when using OMM
+-- description: Climb the Tower!\nBy: \\#ff7f00\\Agent X\\#ffffff\\\n\nThis gamemode revolves around getting the fastest time and getting to the top of the tower the fastest, you can view the scores with /scoreboard\nIf you wish to play another gamemode on this map (e.g. manhunt / hide and seek) then run /ctt off on host.
 
 gGlobalSyncTable.gameEnabled = true
+doubleJumps = 3
+
+function in_range(val, low, max)
+    return val >= low and val <= max
+end
+
+function disable_fall_damage(m)
+    m.peakHeight = m.pos.y
+end
 
 function on_warp()
     gPlayerSyncTable[0].time = 0
+    gPlayerSyncTable[0].finished = false
+    doubleJumps = 3
+    triggered = false
 end
 
+--- @param m MarioState
 function mario_update(m)
     disable_fall_damage(m)
 
@@ -29,9 +42,20 @@ function mario_update(m)
         if (m.controller.buttonPressed & D_JPAD) ~= 0 then
             on_reset_command()
         end
+
+        -- special double jump
+        if (m.action & ACT_GROUP_MASK) == ACT_GROUP_AIRBORNE and (m.controller.buttonPressed & Y_BUTTON) ~= 0 then
+            if doubleJumps ~= 0 then
+                doubleJumps = doubleJumps - 1
+                set_mario_action(m, ACT_LONG_JUMP, 0)
+                m.faceAngle.y = m.intendedYaw
+                m.vel.y = 50
+            end
+        end
     end
 end
 
+--- @param m MarioState
 function on_player_connected(m)
     gPlayerSyncTable[m.playerIndex].time = 0
     gPlayerSyncTable[m.playerIndex].prevTime = 0
@@ -67,6 +91,12 @@ function on_hud_render()
         djui_hud_set_color(255, 0, 0, 255)
     end
     djui_hud_print_text(text, x, y, 0.50)
+
+    djui_hud_set_color(255, 255, 255, 255)
+    hud_render_power_meter(gMarioStates[0].health, djui_hud_get_screen_width() - 58, 0, 60, 60)
+
+    djui_hud_set_font(FONT_HUD)
+    djui_hud_print_text(tostring(doubleJumps), 5, 5, 1)
 end
 
 function on_ctt_command(msg)
@@ -81,21 +111,15 @@ function on_ctt_command(msg)
         hud_hide()
     else
         gGlobalSyncTable.gameEnabled = false
-        if gNetworkPlayers[0].name ~= "AgentX" then
-            djui_chat_message_create("CTT disabled.")
-        else
-            djui_chat_message_create("CTT disabled! How unbased of you! You're banned from this gamemode.")
-        end
+        djui_chat_message_create("CTT disabled.")
         hud_show()
     end
     return true
 end
 
 function on_reset_command()
-    if gGlobalSyncTable.gameEnabled == false then return end
-    gPlayerSyncTable[0].time = 0
-    gPlayerSyncTable[0].finished = false
     warp_to_level(LEVEL_PSS, 0x01, 1)
+    on_warp()
     return true
 end
 

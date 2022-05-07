@@ -7,7 +7,6 @@ function bhv_launchpad_init(o)
     o.oCollisionDistance = 500
     o.collisionData = COL_LAUNCHPAD
     obj_scale(o, 0.85)
-    -- network_init_object(o, false, nil)
 end
 function bhv_launchpad_loop(o)
     local m = nearest_mario_state_to_object(o)
@@ -24,8 +23,8 @@ function bhv_launchpad_loop(o)
                 nil
             )
             set_mario_action(m, ACT_FLYING_TRIPLE_JUMP, 0)
-            m.forwardVel = m.forwardVel + 25
-            m.vel.y = 45
+            m.forwardVel = m.forwardVel + 45
+            m.vel.y = 55
             m.faceAngle.y = 0x4000
         end
     end
