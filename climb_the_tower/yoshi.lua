@@ -17,7 +17,7 @@ function bhv_stationary_yoshi_loop(o)
     if dist_between_objects(o, gMarioStates[0].marioObj) < 500 and triggered == false then
         triggered = true
         play_puzzle_jingle()
-        doubleJumps = 5
+        doubleJumps = 3
     end
 end
 
