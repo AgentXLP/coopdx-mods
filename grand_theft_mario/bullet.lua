@@ -1,18 +1,23 @@
+GUN_SHOOT_SPEED = 180
+
 define_custom_obj_fields({
-    oBulletTimer = 'u32'
+    oBulletTimer = 'u32',
+    oBulletOwner = 'u32'
 })
 
+--- @param o Object
 function bhv_bullet_init(o)
     obj_set_billboard(o)
     o.oFlags = OBJ_FLAG_UPDATE_GFX_POS_AND_ANGLE
-    cur_obj_scale(0.45)
+    obj_set_billboard(o)
 
     o.oIntangibleTimer = 2
     o.oInteractType = INTERACT_DAMAGE
 
-    -- hitbox
-    o.hitboxRadius = 80
-    o.hitboxHeight = 80
+    o.hitboxRadius = 60
+    o.hitboxHeight = 60
+
+    o.oForwardVel = GUN_SHOOT_SPEED
 
     -- physics
     o.oWallHitboxRadius =  30
@@ -24,14 +29,19 @@ function bhv_bullet_init(o)
 
     o.oBulletTimer = 100 -- time until bullet despawns
 
-    network_init_object(o, true, nil)
+    local i = network_local_index_from_global(o.oGunOwner)
+    audio_sample_play(gunTable[gPlayerSyncTable[i].gun].shootSound, gMarioStates[i].pos, 0.5)
+
+    network_init_object(o, true, { "oBulletOwner" })
 end
 
+--- @param o Object
 function bullet_hit(o)
     spawn_mist_particles()
     obj_mark_for_deletion(o)
 end
 
+--- @param o Object
 function spawn_coin(o)
     spawn_sync_object(
         id_bhvMovingYellowCoin,
@@ -42,7 +52,7 @@ function spawn_coin(o)
 end
 
 local dist = 200
-timesBossHit = 0
+--- @param o Object
 function bhv_bullet_loop(o)
     cur_obj_update_floor_and_walls()
     if (o.oMoveFlags & OBJ_MOVE_HIT_WALL) ~= 0 then
@@ -51,14 +61,14 @@ function bhv_bullet_loop(o)
 
     local soundPos = gMarioStates[0].marioObj.header.gfx.cameraToObject
 
-    -- this is major cringe, don't ever do this
-    local toad = cur_obj_nearest_object_with_behavior(get_behavior_from_id(id_bhvToadMessage))
-    local goomba = cur_obj_nearest_object_with_behavior(get_behavior_from_id(id_bhvGoomba))
-    local koopa = cur_obj_nearest_object_with_behavior(get_behavior_from_id(id_bhvKoopa))
-    local bobomb = cur_obj_nearest_object_with_behavior(get_behavior_from_id(id_bhvBobomb))
-    local bowser = cur_obj_nearest_object_with_behavior(get_behavior_from_id(id_bhvBowser))
-    local plant = cur_obj_nearest_object_with_behavior(get_behavior_from_id(id_bhvPiranhaPlant))
-    local box = cur_obj_nearest_object_with_behavior(get_behavior_from_id(id_bhvBreakableBox))
+    -- thank you prince frizzy
+    local toad = obj_get_nearest_object_with_behavior_id(o, id_bhvToadMessage)
+    local goomba = obj_get_nearest_object_with_behavior_id(o, id_bhvGoomba)
+    local koopa = obj_get_nearest_object_with_behavior_id(o, id_bhvKoopa)
+    local bobomb = obj_get_nearest_object_with_behavior_id(o, id_bhvBobomb)
+    local bowser = obj_get_nearest_object_with_behavior_id(o, id_bhvBowser)
+    local plant = obj_get_nearest_object_with_behavior_id(o, id_bhvPiranhaPlant)
+    local box = obj_get_nearest_object_with_behavior_id(o, id_bhvBreakableBox)
     if toad ~= nil and dist_between_objects(o, toad) < dist then
         obj_mark_for_deletion(toad)
         spawn_coin(o)
@@ -82,7 +92,7 @@ function bhv_bullet_loop(o)
         if gGlobalSyncTable.bossTolerance > 0 then
             gGlobalSyncTable.bossTolerance = gGlobalSyncTable.bossTolerance - 1
         else
-            gGlobalSyncTable.bossTolerance = 3
+            gGlobalSyncTable.bossTolerance = 5
             bowser.oAction = 4
             bowser.oHealth = bowser.oHealth - 1
         end
@@ -95,17 +105,31 @@ function bhv_bullet_loop(o)
         bullet_hit(o)
     end
 
-    
+    -- if is_point_within_radius_of_mario((o.header.gfx.prevPos.x + o.oPosX) / 2, o.oPosY, (o.header.gfx.prevPos.z + o.oPosZ) / 2, 3) then
+    --     o.oPosX = (o.header.gfx.prevPos.x + o.oPosX) / 2
+    --     o.oPosZ = (o.header.gfx.prevPos.z + o.oPosZ) / 2
+    -- end
 
-    if o.oTimer <= 1 then
-        o.oForwardVel = 220
-    elseif o.oTimer < 125 then
-        o.oForwardVel = 65
-    else
+    if o.oTimer > 150 then
         obj_mark_for_deletion(o)
     end
 
-    cur_obj_move_xz_using_fvel_and_yaw()
+    if o.oVelY == 0 then cur_obj_move_xz_using_fvel_and_yaw()
+    else cur_obj_move_using_vel() end
 end
 
-id_bhvBullet = hook_behavior(nil, OBJ_LIST_LEVEL, true, bhv_bullet_init, bhv_bullet_loop)
+id_bhvBullet = hook_behavior(nil, OBJ_LIST_GENACTOR, true, bhv_bullet_init, bhv_bullet_loop)
+
+--- @param m MarioState
+--- @param o Object
+function allow_interact(m, o)
+    local b = obj_get_nearest_object_with_behavior_id(m.marioObj, id_bhvBullet)
+    if o == b then
+        if o.oBulletOwner == gNetworkPlayers[m.playerIndex].globalIndex then return false end
+    else
+        if b ~= nil then obj_mark_for_deletion(b) end
+        return true
+    end
+end
+
+hook_event(HOOK_ALLOW_INTERACT, allow_interact)
