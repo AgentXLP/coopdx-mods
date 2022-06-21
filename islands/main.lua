@@ -1,0 +1,4 @@
+-- name: Islands
+-- incompatible: romhack
+-- description: Just replaces Wing Mario Over the Rainbow with my own custom sunset themed map.\nBy \\#ff7f00\\Agent X\\#ffffff\\
+-- gLevelValues.entryLevel = LEVEL_WMOTR
