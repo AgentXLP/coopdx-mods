@@ -1,13 +1,15 @@
 showTitle = true
+local timer = 0
 function on_hud_render()
-    if obj_get_first_with_behavior_id(id_bhvActSelector) ~= nil then
+    if obj_get_first_with_behavior_id(id_bhvActSelector) ~= nil or is_game_paused() then
         return
     end
-    local localGun = gPlayerSyncTable[0].gun
-    if firstPerson == false then
-        if gun == nil then return end
+
+    local localWeapon = gPlayerSyncTable[0].weapon
+
+    if gun ~= nil and weaponTable[localWeapon].gun and gNetworkPlayers[0].currLevelNum ~= LEVEL_BM then
         -- set text
-        local text = tostring(get_ammo(gMarioStates[0])) .. "/" .. tostring(gunTable[localGun].maxAmmo)
+        local text = tostring(get_ammo()) .. "/" .. tostring(weaponTable[localWeapon].maxAmmo)
 
         -- render to native screen space
         djui_hud_set_resolution(RESOLUTION_N64)
@@ -20,29 +22,12 @@ function on_hud_render()
         djui_hud_set_color(255, 255, 255, 255)
         djui_hud_print_text("AMMO", x, y - 20, 1)
         djui_hud_print_text(text, x, y, 1)
-    else
+    end
+
+    if sPlayerFirstPerson.enabled then
         local m = gMarioStates[0]
 
-        local multiplier = 8
-        if m.health >= 2048 then
-            multiplier = 8
-        elseif m.health >= 1792 and m.health < 2048 then
-            multiplier = 7
-        elseif m.health >= 1536 and m.health < 1792 then
-            multiplier = 6
-        elseif m.health >= 1280 and m.health < 1536 then
-            multiplier = 5
-        elseif m.health >= 1024 and m.health < 1280 then
-            multiplier = 4
-        elseif m.health >= 768 and m.health < 1024 then
-            multiplier = 3
-        elseif m.health >= 512 and m.health < 768 then
-            multiplier = 2
-        elseif m.health >= 256 and m.health < 512 then
-            multiplier = 1
-        elseif m.health >= 0 and m.health < 256 then
-            multiplier = 0
-        end
+        local multiplier = m.health / 272
         local health = math.floor((100 / 8) * multiplier)
 
         -- render to native screen space
@@ -55,41 +40,21 @@ function on_hud_render()
         djui_hud_set_color(255, 255, 0, 128)
         djui_hud_render_texture(get_texture_info("crosshair"), djui_hud_get_screen_width() * 0.5 - 15, djui_hud_get_screen_height() * 0.5 - 5, 2, 2)
 
-        if gNetworkPlayers[0].currLevelNum ~= LEVEL_SA then
-            -- set color and render
-            djui_hud_set_color(0, 0, 0, 128)
-            djui_hud_render_rect(15, y, 300, 120)
+        djui_hud_set_resolution(RESOLUTION_N64)
+        djui_hud_set_color(255, 255, 255, 255)
+        local x = 70 + (djui_hud_get_screen_width() / 1024) * 250
+        local scale = 0.18
+        timer = timer + 0.2
+        djui_hud_render_texture(get_texture_info(weaponTable[localWeapon].vmodel), x, 58 + 1.4 * math.sin(timer), scale, scale)
+        djui_hud_render_texture(get_texture_info(weaponTable[localWeapon].arm), x, 58 + 1.4 * math.sin(timer), scale, scale)
+        -- society if you could set djui render order
+        if gNetworkPlayers[0].currLevelNum ~= LEVEL_BM then
+            djui_hud_render_texture(gTextures.lakitu, djui_hud_get_screen_width() - 38, 205, 1, 1)
+            djui_hud_render_texture(gTextures.camera, djui_hud_get_screen_width() - 54, 205, 1, 1)
+        end
+        djui_hud_set_resolution(RESOLUTION_DJUI)
 
-            if health < 20 then
-                djui_hud_set_color(255, 0, 0, 255)
-            else
-                djui_hud_set_color(255, 255, 0, 255)
-            end
-            djui_hud_print_text("HEALTH", 25, y + 80, 1)
-            djui_hud_print_text(tostring(health), 138, y + 10, 3.75)
-
-            if (m.flags & MARIO_METAL_CAP) ~= 0 or (m.flags & MARIO_VANISH_CAP) ~= 0 then
-                djui_hud_set_color(0, 0, 0, 128)
-                djui_hud_render_rect(330, y, 300, 120)
-
-                djui_hud_set_color(255, 255, 0, 255)
-                djui_hud_print_text("SUIT", 340, y + 80, 1)
-                djui_hud_print_text("200", 440, y + 10, 3.75)
-
-                gPlayerSyncTable[0].metalCap = true
-            else
-                gPlayerSyncTable[0].metalCap = false
-            end
-
-            if gun ~= nil then
-                djui_hud_set_color(0, 0, 0, 128)
-                djui_hud_render_rect(width - 315, y, 300, 120)
-                djui_hud_set_color(255, 255, 0, 255)
-                djui_hud_print_text("AMMO", width - 305, y + 80, 1)
-                djui_hud_print_text(tostring(get_ammo(gMarioStates[0])), width - 240, y + 10, 3.75)
-                djui_hud_print_text(tostring(gunTable[localGun].maxAmmo), width - 75, y + 80, 1)
-            end
-        else
+        if gNetworkPlayers[0].currLevelNum == LEVEL_BM then
             djui_hud_set_color(255, 160, 0, 120)
             if health <= 25 then
                 djui_hud_set_color(255, 0, 0, 120)
@@ -103,8 +68,8 @@ function on_hud_render()
             bhDisplay = math.floor(bhDisplay * 100)
             djui_hud_print_text(tostring(bhDisplay), 250, y + 70, 2)
 
-            if gun ~= nil then
-                djui_hud_print_text(tostring(get_ammo(gMarioStates[0])) .. "|" .. tostring(gunTable[localGun].maxAmmo), width - 150, y + 70, 2)
+            if gun ~= nil and weaponTable[localWeapon].gun then
+                djui_hud_print_text(tostring(get_ammo()) .. "|" .. tostring(weaponTable[localWeapon].maxAmmo), width - 150, y + 70, 2)
             end
         end
 
@@ -117,12 +82,12 @@ function on_hud_render()
         end
     end
 
-    if showTitle and gNetworkPlayers[0].currLevelNum == LEVEL_SA then
+    if showTitle and gNetworkPlayers[0].currLevelNum == LEVEL_BM then
         local m = gMarioStates[0]
         set_mario_action(m, ACT_FREEFALL, 0)
         m.health = 0x880
         m.pos.x = 2240
-        m.pos.y = -710
+        m.pos.y = -1750
         m.pos.z = -968
 
         djui_hud_set_resolution(RESOLUTION_DJUI)
@@ -139,7 +104,7 @@ function on_hud_render()
         if (m.controller.buttonPressed & A_BUTTON) ~= 0 or (m.controller.buttonPressed & B_BUTTON) ~= 0 then
             showTitle = false
             -- on_gordon_command("on")
-            on_fp_command("on")
+            if not sPlayerFirstPerson.enabled then on_fp_command("on") end
         elseif (m.controller.buttonPressed & Z_TRIG) ~= 0 then
             warp(LEVEL_CASTLE_GROUNDS, 1)
             showTitle = false
@@ -147,4 +112,9 @@ function on_hud_render()
     end
 end
 
+function on_warp()
+    if gNetworkPlayers[0].currLevelNum == LEVEL_BM then hud_hide() else hud_show() end
+end
+
 hook_event(HOOK_ON_HUD_RENDER, on_hud_render)
+hook_event(HOOK_ON_WARP, on_warp)

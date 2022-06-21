@@ -1,123 +1,97 @@
+-- ______ _          __     _____
+-- |  ____(_)        | |   |  __ \
+-- | |__   _ _ __ ___| |_  | |__) |__ _ __ ___  ___  _ __
+-- |  __| | | '__/ __| __| |  ___/ _ \ '__/ __|/ _ \| '_ \
+-- | |    | | |  \__ \ |_  | |  |  __/ |  \__ \ (_) | | | |
+-- |_|    |_|_|  |___/\__| |_|   \___|_|  |___/\___/|_| |_|
+-- By Agent X and PeachyPeach
+MARIO_HEAD_POS = 120
+
 gGlobalSyncTable.bhop = true
 gGlobalSyncTable.autoBh = true
 
-firstPerson = false
-heightMoving = 135
-yOffset = 0
-local yawOffset = 0
-sensitivity = 5
-sensitivityY = 1
-
-arm = nil
-
-function clamp(v, min, max)
-    if v < min then return min end
-    if v > max then return max end
-    return v
-end
-
-function DEGREES(degree)
-    return (degree * 0x1000 / 360)
-end
-function TO_DEGREES(degree)
-    return (degree * 360 / 0x1000)
+function if_then_else(cond, if_true, if_false)
+    if cond then return if_true end
+    return if_false
 end
 
 --- @param m MarioState
 function update_fp_camera(m)
-    -- handle inputs
-    if m.controller.extStickX == 0 then
-        yawOffset = yawOffset + -1 * djui_hud_get_raw_mouse_x()
-    else
-        yawOffset = yawOffset - m.controller.extStickX
-    end
-    yawOffset = yawOffset * sensitivity
+    local sensX = 0.3 * camera_config_get_x_sensitivity()
+    local sensY = 0.4 * camera_config_get_y_sensitivity()
+    local invX = if_then_else(camera_config_is_x_inverted(), 1, -1)
+    local invY = if_then_else(camera_config_is_y_inverted(), 1, -1)
 
-    if m.controller.extStickY == 0 then
-        yOffset = yOffset + (-0.9 * sensitivityY) * djui_hud_get_raw_mouse_y()
-    else
-        yOffset = yOffset + m.controller.extStickY * sensitivityY
-    end
-    yOffset = clamp(yOffset, DEGREES(-360), DEGREES(360))
-
-    if m.floor.type == SURFACE_LOOK_UP_WARP and yOffset > DEGREES(180) then -- QoL
-        totwc_warp()
-    end
-    -- initiate
-    gLakituState.posHSpeed = 0.0
-    gLakituState.focHSpeed = 0.0
-    if m.action ~= ACT_DISAPPEARED then
-        gLakituState.yaw = gLakituState.yaw + yawOffset
-    end
-    if (m.action & ACT_FLAG_ON_POLE) ~= 0 then
-        gLakituState.yaw = m.faceAngle.y
-    elseif (m.action & ACT_FLAG_SWIMMING) ~= 0 then
-        gLakituState.yaw = m.faceAngle.y + 0x8000
-    end
-    yawOffset = 0
-    -- lock in the position
-    gLakituState.pos.x = m.pos.x
-    if (m.action & ACT_FLAG_SHORT_HITBOX) ~= 0 then
-        gLakituState.pos.y = m.pos.y + (heightMoving / 2) + 6 * math.sin(timer)
-    else
-        gLakituState.pos.y = m.pos.y + heightMoving + 6 * math.sin(timer)
-    end
-    if m.health <= 0xff and gLakituState.pos.y > m.floorHeight then
-        gLakituState.pos.y = gLakituState.pos.y - 1
-    end
-    gLakituState.pos.z = m.pos.z
-    -- fix pos
-    gLakituState.pos.x = gLakituState.pos.x + (8 * math.sin(gLakituState.yaw / 0x8000 * math.pi))
-    gLakituState.pos.z = gLakituState.pos.z + (8 * math.cos(gLakituState.yaw / 0x8000 * math.pi))
-    -- copy pos to curPos and goalPos
-    gLakituState.curPos.x = gLakituState.pos.x
-    gLakituState.curPos.y = gLakituState.pos.y
-    gLakituState.curPos.z = gLakituState.pos.z
-    gLakituState.goalPos.x = gLakituState.pos.x
-    gLakituState.goalPos.y = gLakituState.pos.y
-    gLakituState.goalPos.z = gLakituState.pos.z
-    -- focus
-    gLakituState.focus.x = gLakituState.pos.x
-    gLakituState.focus.y = gLakituState.pos.y
-    gLakituState.focus.z = gLakituState.pos.z
-    gLakituState.focus.x = gLakituState.focus.x - (2048 * math.sin(gLakituState.yaw / 0x8000 * math.pi))
-    gLakituState.focus.y = gLakituState.focus.y + yOffset
-    gLakituState.focus.z = gLakituState.focus.z - (2048 * math.cos(gLakituState.yaw / 0x8000 * math.pi))
-    -- copy focus to curFocus and goalFocus to attempt to prevent the lerping with vertical look
-    gLakituState.curFocus.x = gLakituState.focus.x
-    gLakituState.curFocus.y = gLakituState.focus.y
-    gLakituState.curFocus.z = gLakituState.focus.z
-    gLakituState.goalFocus.x = gLakituState.goalFocus.x
-    gLakituState.goalFocus.y = gLakituState.goalFocus.y
-    gLakituState.goalFocus.z = gLakituState.goalFocus.z
-    -- area camera position
-    m.area.camera.pos.x = gLakituState.pos.x
-    m.area.camera.pos.y = gLakituState.pos.y
-    m.area.camera.pos.z = gLakituState.pos.z
-    -- area camera focus
-    m.area.camera.focus.x = gLakituState.focus.x
-    m.area.camera.focus.y = gLakituState.focus.y
-    m.area.camera.focus.z = gLakituState.focus.z
-    -- area camera yaw
-    m.area.camera.yaw = gLakituState.yaw
-
-    obj_set_model_extended(gMarioStates[0].marioObj, E_MODEL_NONE)
-
-    if m.action == ACT_IN_CANNON or m.action == ACT_BUBBLED then
+    -- check cancels
+    if (m.action & ACT_GROUP_MASK) == ACT_GROUP_CUTSCENE or
+        m.action == ACT_FIRST_PERSON or
+        m.action == ACT_DROWNING or
+        m.action == ACT_WATER_DEATH or
+        m.action == ACT_GRABBED or
+        m.action == ACT_IN_CANNON or
+        m.action == ACT_TORNADO_TWIRLING or
+        m.action == ACT_BUBBLED then
         disable_fp()
+        return
     end
+
+    -- update pitch
+    sPlayerFirstPerson.pitch = sPlayerFirstPerson.pitch - sensY * (invY * m.controller.extStickY - 1.5 * djui_hud_get_raw_mouse_y())
+    sPlayerFirstPerson.pitch = clamp(sPlayerFirstPerson.pitch, -0x3F00, 0x3F00)
+
+    -- update yaw
+    if (m.controller.buttonPressed & L_TRIG) ~= 0 then sPlayerFirstPerson.yaw = m.faceAngle.y + 0x8000
+    else sPlayerFirstPerson.yaw = sPlayerFirstPerson.yaw + sensX * (invX * m.controller.extStickX - 1.5 * djui_hud_get_raw_mouse_x()) end
+    sPlayerFirstPerson.yaw = (sPlayerFirstPerson.yaw + 0x10000) % 0x10000
+
+    -- fix yaw for some specific actions
+    -- if the left stick is held, use Mario's yaw to set the camera's yaw
+    -- otherwise, set Mario's yaw to the camera's yaw
+    for _, flag in ipairs({ ACT_FLYING, ACT_HOLDING_BOWSER, ACT_FLAG_ON_POLE, ACT_FLAG_SWIMMING }) do
+        if (m.action & flag) == flag then
+            if math.abs(m.controller.stickX) > 4 then sPlayerFirstPerson.yaw = m.faceAngle.y + 0x8000
+            else m.faceAngle.y = sPlayerFirstPerson.yaw - 0x8000 end
+            break
+        end
+    end
+    gLakituState.yaw = sPlayerFirstPerson.yaw
+    m.area.camera.yaw = sPlayerFirstPerson.yaw
+
+    -- update pos
+    local y = m.marioBodyState.headPos.y + 35
+    if (m.action & ACT_FLAG_AIR) ~= 0 then
+        y = m.pos.y + MARIO_HEAD_POS
+    end
+
+    gLakituState.pos.x = m.pos.x + coss(sPlayerFirstPerson.pitch) * sins(sPlayerFirstPerson.yaw)
+    gLakituState.pos.y = y + sins(sPlayerFirstPerson.pitch)
+    gLakituState.pos.z = m.pos.z + coss(sPlayerFirstPerson.pitch) * coss(sPlayerFirstPerson.yaw)
+    vec3f_copy(m.area.camera.pos, gLakituState.pos)
+    vec3f_copy(gLakituState.curPos, gLakituState.pos)
+    vec3f_copy(gLakituState.goalPos, gLakituState.pos)
+
+    -- update focus
+    gLakituState.focus.x = m.pos.x - 100 * coss(sPlayerFirstPerson.pitch) * sins(sPlayerFirstPerson.yaw)
+    gLakituState.focus.y = y - 100 * sins(sPlayerFirstPerson.pitch)
+    gLakituState.focus.z = m.pos.z - 100 * coss(sPlayerFirstPerson.pitch) * coss(sPlayerFirstPerson.yaw)
+    vec3f_copy(m.area.camera.focus, gLakituState.focus)
+    vec3f_copy(gLakituState.curFocus, gLakituState.focus)
+    vec3f_copy(gLakituState.goalFocus, gLakituState.focus)
+
+    -- set other values
+    gLakituState.posHSpeed = 0
+    gLakituState.posVSpeed = 0
+    gLakituState.focHSpeed = 0
+    gLakituState.focVSpeed = 0
+    m.marioBodyState.modelState = 0x100
 end
 
 --- @param m MarioState
-function handle_first_person(m)
-    update_fp_camera(m)
-    if m.controller.stickX == 0 and m.controller.stickY > 0 and (m.action & ACT_FLAG_AIR) == 0 and (m.action & ACT_FLAG_SWIMMING) == 0 and
-    m.action ~= ACT_LEDGE_GRAB and m.action ~= ACT_LEDGE_CLIMB_FAST and m.action ~= ACT_LEDGE_CLIMB_SLOW_1 and m.action ~= ACT_LEDGE_CLIMB_SLOW_2 then
-        m.faceAngle.y = gLakituState.yaw + 0x8000
-    end
-    if m.action == ACT_STATIC_JUMP and bhGain > 1.2 then m.faceAngle.y = gLakituState.yaw + 0x8000 end
+function handle_fp(m)
+    if gNetworkPlayers[0].currActNum == 99 then disable_fp() end
 
     djui_hud_set_mouse_locked(true)
+    update_fp_camera(m)
 
     if gGlobalSyncTable.bhop == false then return end
     if (m.action & ACT_FLAG_MOVING) ~= 0 and bhTimer < 5 then bhTimer = bhTimer + 1 end
@@ -135,91 +109,27 @@ function handle_first_person(m)
 end
 
 function enable_fp()
-    firstPerson = true
-    if arm == nil and gun ~= nil then
-        spawn_arm()
-    end
+    sPlayerFirstPerson.freecam = camera_config_is_free_cam_enabled()
     camera_freeze()
-    hud_hide()
     set_override_near(45)
+    sPlayerFirstPerson.enabled = true
+    sPlayerFirstPerson.pitch = 0
+    sPlayerFirstPerson.yaw = gMarioStates[0].faceAngle.y + 0x8000
 end
 
 function disable_fp()
-    firstPerson = false
-    despawn_arm()
+    camera_config_enable_free_cam(sPlayerFirstPerson.freecam)
     camera_unfreeze()
-    hud_show()
     set_override_near(0)
-    set_override_fov(0)
+    sPlayerFirstPerson.enabled = false
+    sPlayerFirstPerson.pitch = 0
+    sPlayerFirstPerson.yaw = 0
 end
 
-function on_arm_changed(tag, oldVal, newVal)
-    if oldVal == newVal then return end
-    gun_change(gMarioStates[0], gPlayerSyncTable[0].gun)
-end
-
--- easter egg level
-function on_level_init()
-    if gNetworkPlayers[0].currLevelNum == LEVEL_SA then
-        showTitle = true
-        play_sound(SOUND_GENERAL_LOUD_POUND2, gMarioStates[0].marioObj.header.gfx.cameraToObject)
-    end
-end
-
-bhGain = 1
-bhTimer = 0
---- @param m MarioState
-function on_set_mario_action(m)
-    if m.playerIndex ~= 0 then return end
-    if (m.prevAction == ACT_IN_CANNON or m.action == ACT_BUBBLED) and fpCommandEnabled then
+function reset_fp()
+    if sPlayerFirstPerson.enabled then
+        disable_fp()
         enable_fp()
-        gLakituState.yaw = m.faceAngle.y - 0x8000
-    end
-
-    if gGlobalSyncTable.bhop == false then return end
-    if firstPerson and m.forwardVel > 20 and (m.action & ACT_FLAG_AIR) ~= 0 then
-        bhGain = bhGain + 0.12
-    end
-    bhTimer = 0
-end
-
---- @param m MarioState
-function mario_before_phys_step(m)
-    if m.playerIndex ~= 0 then return end
-    if gGlobalSyncTable.bhop == false then return end
-    if firstPerson then
-        -- if bhGain >= 1.2 then m.faceAngle.y = m.intendedYaw end
-
-        -- auto bh
-        if gGlobalSyncTable.autoBh and (m.flags & MARIO_WING_CAP) == 0 then
-            if (m.controller.buttonDown & A_BUTTON) ~= 0 and (m.action & ACT_GROUP_MASK) == ACT_GROUP_MOVING then
-                m.vel.y = STATIC_JUMP_HEIGHT
-                set_mario_action(m, ACT_STATIC_JUMP, 0)
-            end
-        end
-
-        if m.forwardVel <= 0 then bhGain = 1 end
-
-        if (m.action & ACT_FLAG_AIR) ~= 0 or (m.action & ACT_FLAG_MOVING) ~= 0 then
-            m.vel.x = m.vel.x * bhGain
-            m.vel.z = m.vel.z * bhGain
-        end
-    end
-end
-
---- @param m MarioState
-function before_mario_update(m)
-    if m.playerIndex ~= 0 then return end
-    if gGlobalSyncTable.bhop == false then return end
-    if firstPerson == false then return end
-
-    if m.action == ACT_JUMP and (m.flags & MARIO_WING_CAP) == 0 then
-        m.vel.y = STATIC_JUMP_HEIGHT
-        set_mario_action(m, ACT_STATIC_JUMP, 0)
-    end
-    if m.action == ACT_DOUBLE_JUMP and (m.flags & MARIO_WING_CAP) == 0 then
-        m.vel.y = STATIC_JUMP_HEIGHT
-        set_mario_action(m, ACT_STATIC_JUMP, 0)
     end
 end
 
@@ -239,19 +149,105 @@ function act_static_jump(m)
     return false
 end
 
+bhGain = 1
+bhTimer = 0
 --- @param m MarioState
-function on_player_disconnected(m)
+function mario_update(m)
     if m.playerIndex == 0 then
-        disable_fp()
+        -- first person
+        if sPlayerFirstPerson.enabled then
+            gLakituState.mode = CAMERA_MODE_FREE_ROAM
+            gLakituState.defMode = CAMERA_MODE_FREE_ROAM
+        elseif camera_config_is_free_cam_enabled() then
+            gLakituState.mode = CAMERA_MODE_NEWCAM
+            gLakituState.defMode = CAMERA_MODE_NEWCAM
+        elseif gLakituState.mode == CAMERA_MODE_NEWCAM or gLakituState.defMode == CAMERA_MODE_NEWCAM then
+            gLakituState.mode = CAMERA_MODE_FREE_ROAM
+            gLakituState.defMode = CAMERA_MODE_FREE_ROAM
+        end
+
+        -- secondary
+        if not sPlayerFirstPerson.enabled then
+            if not camera_config_is_mouse_look_enabled() then
+                djui_hud_set_mouse_locked(false)
+                bhGain = 1
+            end
+        else
+            handle_fp(m)
+        end
     end
+end
+
+--- @param m MarioState
+function on_set_mario_action(m)
+    if m.playerIndex ~= 0 then return end
+    if (m.prevAction == ACT_IN_CANNON or m.prevAction == ACT_BUBBLED or (m.prevAction & ACT_GROUP_MASK) == ACT_GROUP_CUTSCENE) and fpCommandEnabled then
+        enable_fp()
+    end
+
+    if gGlobalSyncTable.bhop == false then return end
+    if sPlayerFirstPerson.enabled and m.forwardVel > 20 and (m.action & ACT_FLAG_AIR) ~= 0 then
+        bhGain = bhGain + 0.12
+    end
+    bhTimer = 0
+end
+
+--- @param m MarioState
+function mario_before_phys_step(m)
+    if m.playerIndex ~= 0 then return end
+    if gGlobalSyncTable.bhop == false then return end
+    if sPlayerFirstPerson.enabled then
+        -- auto bh
+        if gGlobalSyncTable.autoBh and (m.flags & MARIO_WING_CAP) == 0 and mario_floor_is_steep(m) == 0 then
+            if (m.controller.buttonDown & A_BUTTON) ~= 0 and (m.action & ACT_GROUP_MASK) == ACT_GROUP_MOVING then
+                m.vel.y = STATIC_JUMP_HEIGHT
+                set_mario_action(m, ACT_STATIC_JUMP, 0)
+            end
+        end
+
+        if m.forwardVel <= 0 then bhGain = 1 end
+        if bhGain > 1.2 then m.faceAngle.y = sPlayerFirstPerson.yaw + 0x8000 end
+
+        if (m.action & ACT_FLAG_AIR) ~= 0 or (m.action & ACT_FLAG_MOVING) ~= 0 then
+            m.vel.x = m.vel.x * bhGain
+            m.vel.z = m.vel.z * bhGain
+        end
+    end
+end
+
+--- @param m MarioState
+function before_mario_update(m)
+    if m.playerIndex ~= 0 then return end
+    if m.action == ACT_IN_CANNON or
+    m.action == ACT_BUBBLED or
+    m.action == ACT_READING_AUTOMATIC_DIALOG or
+    m.action == ACT_READING_NPC_DIALOG then disable_fp() end
+    if gGlobalSyncTable.bhop == false then return end
+    if not sPlayerFirstPerson.enabled then return end
+
+    if m.action == ACT_JUMP and (m.flags & MARIO_WING_CAP) == 0 then
+        m.vel.y = STATIC_JUMP_HEIGHT
+        set_mario_action(m, ACT_STATIC_JUMP, 0)
+    end
+    if m.action == ACT_DOUBLE_JUMP and (m.flags & MARIO_WING_CAP) == 0 then
+        m.vel.y = STATIC_JUMP_HEIGHT
+        set_mario_action(m, ACT_STATIC_JUMP, 0)
+    end
+end
+
+function on_warp()
+    reset_fp()
+    if sPlayerFirstPerson.enabled then
+        gLakituState.yaw = gMarioStates[0].faceAngle.y + 0x8000
+    end
+    yOffset = 0
+    totwcTimer = 0
 end
 
 hook_mario_action(ACT_STATIC_JUMP, act_static_jump)
 
-hook_event(HOOK_ON_LEVEL_INIT, on_level_init)
+hook_event(HOOK_MARIO_UPDATE, mario_update)
 hook_event(HOOK_ON_SET_MARIO_ACTION, on_set_mario_action)
 hook_event(HOOK_BEFORE_PHYS_STEP, mario_before_phys_step)
 hook_event(HOOK_BEFORE_MARIO_UPDATE, before_mario_update)
-
-hook_on_sync_table_change(gPlayerSyncTable[0], "metalCap", 0, on_arm_changed)
-hook_on_sync_table_change(gPlayerSyncTable[0], "modelId", 0, on_arm_changed)
+hook_event(HOOK_ON_WARP, on_warp)

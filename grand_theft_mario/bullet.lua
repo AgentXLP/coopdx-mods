@@ -9,7 +9,6 @@ define_custom_obj_fields({
 function bhv_bullet_init(o)
     obj_set_billboard(o)
     o.oFlags = OBJ_FLAG_UPDATE_GFX_POS_AND_ANGLE
-    obj_set_billboard(o)
 
     o.oIntangibleTimer = 2
     o.oInteractType = INTERACT_DAMAGE
@@ -29,8 +28,8 @@ function bhv_bullet_init(o)
 
     o.oBulletTimer = 100 -- time until bullet despawns
 
-    local i = network_local_index_from_global(o.oGunOwner)
-    audio_sample_play(gunTable[gPlayerSyncTable[i].gun].shootSound, gMarioStates[i].pos, 0.5)
+    local i = network_local_index_from_global(o.oBulletOwner)
+    audio_sample_play(weaponTable[gPlayerSyncTable[i].weapon].shootSound, gMarioStates[i].pos, 0.5)
 
     network_init_object(o, true, { "oBulletOwner" })
 end
@@ -105,9 +104,13 @@ function bhv_bullet_loop(o)
         bullet_hit(o)
     end
 
-    -- if is_point_within_radius_of_mario((o.header.gfx.prevPos.x + o.oPosX) / 2, o.oPosY, (o.header.gfx.prevPos.z + o.oPosZ) / 2, 3) then
-    --     o.oPosX = (o.header.gfx.prevPos.x + o.oPosX) / 2
-    --     o.oPosZ = (o.header.gfx.prevPos.z + o.oPosZ) / 2
+    -- local i = network_local_index_from_global(o.oBulletOwner)
+    -- local m = gMarioStates[i]
+    -- if i == 0 and obj_has_model_extended(o, weaponTable[gPlayerSyncTable[i].weapon].bullet) and ((m.action & ACT_FLAG_AIR) == 0 or m.action == ACT_STATIC_JUMP) and o.oPosY < o.oFloorHeight + 60 then
+    --     set_mario_action(m, ACT_FREEFALL, 0)
+    --     m.faceAngle.y = m.intendedYaw
+    --     m.vel.y = m.vel.y + 60
+    --     m.forwardVel = m.forwardVel * 2
     -- end
 
     if o.oTimer > 150 then

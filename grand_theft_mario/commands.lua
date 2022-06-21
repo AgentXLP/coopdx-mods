@@ -36,12 +36,11 @@ function on_kill_command()
 end
 
 function on_reload_command()
-    local m = gMarioStates[0]
-    if get_ammo(m) == gunTable[gPlayerSyncTable[0].gun].maxAmmo then
+    if get_ammo() == weaponTable[gPlayerSyncTable[0].weapon].maxAmmo then
         return true
     end
-    reloadTimer = reloadTimer - get_ammo(m)
-    set_ammo(m, 0)
+    reloadTimer = reloadTimer - get_ammo()
+    set_ammo(0)
     return true
 end
 
@@ -76,9 +75,9 @@ function on_fp_command(msg)
         if notified == false then
             notified = true
             djui_popup_create("\
-GTM - \\#1000ff\\First Person Testing Initiative\
+Gun Mod - \\#1000ff\\First Person Testing Initiative\
 \
-\\#ffffff\\Welcome to the \\#ffff00\\W.I.P\\#ffffff\\ first person camera system for GTM.\
+\\#ffffff\\Welcome to the \\#ffff00\\W.I.P\\#ffffff\\ first person camera system.\
 \\#ffff00\\Ensure free camera is disabled before playing.\\#ffffff\\\
 \
 You can use the mouse for camera movement as well as the right stick and rebind the keyboard controls to your liking as well.\
@@ -120,26 +119,6 @@ function on_bhop_command(msg)
     return true
 end
 
-function on_sensitivity_command(msg)
-    if tonumber(msg) then
-        djui_chat_message_create("Sensitivity set to " .. msg)
-        sensitivity = tonumber(msg)
-    else
-        djui_chat_message_create("\\#ff0000\\Failed to set sensitivity to " .. msg)
-    end
-    return true
-end
-
-function on_sensitivity_y_command(msg)
-    if tonumber(msg) then
-        djui_chat_message_create("Y sensitivity set to " .. msg)
-        sensitivityY = tonumber(msg)
-    else
-        djui_chat_message_create("\\#ff0000\\Failed to set Y sensitivity to " .. msg)
-    end
-    return true
-end
-
 function on_fov_command(msg)
     if tonumber(msg) then
         djui_chat_message_create("FOV set to " .. msg)
@@ -158,6 +137,4 @@ hook_chat_command("gordon", "[on|off] become Freeman, default is \\#FF0000\\OFF"
 hook_chat_command("fp","[on|off] turn first person mode on or off, default is \\#FF0000\\OFF", on_fp_command)
 hook_chat_command("bhop", "[on|off] turn bunny hop on or off, default is \\#00ff00\\ON", on_bhop_command)
 hook_chat_command("bhop_auto", "[on|off] turn auto bhop (hold down A) on or off, default is \\#00ff00\\ON", on_bhop_auto_command)
-hook_chat_command("sensitivity", "[number] set your sensitivity to a new value, default is \\#ffff00\\5", on_sensitivity_command)
-hook_chat_command("sensitivity_y", "[number] set your Y sensitivity to a new value, default is \\#ffff00\\1", on_sensitivity_y_command)
 hook_chat_command("fov", "[number (1-90 preferrably)] set your FOV to a new value, default is \\#ffff00\\0 (no override)", on_fov_command)
