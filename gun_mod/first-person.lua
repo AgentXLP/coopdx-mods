@@ -34,6 +34,12 @@ function update_fp_camera(m)
         disable_fp()
         return
     end
+    
+    --update the camera yaw to mario's if the player does a wallkick
+    if m.action == ACT_WALL_KICK_AIR then
+        sPlayerFirstPerson.yaw = m.faceAngle.y + 0x8000
+    end
+
 
     -- update pitch
     sPlayerFirstPerson.pitch = sPlayerFirstPerson.pitch - sensY * (invY * m.controller.extStickY - 1.5 * djui_hud_get_raw_mouse_y())
