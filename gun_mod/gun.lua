@@ -93,7 +93,6 @@ function active_player(m)
     return is_player_active(m)
 end
 
--- GUN OBJECT --
 
 --- @param o Object
 function bhv_gun_init(o)

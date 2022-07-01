@@ -1,6 +1,6 @@
--- name: Gun Mod
+-- name: \\#ff7f00\\Gun Mod
 -- incompatible: weapon
--- description: Gun Mod v2.0.1\nBy \\#ff7f00\\Agent X\\#ffffff\\\n\nThis mod adds guns to sm64ex-coop. You can give yourself a gun and shoot it by pressing [\\#3040ff\\Y\\#ffffff\\] and swap between the PISTOL and the magnum with DPad Up.
+-- description: Gun Mod v2.0.3\nBy \\#ff7f00\\Agent X\\#ffffff\\\n\nThis mod adds guns to sm64ex-coop. You can give yourself a gun and shoot it by pressing [\\#3040ff\\Y\\#ffffff\\] and swap between the PISTOL and the magnum with DPad Up.
 
 sPlayerFirstPerson = { enabled = false, freecam = camera_config_is_free_cam_enabled(), pitch = 0, yaw = 0 }
 
@@ -22,6 +22,10 @@ function warp(level, area)
     on_warp()
 end
 
+function in_bm()
+    return gMarioStates[0].currLevelNum == LEVEL_BM and find_object_with_behavior(get_behavior_from_id(id_bhvLaunchpad)) ~= nil
+end
+
 E_MODEL_CORPSE = smlua_model_util_get_id("skeleton_geo")
 
 reloadTimer = 75 -- default value
@@ -31,7 +35,7 @@ local localWeapon = gPlayerSyncTable[0].weapon
 --- @param m MarioState
 function mario_update_local(m)
     localWeapon = gPlayerSyncTable[0].weapon
-    if showTitle and gNetworkPlayers[0].currLevelNum == LEVEL_BM then return end
+    if showTitle and in_bm() then return end
 
     if gun ~= nil then
         if m.health <= 0xff or m.action == ACT_IN_CANNON or m.action == ACT_DISAPPEARED then
@@ -159,14 +163,14 @@ function on_player_connected(m)
 end
 
 function on_warp()
-    if gNetworkPlayers[0].currLevelNum == LEVEL_BM then gMarioStates[0].health = 0x880 end -- fail safe
     despawn_weapon()
     if gGlobalSyncTable.warpAmmo then
         set_ammo(weaponTable[localWeapon].maxAmmo)
     end
 
-    if gNetworkPlayers[0].currLevelNum == LEVEL_BM then
+    if in_bm() then
         local m = gMarioStates[0]
+        m.health = 0x880 -- fail safe
         m.flags = m.flags & ~(MARIO_VANISH_CAP | MARIO_METAL_CAP | MARIO_WING_CAP)
         if (m.flags & (MARIO_NORMAL_CAP | MARIO_VANISH_CAP | MARIO_METAL_CAP | MARIO_WING_CAP)) == 0 then
             m.flags = m.flags ~MARIO_CAP_ON_HEAD

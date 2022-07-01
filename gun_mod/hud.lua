@@ -7,7 +7,7 @@ function on_hud_render()
 
     local localWeapon = gPlayerSyncTable[0].weapon
 
-    if gun ~= nil and weaponTable[localWeapon].gun and gNetworkPlayers[0].currLevelNum ~= LEVEL_BM then
+    if gun ~= nil and weaponTable[localWeapon].gun and not in_bm() then
         -- set text
         local text = tostring(get_ammo()) .. "/" .. tostring(weaponTable[localWeapon].maxAmmo)
 
@@ -48,13 +48,13 @@ function on_hud_render()
         djui_hud_render_texture(get_texture_info(weaponTable[localWeapon].vmodel), x, 58 + 1.4 * math.sin(timer), scale, scale)
         djui_hud_render_texture(get_texture_info(weaponTable[localWeapon].arm), x, 58 + 1.4 * math.sin(timer), scale, scale)
         -- society if you could set djui render order
-        if gNetworkPlayers[0].currLevelNum ~= LEVEL_BM then
+        if not in_bm() then
             djui_hud_render_texture(gTextures.lakitu, djui_hud_get_screen_width() - 38, 205, 1, 1)
             djui_hud_render_texture(gTextures.camera, djui_hud_get_screen_width() - 54, 205, 1, 1)
         end
         djui_hud_set_resolution(RESOLUTION_DJUI)
 
-        if gNetworkPlayers[0].currLevelNum == LEVEL_BM then
+        if in_bm() then
             djui_hud_set_color(255, 160, 0, 120)
             if health <= 25 then
                 djui_hud_set_color(255, 0, 0, 120)
@@ -82,7 +82,7 @@ function on_hud_render()
         end
     end
 
-    if showTitle and gNetworkPlayers[0].currLevelNum == LEVEL_BM then
+    if showTitle and in_bm() then
         local m = gMarioStates[0]
         set_mario_action(m, ACT_FREEFALL, 0)
         m.health = 0x880
@@ -113,7 +113,7 @@ function on_hud_render()
 end
 
 function on_warp()
-    if gNetworkPlayers[0].currLevelNum == LEVEL_BM then hud_hide() else hud_show() end
+    if in_bm() then hud_hide() else hud_show() end
 end
 
 hook_event(HOOK_ON_HUD_RENDER, on_hud_render)
