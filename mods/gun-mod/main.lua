@@ -1,6 +1,6 @@
--- name: \\#ff7f00\\Gun Mod
+-- name: Gun Mod
 -- incompatible: weapon
--- description: Gun Mod v2.0.3\nBy \\#ff7f00\\Agent X\\#ffffff\\\n\nThis mod adds guns to sm64ex-coop. You can give yourself a gun and shoot it by pressing [\\#3040ff\\Y\\#ffffff\\] and swap between the PISTOL and the magnum with DPad Up.
+-- description: Gun Mod v2.0.3\nBy \\#ff7f00\\Agent X\\#ffffff\\\n\nThis mod adds guns to sm64ex-coop. You will automatically obtain a gun, shoot it by pressing [\\#3040ff\\Y\\#ffffff\\] and swap between the pistol and the magnum with DPad Up.
 
 sPlayerFirstPerson = { enabled = false, freecam = camera_config_is_free_cam_enabled(), pitch = 0, yaw = 0 }
 
@@ -23,7 +23,7 @@ function warp(level, area)
 end
 
 function in_bm()
-    return gMarioStates[0].currLevelNum == LEVEL_BM and find_object_with_behavior(get_behavior_from_id(id_bhvLaunchpad)) ~= nil
+    return gNetworkPlayers[0].currLevelNum == LEVEL_BM and find_object_with_behavior(get_behavior_from_id(id_bhvLaunchpad)) ~= nil
 end
 
 E_MODEL_CORPSE = smlua_model_util_get_id("skeleton_geo")
