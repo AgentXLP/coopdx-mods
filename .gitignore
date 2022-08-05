@@ -1,0 +1,8 @@
+dynos
+tmp
+*_skybox.c
+*log.txt
+*.cache
+sm64_save_file.bin
+sm64config.txt
+.vscode
