@@ -190,6 +190,8 @@ function on_set_mario_action(m)
         bhGain = bhGain + 0.12
     end
     bhTimer = 0
+
+    if m.action == ACT_WALL_KICK_AIR then sPlayerFirstPerson.yaw = m.faceAngle.y + 0x8000 end -- PR by Bloxxel
 end
 
 --- @param m MarioState
