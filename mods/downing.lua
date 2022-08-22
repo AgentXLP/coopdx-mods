@@ -1,5 +1,5 @@
 -- name: Downing
--- description: Downing\nBy \\#ff7f00\\Agent X\\#ffffff\\\n\nThis mod adds an incapacitation system where if you're killed in normal gameplay by fall damage or anything of\nthat nature you can be rescued by other players from death.\nBecause of obvious reasons, this mod only works in multiplayer and replaces bubbles.
+-- description: Downing\nBy \\#ec7731\\Agent X\\#ffffff\\\n\nThis mod adds an incapacitation system where if you're killed in normal gameplay by fall damage or anything of\nthat nature you can be rescued by other players from death.\nBecause of obvious reasons, this mod only works in multiplayer and replaces bubbles.
 
 gGlobalTimer = 0
 gGlobalSyncTable.downing = true
