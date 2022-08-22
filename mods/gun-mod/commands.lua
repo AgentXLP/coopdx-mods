@@ -129,12 +129,12 @@ function on_fov_command(msg)
     return true
 end
 
-hook_chat_command("inf_ammo", "[on|off] turn infinite ammo on or off, default is \\#00ff00\\ON", on_inf_ammo_command)
-hook_chat_command("warp_ammo", "[on|off] turn ammo regeneration on warp on or off, default is \\#00ff00\\ON", on_warp_ammo_command)
+hook_chat_command("inf_ammo", "[on|off] to turn infinite ammo on or off, default is \\#00ff00\\ON", on_inf_ammo_command)
+hook_chat_command("warp_ammo", "[on|off] to turn ammo regeneration on warp on or off, default is \\#00ff00\\ON", on_warp_ammo_command)
 hook_chat_command("kill", "to set your health 0", on_kill_command)
 hook_chat_command("reload", "to reload your gun", on_reload_command)
 hook_chat_command("gordon", "[on|off] become Freeman, default is \\#FF0000\\OFF", on_gordon_command)
-hook_chat_command("fp","[on|off] turn first person mode on or off, default is \\#FF0000\\OFF", on_fp_command)
-hook_chat_command("bhop", "[on|off] turn bunny hop on or off, default is \\#00ff00\\ON", on_bhop_command)
-hook_chat_command("bhop_auto", "[on|off] turn auto bhop (hold down A) on or off, default is \\#00ff00\\ON", on_bhop_auto_command)
-hook_chat_command("fov", "[number (1-90 preferrably)] set your FOV to a new value, default is \\#ffff00\\0 (no override)", on_fov_command)
+hook_chat_command("fp","[on|off] to turn first person mode on or off, default is \\#FF0000\\OFF", on_fp_command)
+hook_chat_command("bhop", "[on|off] to turn bunny hop on or off, default is \\#00ff00\\ON", on_bhop_command)
+hook_chat_command("bhop_auto", "[on|off] to turn auto bhop (hold down A) on or off, default is \\#00ff00\\ON", on_bhop_auto_command)
+hook_chat_command("fov", "[number (1-90 preferably)] to set your FOV to a new value, default is \\#ffff00\\0 (no override)", on_fov_command)
