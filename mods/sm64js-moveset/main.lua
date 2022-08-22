@@ -1,6 +1,6 @@
 -- name: sm64js Moveset
 -- incompatible: moveset
--- description: \\#ff0000\\sm64js Moveset\n\\#ffffff\\By \\#ff7f00\\Agent X\\#ffffff\\\n\nThis mod adds the sm64js moveset (ground pound jump, dive, ect) into sm64ex-coop.\n\nPress \\#3040ff\\[L]\\#ffffff\\ or \\#3040ff\\[X]\\#ffffff\\ to spawn yourself a kart or glider.
+-- description: \\#ff0000\\sm64js Moveset v1.0.1\n\\#ffffff\\By \\#ff7f00\\Agent X\\#ffffff\\\n\nThis mod adds the sm64js moveset (ground pound jump, dive, ect) into sm64ex-coop.\n\nPress \\#3040ff\\[L]\\#ffffff\\ or \\#3040ff\\[X]\\#ffffff\\ to spawn yourself a kart or glider.
 
 E_MODEL_GLIDER = smlua_model_util_get_id("glider_geo")
 
@@ -83,6 +83,16 @@ function mario_update(m)
             m.vel.y = 15
             mario_set_forward_vel(m, 30)
             set_mario_action(m, ACT_DIVE, 0)
+        end
+    elseif m.action == ACT_SHOT_FROM_CANNON then
+        if m.vel.y < 0 then
+            spawn_non_sync_object(
+                id_bhvWingCap,
+                E_MODEL_NONE,
+                m.pos.x + m.vel.x, m.pos.y + m.vel.y, m.pos.z + m.vel.z,
+                nil
+            )
+            set_mario_action(m, ACT_FLYING, 0)
         end
     end
 
