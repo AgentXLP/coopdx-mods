@@ -1,5 +1,5 @@
 # agent-ex-coop-mods
-This repo contains every sm64ex-coop mod I've made.
+This repo contains every sm64ex-coop mod I feel like making "public" here. (Nobody checks this repo anyway so if I dropped the coolest mod ever it would take like 6 months for someone to find it.)
 
 
 ## Grand Theft Mario - guns in sm64ex-coop
@@ -20,3 +20,21 @@ https://www.youtube.com/watch?v=b4xx_ZeL7do
 
 This gamemode revolves around getting the fastest time and getting to the top of the tower the fastest, you can view the scores with /scoreboard
 If you wish to play another gamemode on this map (e.g. manhunt / hide and seek) then run /ctt off on host.
+
+## Downing
+
+<img width="1532" alt="downing" src="https://user-images.githubusercontent.com/44549182/185983238-4a1acfe2-7954-4bc4-bad4-ffd8f3b8731d.png">
+
+This mod adds a Left 4 Dead like incapacitation system where instead of dying you will be incapacitated and someone has to come and revive you before you die, they can also continously bash you while incapacitated until you actually die. Incapacitation doesn't work over death planes, vertical wind, quicksand or lava for obvious reasons.
+
+## sm64js Moveset
+
+https://user-images.githubusercontent.com/44549182/185991038-8521e330-d85a-4110-a37b-4373baccb0e2.mp4
+
+This mod ports Mario's moveset from sm64js into sm64ex-coop. You can dive chain, ground pound jump, ground pound dive, glide and kart.
+
+## Pos Display
+
+<img width="600" alt="pos-display" src="https://user-images.githubusercontent.com/44549182/185991888-269d4823-1d33-4851-b01c-371d4bd967f9.png">
+
+This mod adds just a simple position display on the side of your screen, works with all resolutions.
