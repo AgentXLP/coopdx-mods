@@ -2,6 +2,6 @@ dynos
 tmp
 *log.txt
 *.cache
-sm64_save_file.bin
+sm64_save_file*
 sm64config.txt
 .vscode
