@@ -246,6 +246,7 @@ function on_warp()
     totwcTimer = 0
 end
 
+---@diagnostic disable-next-line: missing-parameter
 hook_mario_action(ACT_STATIC_JUMP, act_static_jump)
 
 hook_event(HOOK_MARIO_UPDATE, mario_update)

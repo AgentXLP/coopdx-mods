@@ -192,8 +192,8 @@ function on_sync_valid()
     end
 end
 
---- @param m MarioState
 SOUND_CUSTOM_DEATH = audio_sample_load("death.mp3")
+--- @param m MarioState
 function on_death(m)
     if m.playerIndex == 0 and m.floor.type ~= SURFACE_DEATH_PLANE then
         spawn_sync_object(

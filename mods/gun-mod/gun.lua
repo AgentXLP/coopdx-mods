@@ -179,11 +179,11 @@ function weapon_change(m, new)
     if gun == nil then
         return
     end
-    if gPlayerSyncTable[0].weapon == new and sPlayerFirstPerson.enabled then
-        deployHeight = deployMax
-    elseif sPlayerFirstPerson.enabled then
-        deployHeight = deployMin
-    end
+    -- if gPlayerSyncTable[0].weapon == new and sPlayerFirstPerson.enabled then
+    --     deployHeight = deployMax
+    -- elseif sPlayerFirstPerson.enabled then
+    --     deployHeight = deployMin
+    -- end
     gPlayerSyncTable[m.playerIndex].weapon = new
     local localWeapon = gPlayerSyncTable[m.playerIndex].weapon
     reloadTimer = weaponTable[localWeapon].reloadTime
