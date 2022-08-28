@@ -38,3 +38,10 @@ This mod ports Mario's moveset from sm64js into sm64ex-coop. You can dive chain,
 <img width="600" alt="pos-display" src="https://user-images.githubusercontent.com/44549182/185991888-269d4823-1d33-4851-b01c-371d4bd967f9.png">
 
 This mod adds just a simple position display on the side of your screen, works with all resolutions.
+
+## Nametags
+
+<img width="600" alt="nametags1" src="https://user-images.githubusercontent.com/44549182/187086954-d8e8ef14-5dad-48ac-8665-f73ca451c774.png">
+<img width="600" alt="nametags2" src="https://user-images.githubusercontent.com/44549182/187086960-135affa8-bfe0-48d4-8bd8-4cf77b3dbec4.png">
+
+This mod adds nametags to sm64ex-coop, a long awaited feature that will ultimately never be added.
