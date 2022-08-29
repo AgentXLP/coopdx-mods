@@ -1,6 +1,14 @@
 -- name: Nametags
 -- description: Nametags\nBy \\#ec7731\\Agent X\\#ffffff\\\n\nThis mod adds nametags to sm64ex-coop, a long awaited feature that will ultimately never be added.
 
+gGlobalSyncTable.nametags = true
+
+for k, v in pairs(gActiveMods) do
+    if v.enabled and (v.name:find("Hide")) then
+        gGlobalSyncTable.nametags = false
+    end
+end
+
 function clamp(x, a, b)
     if x < a then return a end
     if x > b then return b end
@@ -83,6 +91,8 @@ function hex_to_rgb(hex)
 end
 
 function on_hud_render()
+    if not gGlobalSyncTable.nametags then return end
+
     djui_hud_set_resolution(RESOLUTION_N64)
     djui_hud_set_font(FONT_NORMAL)
 
@@ -109,4 +119,19 @@ function on_hud_render()
     end
 end
 
+function on_nametags_command(msg)
+    if msg == "on" then
+        gGlobalSyncTable.nametags = true
+        djui_chat_message_create("Nametag status: \\#00ff00\\ON")
+    else
+        gGlobalSyncTable.nametags = false
+        djui_chat_message_create("Nametag status: \\#FF0000\\OFF")
+    end
+    return true
+end
+
 hook_event(HOOK_ON_HUD_RENDER, on_hud_render)
+
+if network_is_server() then
+    hook_chat_command("nametags", "[on|off] to turn nametags on or off, default is \\#00ff00\\ON", on_nametags_command)
+end
