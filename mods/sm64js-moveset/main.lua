@@ -1,6 +1,6 @@
 -- name: sm64js Moveset
 -- incompatible: moveset
--- description: \\#ff0000\\sm64js Moveset v1.0.1\n\\#ffffff\\By \\#ff7f00\\Agent X\\#ffffff\\\n\nThis mod adds the sm64js moveset (ground pound jump, dive, ect) into sm64ex-coop.\n\nPress \\#3040ff\\[L]\\#ffffff\\ or \\#3040ff\\[X]\\#ffffff\\ to spawn yourself a kart or glider.
+-- description: sm64js Moveset v1.0.1\n\\#ffffff\\By \\#ff7f00\\Agent X\\#ffffff\\\n\nThis mod adds the sm64js moveset (ground pound jump, dive, ect) into sm64ex-coop.\n\nPress \\#3040ff\\[L]\\#ffffff\\ or \\#3040ff\\[X]\\#ffffff\\ to spawn yourself a kart or glider.
 
 E_MODEL_GLIDER = smlua_model_util_get_id("glider_geo")
 
