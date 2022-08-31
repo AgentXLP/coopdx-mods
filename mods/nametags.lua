@@ -1,5 +1,7 @@
 -- name: Nametags
--- description: Nametags\nBy \\#ec7731\\Agent X\\#ffffff\\\n\nThis mod adds nametags to sm64ex-coop, a long awaited feature that will ultimately never be added.
+-- description: Nametags\nBy \\#ec7731\\Agent X\\#ffffff\\\n\nThis mod adds nametags to sm64ex-coop, this helps to indentify other players more easily without needing to open the player list or anything like that, nametags can toggled with /nametags [on|off]\n\nIf you have a color code in your name nametags will automatically change to that color, in case you want to have a custom nametag color.
+
+MAX_SCALE = 0.32
 
 gGlobalSyncTable.nametags = true
 
@@ -37,6 +39,11 @@ function active_player(m)
         return false
     end
     return is_player_active(m)
+end
+
+function if_then_else(cond, if_true, if_false)
+    if cond then return if_true end
+    return if_false
 end
 
 function djui_hud_set_adjusted_color(r, g, b, a)
@@ -90,30 +97,31 @@ function hex_to_rgb(hex)
     return { r = tonumber(hexTable[1], 16), g = tonumber(hexTable[2], 16), b = tonumber(hexTable[3], 16) }
 end
 
+showSelfTag = false
 function on_hud_render()
     if not gGlobalSyncTable.nametags then return end
 
     djui_hud_set_resolution(RESOLUTION_N64)
     djui_hud_set_font(FONT_NORMAL)
 
-    for i = 1, network_player_connected_count() - 1 do
+    for i = if_then_else(showSelfTag, 0, 1), network_player_connected_count() - 1 do
         local m = gMarioStates[i]
-        if dist_between_objects(gMarioStates[0].marioObj, m.marioObj) > 2000 then return end
         if active_player(m) then
+            if m.playerIndex == 0 and (m.input & INPUT_FIRST_PERSON) ~= 0 then return end
             local out = { x = 0, y = 0, z = 0 }
             local pos = { x = m.pos.x, y = m.marioBodyState.headPos.y + 120, z = m.pos.z }
             djui_hud_world_pos_to_screen_pos(pos, out)
 
-            local scale = 0.5
-            if m.playerIndex ~= 0 then
-                scale = 0.25
-                scale = scale + dist_between_objects(gMarioStates[0].marioObj, m.marioObj) / 3000
-                scale = clamp(1 - scale, 0, 0.5)
+            local scale = MAX_SCALE
+            if m.playerIndex ~= 0 and vec3f_dist(gMarioStates[0].pos, m.pos) > 1000 then
+                scale = 0.5
+                scale = scale + vec3f_dist(gMarioStates[0].pos, m.pos) / 6200
+                scale = clamp(1 - scale, 0, MAX_SCALE)
             end
             local info = name_and_hex(gNetworkPlayers[i].name)
             local color = { r = 162, g = 202, b = 234 }
             if info.color ~= "000000" then color = hex_to_rgb(info.color) end
-            local measure = djui_hud_measure_text(info.name) * 0.5 * scale
+            local measure = djui_hud_measure_text(info.name) * scale * 0.5
             djui_hud_print_outlined_text(info.name, out.x - measure, out.y, scale, color.r, color.g, color.b, 0.25)
         end
     end
@@ -130,8 +138,20 @@ function on_nametags_command(msg)
     return true
 end
 
+function on_show_self_tag_command(msg)
+    if msg == "on" then
+        showSelfTag = true
+        djui_chat_message_create("Show self tag status: \\#00ff00\\ON")
+    else
+        showSelfTag = false
+        djui_chat_message_create("Show self tag status: \\#FF0000\\OFF")
+    end
+    return true
+end
+
 hook_event(HOOK_ON_HUD_RENDER, on_hud_render)
 
 if network_is_server() then
     hook_chat_command("nametags", "[on|off] to turn nametags on or off, default is \\#00ff00\\ON", on_nametags_command)
 end
+hook_chat_command("show-self-tag", "[on|off] to turn your own nametag on or off, default is \\#ff0000\\OFF", on_show_self_tag_command)
