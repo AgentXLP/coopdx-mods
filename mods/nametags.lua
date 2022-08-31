@@ -1,9 +1,10 @@
 -- name: Nametags
--- description: Nametags\nBy \\#ec7731\\Agent X\\#ffffff\\\n\nThis mod adds nametags to sm64ex-coop, this helps to indentify other players more easily without needing to open the player list or anything like that, nametags can toggled with /nametags [on|off]\n\nIf you have a color code in your name nametags will automatically change to that color, in case you want to have a custom nametag color.
+-- description: Nametags\nBy \\#ec7731\\Agent X\\#ffffff\\\n\nThis mod adds nametags to sm64ex-coop, this helps to easily identify other players without the need of the player list, nametags can toggled with \\#ffff00\\/nametags [on|off]\\#ffffff\\\n\nIf you have a \\#ff0000\\c\\#ff7f00\\o\\#ffff00\\l\\#00ff00\\o\\#0000ff\\r\\#ffffff\\ code in your name nametags will automatically change to that color, in case you want to have a custom nametag color.
 
 MAX_SCALE = 0.32
 
 gGlobalSyncTable.nametags = true
+gGlobalSyncTable.dist = 7000
 
 for k, v in pairs(gActiveMods) do
     if v.enabled and (v.name:find("Hide")) then
@@ -115,7 +116,7 @@ function on_hud_render()
             local scale = MAX_SCALE
             if m.playerIndex ~= 0 and vec3f_dist(gMarioStates[0].pos, m.pos) > 1000 then
                 scale = 0.5
-                scale = scale + vec3f_dist(gMarioStates[0].pos, m.pos) / 6200
+                scale = scale + vec3f_dist(gMarioStates[0].pos, m.pos) / gGlobalSyncTable.dist
                 scale = clamp(1 - scale, 0, MAX_SCALE)
             end
             local info = name_and_hex(gNetworkPlayers[i].name)
@@ -138,13 +139,23 @@ function on_nametags_command(msg)
     return true
 end
 
-function on_show_self_tag_command(msg)
+function on_nametags_distance_command(msg)
+    if tonumber(msg) ~= nil then
+        djui_chat_message_create("Set distance to " .. msg)
+        gGlobalSyncTable.dist = tonumber(msg)
+    else
+        djui_chat_message_create("\\#ff0000\\Failed to set distance to " .. msg)
+    end
+    return true
+end
+
+function on_show_my_tag_command(msg)
     if msg == "on" then
         showSelfTag = true
-        djui_chat_message_create("Show self tag status: \\#00ff00\\ON")
+        djui_chat_message_create("Show my tag status: \\#00ff00\\ON")
     else
         showSelfTag = false
-        djui_chat_message_create("Show self tag status: \\#FF0000\\OFF")
+        djui_chat_message_create("Show my tag status: \\#FF0000\\OFF")
     end
     return true
 end
@@ -153,5 +164,6 @@ hook_event(HOOK_ON_HUD_RENDER, on_hud_render)
 
 if network_is_server() then
     hook_chat_command("nametags", "[on|off] to turn nametags on or off, default is \\#00ff00\\ON", on_nametags_command)
+    hook_chat_command("nametags-distance", "[number] set the distance at which nametags disappear, default is 7000", on_nametags_distance_command)
 end
-hook_chat_command("show-self-tag", "[on|off] to turn your own nametag on or off, default is \\#ff0000\\OFF", on_show_self_tag_command)
+hook_chat_command("show-my-tag", "[on|off] to turn your own nametag on or off, default is \\#ff0000\\OFF", on_show_my_tag_command)
