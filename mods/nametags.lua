@@ -1,5 +1,5 @@
 -- name: Nametags
--- description: Nametags\nBy \\#ec7731\\Agent X\\#ffffff\\\n\nThis mod adds nametags to sm64ex-coop, this helps to easily identify other players without the need of the player list, nametags can toggled with \\#ffff00\\/nametags [on|off]\\#ffffff\\\n\nIf you have a \\#ff0000\\c\\#ff7f00\\o\\#ffff00\\l\\#00ff00\\o\\#0000ff\\r\\#ffffff\\ code in your name nametags will automatically change to that color, in case you want to have a custom nametag color.
+-- description: Nametags\nBy \\#ec7731\\Agent X\\#ffffff\\\n\nThis mod adds nametags to sm64ex-coop, this helps to easily identify other players without the player list, nametags can toggled with \\#ffff00\\/nametags [on|off]\\#ffffff\\\n\nIf you have a \\#ff0000\\c\\#ff7f00\\o\\#ffff00\\l\\#00ff00\\o\\#0000ff\\r\\#ffffff\\ code in your name nametags will automatically change to that color.
 
 MAX_SCALE = 0.32
 
