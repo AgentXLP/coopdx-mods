@@ -9,7 +9,7 @@ gGlobalSyncTable.dist = 7000
 
 for k, v in pairs(gActiveMods) do
     local name = v.name:lower()
-    if v.enabled and (name:find("hide") or name:find("hns")) then
+    if v.enabled and (name:find("hide") or name:find("hns") or name:find("hunt")) then
         gGlobalSyncTable.nametags = false
     end
 end
