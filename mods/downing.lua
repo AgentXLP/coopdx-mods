@@ -126,6 +126,10 @@ end
 --- @param m MarioState
 function mario_update(m)
     if m.playerIndex ~= 0 then return end
+
+    local yoshi = obj_get_first_with_behavior_id(id_bhvYoshi)
+    if yoshi ~= nil then obj_mark_for_deletion(yoshi) end
+
     m.numLives = clamp(m.numLives, 0, 3)
 
     if can_be_downed(m) then down(m) end
@@ -183,7 +187,7 @@ function on_set_mario_action(m)
 
     if m.prevAction == ACT_DOWN and m.action == ACT_DOWN and can_be_downed(m) then
         gPlayerSyncTable[m.playerIndex].downHealth = gPlayerSyncTable[m.playerIndex].downHealth - 1
-        m.invincTimer = 80
+        m.invincTimer = 30
     end
 end
 
