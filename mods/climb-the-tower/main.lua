@@ -1,5 +1,5 @@
 -- name: Climb the Tower
--- incompatible: gamemode
+-- incompatible: gamemode romhack
 -- description: Climb the Tower v1.2\nBy: \\#ec7731\\Agent X\\#ffffff\\\n\nThis gamemode revolves around getting the fastest time and getting to the top of the tower the fastest, you can view the scores with /scoreboard\nIf you wish to play another gamemode on this map (e.g. manhunt / hide and seek) then run /ctt off on host.
 
 gGlobalSyncTable.gameEnabled = true
