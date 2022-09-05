@@ -4,7 +4,7 @@
 
 E_MODEL_GLIDER = smlua_model_util_get_id("glider_geo")
 
-_G.switch = function(param, case_table)
+function switch(param, case_table)
     local case = case_table[param]
     if case then return case() end
     local def = case_table['default']
