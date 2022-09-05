@@ -176,7 +176,7 @@ function on_hud_render()
             djui_hud_print_text(tostring(math.floor(gPlayerSyncTable[0].downHealth)), djui_hud_get_screen_width() * 0.53, 35, 1)
 
             djui_hud_set_color(0, 0, 0, lerp(255, 0, gPlayerSyncTable[0].downHealth / DOWN_MAX_HEALTH))
-            djui_hud_render_rect(0, 0, djui_hud_get_screen_width(), djui_hud_get_screen_height())
+            djui_hud_render_rect(0, 0, djui_hud_get_screen_width() + 2, djui_hud_get_screen_height() + 2)
         end
     end
 end
