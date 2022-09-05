@@ -102,7 +102,7 @@ end
 
 showSelfTag = false
 function on_hud_render()
-    if not gGlobalSyncTable.nametags then return end
+    if not gGlobalSyncTable.nametags or not gNetworkPlayers[0].currAreaSyncValid then return end
 
     djui_hud_set_resolution(RESOLUTION_N64)
     djui_hud_set_font(FONT_NORMAL)
