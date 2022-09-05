@@ -170,8 +170,6 @@ function mario_update(m)
         if m.action ~= _G.ACT_DOWN then play_character_sound(m, CHAR_SOUND_WAAAOOOW) end
     end
 
-    if (m.controller.buttonPressed & L_TRIG) ~= 0 then m.health = 383 end
-
     if m.action == _G.ACT_DOWN then network_player_set_description(gNetworkPlayers[0], "Down", 255, 0, 0, 255) else network_player_set_description(gNetworkPlayers[0], "", 255, 255, 255, 255) end
 
     if gGlobalSyncTable.customFallDamage then
