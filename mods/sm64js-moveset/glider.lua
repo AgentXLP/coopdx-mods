@@ -120,6 +120,5 @@ function act_gliding(m)
 
     set_camera_mode(m.area.camera, CAMERA_MODE_FREE_ROAM, 1)
 end
-
 ACT_GLIDING = allocate_mario_action(ACT_FLAG_AIR | 0x1100088C)
 glides = 2

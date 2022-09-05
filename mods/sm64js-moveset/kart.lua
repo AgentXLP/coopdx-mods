@@ -105,5 +105,4 @@ function act_karting(m)
     end
 	m.marioObj.header.gfx.pos.y = m.marioObj.header.gfx.pos.y + if_then_else(m.actionState == 1, 12, 24)
 end
-
 ACT_KARTING = allocate_mario_action(ACT_FLAG_ATTACKING | 0x10840452)
