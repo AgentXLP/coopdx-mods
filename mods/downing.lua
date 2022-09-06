@@ -8,15 +8,15 @@ end
 gGlobalSyncTable.downing = true
 gGlobalSyncTable.customFallDamage = false
 
-DOWNING_MIN_PLAYERS = 2
+DOWNING_MIN_PLAYERS = 1
 
 function check_for_mod(name, find)
     local has = false
-    for i in pairs(gActiveMods) do
+    for k, v in pairs(gActiveMods) do
         if find then
-            if gActiveMods[i].enabled and gActiveMods[i].name:find(name) then has = true end
+            if v.enabled and v.name:find(name) then has = true end
         else
-            if gActiveMods[i].enabled and gActiveMods[i].name == name then has = true end
+            if v.enabled and v.name == name then has = true end
         end
     end
     return has
@@ -60,6 +60,28 @@ function djui_hud_set_adjusted_color(r, g, b, a)
     djui_hud_set_color(r * multiplier, g * multiplier, b * multiplier, a)
 end
 
+function name_without_hex(name)
+    local nameTable = {}
+    name:gsub(".", function(c) table.insert(nameTable, c) end)
+
+    local removed = false
+    for k, v in pairs(nameTable) do
+        if v == "\\" and not removed then
+            removed = true
+            nameTable[k] = ""     -- \
+            nameTable[k + 1] = "" -- #
+            nameTable[k + 2] = "" -- f
+            nameTable[k + 3] = "" -- f
+            nameTable[k + 4] = "" -- f
+            nameTable[k + 5] = "" -- f
+            nameTable[k + 6] = "" -- f
+            nameTable[k + 7] = "" -- f
+            nameTable[k + 8] = "" -- \
+        end
+    end
+    return table.concat(nameTable, "")
+end
+
 l4dHud = check_for_mod("Left 4 Dead 2 HUD", false)
 
 --- @param m MarioState
@@ -88,7 +110,7 @@ end
 --- @param m MarioState
 function undown(m)
     m.health = 0x380
-    set_mario_action(m, ACT_STOP_CROUCHING, 0)
+    set_mario_action(m, ACT_IDLE, 0)
     m.invincTimer = 60
     gPlayerSyncTable[m.playerIndex].downHealth = 300
     play_character_sound(m, CHAR_SOUND_OKEY_DOKEY)
@@ -165,6 +187,8 @@ function mario_update(m)
 
     if m.playerIndex ~= 0 or network_player_connected_count() < DOWNING_MIN_PLAYERS then return end
 
+    if (m.controller.buttonPressed & L_TRIG) ~= 0 then m.health = 383 end
+
     if should_be_downed(m) then
         m.action = _G.ACT_DOWN
         if m.action ~= _G.ACT_DOWN then play_character_sound(m, CHAR_SOUND_WAAAOOOW) end
@@ -216,46 +240,77 @@ reviveTime = 210
 reviveTimer = reviveTime
 soundPlayed = false
 function on_hud_render()
-    djui_hud_set_resolution(RESOLUTION_DJUI)
-    djui_hud_set_font(FONT_MENU)
+    djui_hud_set_resolution(RESOLUTION_N64)
+    djui_hud_set_font(FONT_NORMAL)
+
+    local width = djui_hud_get_screen_width()
+    local height = djui_hud_get_screen_height()
 
     local m = gMarioStates[0]
+    if m.action == _G.ACT_DOWN and not l4dHud then
+        djui_hud_set_resolution(RESOLUTION_N64)
+        djui_hud_set_font(FONT_HUD)
+        djui_hud_set_adjusted_color(255, 255, 255, 255)
+        djui_hud_print_text(tostring(math.floor(gPlayerSyncTable[0].downHealth)), width * 0.53, 32, 1)
+    end
 
     local near = nearest_mario_state_to_object(m.marioObj)
     if near ~= nil and dist_between_objects(m.marioObj, near.marioObj) < 250 and near.action == _G.ACT_DOWN and m.action ~= _G.ACT_DOWN then
-
         if not soundPlayed then
             play_sound(SOUND_MENU_CHANGE_SELECT, m.marioObj.header.gfx.cameraToObject)
             soundPlayed = true
         end
-        local text = "[Z ] Revive"
-        local out = { x = 0, y = 0, z = 0 }
-        djui_hud_world_pos_to_screen_pos(near.pos, out)
-        djui_hud_set_adjusted_color(255, 255, 0, 255)
-        djui_hud_print_text(text, out.x - (djui_hud_measure_text(text) * 0.5), out.y, 1)
-        djui_hud_print_text(tostring(math.floor(reviveTimer / 30)), out.x, out.y + 50, 1)
+        if not (l4dHud and (m.controller.buttonDown & Z_TRIG) ~= 0) then
+            local text = "Help " .. name_without_hex(gNetworkPlayers[near.playerIndex].name) .. " up"
+            local out = { x = 0, y = 0, z = 0 }
+            djui_hud_world_pos_to_screen_pos(near.pos, out)
+            djui_hud_set_adjusted_color(0, 0, 0, 180)
+            djui_hud_print_text(text, out.x - (djui_hud_measure_text(text) * 0.5), out.y + 1, 0.5)
+            djui_hud_print_text(tostring(math.floor(reviveTimer / 30)), out.x - (djui_hud_measure_text(text) * 0.25), out.y + 13, 0.5)
+            djui_hud_set_adjusted_color(255, 255, 255, 255)
+            djui_hud_print_text(text, out.x - (djui_hud_measure_text(text) * 0.5), out.y, 0.5)
+            djui_hud_print_text(tostring(math.floor(reviveTimer / 30)), out.x - (djui_hud_measure_text(text) * 0.25), out.y + 12, 0.5)
+        end
         if (m.controller.buttonDown & Z_TRIG) ~= 0 then
-            if reviveTimer > 0 then reviveTimer = reviveTimer - 1
+            if reviveTimer > 0 then
+                reviveTimer = reviveTimer - 1
+                if l4dHud then
+                    width = (djui_hud_get_screen_width() * 0.5) + 3
+                    height = djui_hud_get_screen_height() * 0.5
+                    djui_hud_set_adjusted_color(77, 73, 79, 255)
+                    djui_hud_render_rect(width - 69, height - 18, 29, 29)
+                    djui_hud_render_rect(width - 41, height - 4, 118, 15)
+                    djui_hud_set_color(0, 0, 0, 255)
+                    djui_hud_render_rect(width - 68, height - 17, 27, 27)
+                    djui_hud_render_rect(width - 40, height - 3, 116, 13)
+                    -- text
+                    djui_hud_set_adjusted_color(255, 255, 255, 255)
+                    djui_hud_set_font(FONT_MENU)
+                    djui_hud_print_text("+", width - 67, height - 25, 0.6)
+                    djui_hud_set_font(FONT_NORMAL)
+                    djui_hud_set_color(0, 0, 0, 180)
+                    djui_hud_print_text("REVIVING PLAYER", width - 38, height - 20, 0.45)
+                    djui_hud_set_adjusted_color(255, 255, 255, 255)
+                    djui_hud_print_text("REVIVING PLAYER", width - 38, height - 21, 0.45)
+                    -- bar
+                    djui_hud_set_adjusted_color(221, 184, 64, 255)
+                    local fill = lerp(1.78, 0, (reviveTimer / reviveTime))
+                    djui_hud_render_texture(_G.l4dBarTexture, width - 39, height - 2, fill, 0.175)
+                end
             else
                 reviveTimer = reviveTime
                 network_send(true, { global = network_global_index_from_local(near.playerIndex) })
             end
-        else reviveTimer = reviveTime end
+        else
+            reviveTimer = reviveTime
+        end
     else
         soundPlayed = false
-        if m.action == _G.ACT_DOWN then
-            djui_hud_set_resolution(RESOLUTION_N64)
-            if not l4dHud then
-                djui_hud_set_font(FONT_HUD)
-                djui_hud_set_adjusted_color(255, 255, 255, 255)
-                djui_hud_print_text(tostring(math.floor(gPlayerSyncTable[0].downHealth)), djui_hud_get_screen_width() * 0.53, 35, 1)
-            end
-        end
     end
 
     if gPlayerSyncTable[0].downHealth ~= nil and gPlayerSyncTable[0].downHealth < 300 then
         djui_hud_set_color(0, 0, 0, lerp(255, 0, gPlayerSyncTable[0].downHealth / 300))
-        djui_hud_render_rect(0, 0, djui_hud_get_screen_width() + 2, djui_hud_get_screen_height() + 2)
+        djui_hud_render_rect(0, 0, width + 2, height + 2)
     end
 end
 
