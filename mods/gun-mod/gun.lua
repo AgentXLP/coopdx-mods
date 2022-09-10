@@ -171,6 +171,7 @@ function bhv_gun_loop(o)
     o.oFaceAngleYaw = m.faceAngle.y
     o.oFaceAngleRoll = 0
 end
+
 id_bhvGun = hook_behavior(nil, OBJ_LIST_GENACTOR, true, bhv_gun_init, bhv_gun_loop)
 
 local vgun = nil

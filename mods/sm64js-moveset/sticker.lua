@@ -27,6 +27,7 @@ function bhv_sticker_loop(o)
     o.oFaceAngleYaw = m.faceAngle.y
     o.oFaceAngleRoll = 0 -- m.marioObj.header.gfx.angle.z
 end
+
 id_bhvSticker = hook_behavior(nil, OBJ_LIST_GENACTOR, true, bhv_sticker_init, bhv_sticker_loop)
 
 --- @param m MarioState

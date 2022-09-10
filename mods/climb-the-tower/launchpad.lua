@@ -30,4 +30,5 @@ function bhv_launchpad_loop(o)
     end
     load_object_collision_model()
 end
+
 id_bhvLaunchpad = hook_behavior(nil, OBJ_LIST_SURFACE, true, bhv_launchpad_init, bhv_launchpad_loop)
