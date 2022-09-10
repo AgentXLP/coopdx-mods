@@ -21,4 +21,7 @@ This mod adds just a simple position display on the side of your screen, works w
 
 # Tree Billboard Fix
 
-TODO
+<img width="600" alt="not" src="https://user-images.githubusercontent.com/44549182/189467347-6a244e3d-9d6c-4e33-be71-65f84d47118c.png">
+<img width="600" alt="with" src="https://user-images.githubusercontent.com/44549182/189467349-4c6b2b66-72bf-46a1-a208-8d8ada12239c.png">
+
+In sm64ex, trees uses cylboard instead of billboard which makes them only rotate in relation the camera horizontally, this mod fixes that.
