@@ -1,4 +1,4 @@
 -- name: Islands
 -- incompatible: romhack
--- description: Just replaces Wing Mario Over the Rainbow with my own custom sunset themed map.\nBy \\#ff7f00\\Agent X\\#ffffff\\
+-- description: Islands\nBy \\#ff7f00\\Agent X\\#ffffff\\\n\nThis mod just replaces Wing Mario Over the Rainbow with my own custom sunset themed map.
 -- gLevelValues.entryLevel = LEVEL_WMOTR
