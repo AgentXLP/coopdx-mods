@@ -22,6 +22,10 @@ https://www.youtube.com/watch?v=b4xx_ZeL7do
 This gamemode revolves around getting the fastest time and getting to the top of the tower the fastest, you can view the scores with /scoreboard
 If you wish to play another gamemode on this map (e.g. manhunt / hide and seek) then run /ctt off on host.
 
+## Islands
+
+TODO
+
 ## Downing
 
 <img width="1532" alt="downing" src="https://user-images.githubusercontent.com/44549182/185983238-4a1acfe2-7954-4bc4-bad4-ffd8f3b8731d.png">
@@ -46,3 +50,11 @@ This mod adds just a simple position display on the side of your screen, works w
 <img width="600" alt="nametags2" src="https://user-images.githubusercontent.com/44549182/187086960-135affa8-bfe0-48d4-8bd8-4cf77b3dbec4.png">
 
 This mod adds nametags to sm64ex-coop, a long awaited feature of sm64ex-coop that (from what I know) will never officially get added.
+
+Left 4 Dead 2 HUD
+TODO
+
+Tree Billboard Fix
+TODO
+
+Mario Style TODO
