@@ -28,6 +28,7 @@ In sm64ex, trees uses cylboard instead of billboard which makes them only rotate
 
 ## Easy Ceiling Cling
 
-TODO IMAGES
+<img width="600" alt="ceilinghang" src="https://user-images.githubusercontent.com/44549182/189996063-4afe874f-ebad-495f-8b80-4801df90d1f6.png">
+<img width="600" alt="ceilinghang2" src="https://user-images.githubusercontent.com/44549182/189996076-aea3446b-a4d6-4320-a1ee-e2256615249a.png">
 
 This mod adds improved ceiling hang detection system so you can now begin clinging to ceiling from actions outside of just the single and double jump.
