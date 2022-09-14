@@ -1,5 +1,5 @@
 -- name: Downing
--- description: Downing\nBy \\#ec7731\\Agent X\\#ffffff\\\n\nThis mod adds an incapacitation system where if you're killed in normal gameplay by fall damage or anything of\nthat nature you can be rescued by other players from death.\nBecause of obvious reasons, this mod only works in multiplayer and replaces bubbles.
+-- description: Downing v2.0.1\nBy \\#ec7731\\Agent X\\#ffffff\\\n\nThis mod adds an incapacitation system where if you're killed in normal gameplay by fall damage or anything of\nthat nature you can be rescued by other players from death.\nBecause of obvious reasons, this mod only works in multiplayer and replaces bubbles.
 
 _G.downHealth = {}
 for i = 0, (MAX_PLAYERS - 1) do
@@ -12,6 +12,8 @@ PACKET_REVIVE = 0
 PACKET_POPUP = 1
 
 DOWNING_MIN_PLAYERS = 2
+
+gotUp = false
 
 function check_for_mod(name, find)
     local has = false
@@ -188,7 +190,7 @@ extraVel = 0
 function mario_update(m)
     _G.downHealth[m.playerIndex] = gPlayerSyncTable[m.playerIndex].downHealth
 
-    if should_be_downed(m) then
+    if should_be_downed(m) and not (m.playerIndex == 0 and not gotUp) then
         if m.action ~= _G.ACT_DOWN then play_character_sound(m, CHAR_SOUND_WAAAOOOW) end
         m.action = _G.ACT_DOWN
     end
@@ -196,6 +198,11 @@ function mario_update(m)
     if m.action == _G.ACT_DOWN then network_player_set_description(gNetworkPlayers[0], "Down", 255, 0, 0, 255) else network_player_set_description(gNetworkPlayers[0], "", 255, 255, 255, 255) end
 
     if m.playerIndex ~= 0 or network_player_connected_count() < DOWNING_MIN_PLAYERS then return end
+
+    if (m.action & ACT_GROUP_MASK) ~= ACT_GROUP_CUTSCENE then gotUp = true end
+
+    local heart = obj_get_nearest_object_with_behavior_id(m.marioObj, id_bhvRecoveryHeart)
+    if heart ~= nil and obj_check_if_collided_with_object(m.marioObj, heart) ~= 0 and gPlayerSyncTable[0].downHealth < 300 then undown(m) end
 
     if gGlobalSyncTable.customFallDamage then
         m.peakHeight = m.pos.y
@@ -325,12 +332,13 @@ function on_packet_receive(table)
     end
 end
 
-function on_warp()
-    gPlayerSyncTable[0].downHealth = 300
+function on_level_init()
+    if gPlayerSyncTable[0].downHealth ~= nil then gPlayerSyncTable[0].downHealth = 300 end
+    gotUp = false
 end
 
 function on_pause_exit()
-    if gMarioStates[0].action == _G.ACT_DOWN then return false end
+    if gPlayerSyncTable[0].downHealth < 300 then return false end
     return true
 end
 
@@ -355,7 +363,7 @@ hook_event(HOOK_ON_SET_MARIO_ACTION, on_set_mario_action)
 hook_event(HOOK_ON_PLAYER_CONNECTED, on_player_connected)
 hook_event(HOOK_ON_HUD_RENDER, on_hud_render)
 hook_event(HOOK_ON_PACKET_RECEIVE, on_packet_receive)
-hook_event(HOOK_ON_WARP, on_warp)
+hook_event(HOOK_ON_LEVEL_INIT, on_level_init)
 hook_event(HOOK_ON_PAUSE_EXIT, on_pause_exit)
 
 for i = 1, (MAX_PLAYERS - 1) do
