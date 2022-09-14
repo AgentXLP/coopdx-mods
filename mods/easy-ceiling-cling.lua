@@ -3,9 +3,8 @@
 
 --- @param m MarioState
 function before_phys_step(m)
-    if m.ceil ~= nil and m.ceil.type == SURFACE_HANGABLE and (m.action & ACT_FLAG_AIR) ~= 0 and m.action ~= ACT_DIVE and m.action ~= ACT_FLYING then
-        local ceilHeight = find_ceil_height(m.pos.x, m.pos.y, m.pos.z)
-        if m.pos.y + 180 > ceilHeight then
+    if m.ceil ~= nil and m.ceil.type == SURFACE_HANGABLE and (m.action == ACT_TRIPLE_JUMP or m.action == ACT_WALL_KICK_AIR) then
+        if m.pos.y + 180 > m.ceil.lowerY then
             set_mario_action(m, ACT_START_HANGING, 0)
         end
     end
