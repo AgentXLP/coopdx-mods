@@ -24,3 +24,5 @@ To download single file mods click on the link and then press the "Raw" button t
 [Pos Display](./mods/pos-display.lua)
 
 [Tree Billboard Fix](./mods/tree-billboard-fix.lua)
+
+[Easy Ceiling Cling](./mods/easy-ceiling-cling.lua)
