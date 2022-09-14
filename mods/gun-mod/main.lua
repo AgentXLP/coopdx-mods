@@ -214,8 +214,6 @@ hook_event(HOOK_ON_WARP, on_warp)
 hook_event(HOOK_ON_SYNC_VALID, on_sync_valid)
 hook_event(HOOK_ON_DEATH, on_death)
 
-smlua_text_utils_secret_star_replace(COURSE_VCUTM, "   BLACK MESA")
-
 gServerSettings.playerInteractions = 2
 gServerSettings.bubbleDeath = 0
 
