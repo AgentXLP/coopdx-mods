@@ -1,6 +1,6 @@
 -- name: Left 4 Dead 2 HUD
 -- incompatible: hud
--- description: Left 4 Dead 2 HUD\nBy \\#ec7731\\Agent X\\#ffffff\\\n\nThis mod adds the Left 4 Dead 2 HUD into sm64ex-coop with other players' health bars on the side too, you can cycle through them with DPad left and DPad right. This mod is fully cross compatible and fully integrated with Downing as well so players will show as\nincapacitated on their healthbars and everything else.\nIf SM64 health is off (by default it is) you can pick up 1 ups and use them\nas first aid kits to heal.
+-- description: Left 4 Dead 2 HUD\nBy \\#ec7731\\Agent X\\#ffffff\\\n\nThis mod adds the Left 4 Dead 2 HUD into sm64ex-coop with other health bars to the left too, you can cycle through them with DPad left and DPad right. This mod is fully cross compatible with Downing too meaning incapacitated players will also be accounted for.\nIf SM64 health is off (by default it is) you can pick up and use 1 ups as healing. Toggle SM64 health with\n\\#ffff00\\/sm64-health [on|off]
 
 gGlobalSyncTable.sm64Health = false
 

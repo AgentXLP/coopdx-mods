@@ -8,7 +8,10 @@ end
 gGlobalSyncTable.downing = true
 gGlobalSyncTable.customFallDamage = false
 
-DOWNING_MIN_PLAYERS = 1
+PACKET_REVIVE = 0
+PACKET_POPUP = 1
+
+DOWNING_MIN_PLAYERS = 2
 
 function check_for_mod(name, find)
     local has = false
@@ -185,16 +188,14 @@ extraVel = 0
 function mario_update(m)
     _G.downHealth[m.playerIndex] = gPlayerSyncTable[m.playerIndex].downHealth
 
-    if m.playerIndex ~= 0 or network_player_connected_count() < DOWNING_MIN_PLAYERS then return end
-
-    if (m.controller.buttonPressed & L_TRIG) ~= 0 then m.health = 383 end
-
     if should_be_downed(m) then
-        m.action = _G.ACT_DOWN
         if m.action ~= _G.ACT_DOWN then play_character_sound(m, CHAR_SOUND_WAAAOOOW) end
+        m.action = _G.ACT_DOWN
     end
 
     if m.action == _G.ACT_DOWN then network_player_set_description(gNetworkPlayers[0], "Down", 255, 0, 0, 255) else network_player_set_description(gNetworkPlayers[0], "", 255, 255, 255, 255) end
+
+    if m.playerIndex ~= 0 or network_player_connected_count() < DOWNING_MIN_PLAYERS then return end
 
     if gGlobalSyncTable.customFallDamage then
         m.peakHeight = m.pos.y
@@ -255,7 +256,7 @@ function on_hud_render()
     end
 
     local near = nearest_mario_state_to_object(m.marioObj)
-    if near ~= nil and dist_between_objects(m.marioObj, near.marioObj) < 250 and near.action == _G.ACT_DOWN and m.action ~= _G.ACT_DOWN then
+    if near ~= nil and dist_between_objects(m.marioObj, near.marioObj) < 250 and near.action == _G.ACT_DOWN and m.action ~= _G.ACT_DOWN and (m.action & ACT_GROUP_MASK) ~= ACT_GROUP_CUTSCENE then
         if not soundPlayed then
             play_sound(SOUND_MENU_CHANGE_SELECT, m.marioObj.header.gfx.cameraToObject)
             soundPlayed = true
@@ -299,7 +300,7 @@ function on_hud_render()
                 end
             else
                 reviveTimer = reviveTime
-                network_send(true, { global = network_global_index_from_local(near.playerIndex) })
+                network_send(true, { id = PACKET_REVIVE, global = network_global_index_from_local(near.playerIndex) })
             end
         else
             reviveTimer = reviveTime
@@ -317,11 +318,24 @@ end
 function on_packet_receive(table)
     local m = gMarioStates[0]
 
-    if network_global_index_from_local(m.playerIndex) == table.global then undown(m) end
+    if table.id == PACKET_REVIVE then
+        if network_global_index_from_local(m.playerIndex) == table.global then undown(m) end
+    elseif table.id == PACKET_POPUP then
+        djui_popup_create(table.msg, 1)
+    end
 end
 
 function on_warp()
     gPlayerSyncTable[0].downHealth = 300
+end
+
+function on_pause_exit()
+    if gMarioStates[0].action == _G.ACT_DOWN then return false end
+    return true
+end
+
+function on_downhealth_changed(tag, oldVal, newVal)
+    if oldVal == 300 and newVal ~= 300 then djui_popup_create(gNetworkPlayers[tag].name .. "\\#ffff00\\ is down!", 1) end
 end
 
 function on_custom_fall_damage_command(msg)
@@ -342,6 +356,11 @@ hook_event(HOOK_ON_PLAYER_CONNECTED, on_player_connected)
 hook_event(HOOK_ON_HUD_RENDER, on_hud_render)
 hook_event(HOOK_ON_PACKET_RECEIVE, on_packet_receive)
 hook_event(HOOK_ON_WARP, on_warp)
+hook_event(HOOK_ON_PAUSE_EXIT, on_pause_exit)
+
+for i = 1, (MAX_PLAYERS - 1) do
+    hook_on_sync_table_change(gPlayerSyncTable[i], "downHealth", i, on_downhealth_changed)
+end
 
 hook_mario_action(_G.ACT_DOWN, act_down, INTERACT_PLAYER)
 

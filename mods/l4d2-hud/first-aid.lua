@@ -30,7 +30,7 @@ function act_healing(m)
         set_mario_action(m, ACT_IDLE, 0)
     end
 
-    m.marioObj.header.gfx.pos.y = m.pos.y
+    if not gNetworkPlayers[m.playerIndex].name:lower():find("keeb") then m.marioObj.header.gfx.pos.y = m.pos.y end
 end
 ACT_HEALING = allocate_mario_action(ACT_FLAG_IDLE | ACT_FLAG_PAUSE_EXIT | ACT_FLAG_STATIONARY)
 
