@@ -1,6 +1,6 @@
 -- name: Nametags
 -- incompatible: nametags
--- description: Nametags\nBy \\#ec7731\\Agent X\\#ffffff\\\n\nThis mod adds nametags to sm64ex-coop, this helps to easily identify other players without the player list, nametags can toggled with \\#ffff00\\/nametags [on|off]\\#ffffff\\\n\nIf you have a \\#ff0000\\c\\#ff7f00\\o\\#ffff00\\l\\#00ff00\\o\\#0000ff\\r\\#ffffff\\ code in your name nametags will automatically change to that color too.
+-- description: Nametags\nBy \\#ec7731\\Agent X\\#ffffff\\\n\nThis mod adds nametags to sm64ex-coop, this helps to easily identify other players without the player list, nametags can toggled with \\#ffff00\\/nametags [on|off]\\#ffffff\\
 
 MAX_SCALE = 0.32
 
@@ -112,7 +112,7 @@ function on_hud_render()
         if active_player(m) ~= 0 then
             if m.playerIndex == 0 and (m.input & INPUT_FIRST_PERSON) ~= 0 then return end
             local out = { x = 0, y = 0, z = 0 }
-            local pos = { x = m.mariObj.header.gfx.pos.x, y = m.marioBodyState.headPos.y + 120, z = m.mariObj.header.gfx.pos.z }
+            local pos = { x = m.marioObj.header.gfx.pos.x, y = m.marioBodyState.headPos.y + 120, z = m.marioObj.header.gfx.pos.z }
             djui_hud_world_pos_to_screen_pos(pos, out)
 
             local scale = MAX_SCALE
@@ -123,7 +123,7 @@ function on_hud_render()
             end
             local info = name_and_hex(gNetworkPlayers[i].name)
             local color = { r = 162, g = 202, b = 234 }
-            if info.color ~= "000000" then color = hex_to_rgb(info.color) end
+            network_player_palette_to_color(gNetworkPlayers[i], SHIRT, color)
             local measure = djui_hud_measure_text(info.name) * scale * 0.5
             djui_hud_print_outlined_text(info.name, out.x - measure, out.y, scale, color.r, color.g, color.b, 0.25)
         end
@@ -136,7 +136,7 @@ function on_nametags_command(msg)
         djui_chat_message_create("Nametag status: \\#00ff00\\ON")
     else
         gGlobalSyncTable.nametags = false
-        djui_chat_message_create("Nametag status: \\#FF0000\\OFF")
+        djui_chat_message_create("Nametag status: \\#ff0000\\OFF")
     end
     return true
 end
@@ -157,7 +157,7 @@ function on_show_my_tag_command(msg)
         djui_chat_message_create("Show my tag status: \\#00ff00\\ON")
     else
         showSelfTag = false
-        djui_chat_message_create("Show my tag status: \\#FF0000\\OFF")
+        djui_chat_message_create("Show my tag status: \\#ff0000\\OFF")
     end
     return true
 end
