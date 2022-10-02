@@ -5,6 +5,7 @@
 gGlobalSyncTable.sm64Health = false
 
 _G.l4dBarTexture = get_texture_info("gradient")
+_G.l4dBoxTexture = get_texture_info("box")
 
 function check_for_mod(name, find)
     local has = false
@@ -45,22 +46,22 @@ end
 function active_player(m)
     local np = gNetworkPlayers[m.playerIndex]
     if m.playerIndex == 0 then
-        return true
+        return 1
     end
     if not np.connected then
-        return false
+        return 0
     end
     if np.currCourseNum ~= gNetworkPlayers[0].currCourseNum then
-        return false
+        return 0
     end
     if np.currActNum ~= gNetworkPlayers[0].currActNum then
-        return false
+        return 0
     end
     if np.currLevelNum ~= gNetworkPlayers[0].currLevelNum then
-        return false
+        return 0
     end
     if np.currAreaIndex ~= gNetworkPlayers[0].currAreaIndex then
-        return false
+        return 0
     end
     return is_player_active(m)
 end
@@ -92,6 +93,14 @@ function djui_hud_set_adjusted_color(r, g, b, a)
     if is_game_paused() then multiplier = 0.5 end
     djui_hud_set_color(r * multiplier, g * multiplier, b * multiplier, a)
 end
+
+gCharGlyphs = {
+    [CT_MARIO] = gTextures.mario_head,
+    [CT_LUIGI] = gTextures.luigi_head,
+    [CT_TOAD] = gTextures.toad_head,
+    [CT_WALUIGI] = gTextures.waluigi_head,
+    [CT_WARIO] = gTextures.wario_head
+}
 
 glyphs = {
     [CT_MARIO] = get_texture_info("mario"),
@@ -139,11 +148,15 @@ function render_health_bar(x, m, scale, name)
     else
         if m.health > 0xff then djui_hud_set_adjusted_color(255, 255, 255, 255)
         else djui_hud_set_adjusted_color(230, 0, 0, 255) end
-        djui_hud_render_texture(glyphs[m.character.type], x - (126.2 * scale), height - (33.6 * scale), 0.1 * scale, 0.1 * scale)
+        if gNetworkPlayers[0].name:find("Spoomples") then
+            djui_hud_render_texture(get_texture_info("pac"), x - (126.2 * scale), height - (33.6 * scale), 0.1 * scale, 0.1 * scale)
+        else
+            djui_hud_render_texture(glyphs[m.character.type], x - (126.2 * scale), height - (33.6 * scale), 0.1 * scale, 0.1 * scale)
+        end
     end
     -- health bar
-    local health = if_then_else(gGlobalSyncTable.sm64Health, math.floor(m.health / 272), math.floor(m.health / 21.72))
-    if not gGlobalSyncTable.sm64Health then health = math.floor(health - lerp(12, 0, (health / 100))) end
+    local health = if_then_else(gGlobalSyncTable.sm64Health, math.floor(m.health / 272), math.ceil(m.health / 21.72) - 1)
+    if not gGlobalSyncTable.sm64Health then health = math.ceil(health - lerp(13, 0, (health / 100))) end
 
     djui_hud_set_color(0, 0, 0, 255)
     djui_hud_render_rect(x - (99 * scale), height - (20 * scale), 96 * scale, 11.1 * scale)
@@ -170,8 +183,12 @@ function render_health_bar(x, m, scale, name)
         else
             djui_hud_print_text("+" .. health, x - (98.5 * scale), height - (37 * scale), 0.26 * scale)
         end
-    elseif not (downing and m.action == _G.ACT_DOWN) then
-        djui_hud_print_text("+" .. if_then_else(downing and m.action == _G.ACT_DOWN, _G.downHealth[m.playerIndex], health), x - (98.5 * scale), height - (37 * scale), 0.26 * scale)
+    else
+        if downing and m.action == _G.ACT_DOWN then
+            djui_hud_print_text("+" .. _G.downHealth[m.playerIndex], x - (98.5 * scale), height - (37 * scale), 0.26 * scale)
+        else
+            djui_hud_print_text("+" .. health, x - (98.5 * scale), height - (37 * scale), 0.26 * scale)
+        end
     end
     if name then
         djui_hud_set_font(FONT_NORMAL)
@@ -186,7 +203,7 @@ function render_info_box(y, glyph, info)
 
     local boxLeft = width - 55
     djui_hud_set_color(0, 0, 0, 150)
-    djui_hud_render_texture(get_texture_info("box"), boxLeft, height - y, 1.4, 1.06)
+    djui_hud_render_texture(_G.l4dBoxTexture, boxLeft, height - y, 1.4, 1.06)
     djui_hud_set_adjusted_color(255, 255, 255, 255)
     djui_hud_render_texture(glyph, boxLeft + 2, height - y + 1.5, 0.9, 0.9)
     djui_hud_set_font(FONT_NORMAL)
@@ -203,11 +220,12 @@ function on_hud_render()
     local height = djui_hud_get_screen_height() * 0.5
     -- health bars
     local m = gMarioStates[0]
+    m.health = clamp(m.health, 0xff, 0x880)
     render_health_bar(width, m, 1, false)
     local spot = 0
     local gActiveMarioStates = {}
     for i = 1, network_player_connected_count() - 1 do
-        if active_player(gMarioStates[i]) then table.insert(gActiveMarioStates, gMarioStates[i]) end
+        if active_player(gMarioStates[i]) ~= 0 then table.insert(gActiveMarioStates, gMarioStates[i]) end
     end
     if (m.controller.buttonPressed & R_JPAD) ~= 0 then offset = offset + 1 end
     if (m.controller.buttonPressed & L_JPAD) ~= 0 then offset = offset - 1 end
@@ -222,7 +240,7 @@ function on_hud_render()
     -- side bar
     render_info_box(42, gTextures.star,   tostring("x" .. hud_get_value(HUD_DISPLAY_STARS)))
     render_info_box(21, gTextures.coin,   tostring("x" .. hud_get_value(HUD_DISPLAY_COINS)))
-    render_info_box(0,  get_texture_info("1up"), tostring("x" .. hud_get_value(HUD_DISPLAY_LIVES)))
+    render_info_box(0,  gCharGlyphs[m.character.type], tostring("x" .. hud_get_value(HUD_DISPLAY_LIVES)))
     -- first aid
     if not gGlobalSyncTable.sm64Health then
         local boxLeft = width - 27
@@ -259,6 +277,7 @@ function on_hud_render()
     end
 end
 
+
 function on_sm64_health_command(msg)
     if msg == "on" then
         gGlobalSyncTable.sm64Health = true
@@ -274,6 +293,7 @@ function on_sm64_health_changed(tag, oldVal, newVal)
     if newVal and gPlayerSyncTable[0].firstAid then
         local m = gMarioStates[0]
         m.numLives = m.numLives + 1
+        play_sound(SOUND_GENERAL_COLLECT_1UP, m.marioObj.header.gfx.cameraToObject)
         gPlayerSyncTable[0].firstAid = false
     end
 end
