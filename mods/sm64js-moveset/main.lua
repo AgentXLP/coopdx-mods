@@ -31,30 +31,6 @@ function approach_number(current, target, inc, dec)
     return current
 end
 
---- @param m MarioState
-function active_player(m)
-    local np = gNetworkPlayers[m.playerIndex]
-    if m.playerIndex == 0 then
-        return true
-    end
-    if not np.connected then
-        return false
-    end
-    if np.currCourseNum ~= gNetworkPlayers[0].currCourseNum then
-        return false
-    end
-    if np.currActNum ~= gNetworkPlayers[0].currActNum then
-        return false
-    end
-    if np.currLevelNum ~= gNetworkPlayers[0].currLevelNum then
-        return false
-    end
-    if np.currAreaIndex ~= gNetworkPlayers[0].currAreaIndex then
-        return false
-    end
-    return is_player_active(m)
-end
-
 CUSTOM_BUTTON = L_TRIG | X_BUTTON
 
 kartGliderCooldown = 0

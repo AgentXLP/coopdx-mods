@@ -99,6 +99,7 @@ function on_hud_render()
     djui_hud_print_text(tostring(doubleJumps), 5, 5, 1)
 end
 
+
 function on_ctt_command(msg)
     if msg == "on" then
         gGlobalSyncTable.gameEnabled = true
