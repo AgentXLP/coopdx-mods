@@ -19,6 +19,8 @@ To download single file mods click on the link and then press the "Raw" button t
 
 [Downing (Cross compatible with Left 4 Dead 2 HUD)](./mods/downing.lua)
 
+[Nametags](./mods/nametags.lua)
+
 [Pos Display](./mods/pos-display.lua)
 
 [Tree Billboard Fix](./mods/tree-billboard-fix.lua)

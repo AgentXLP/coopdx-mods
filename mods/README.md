@@ -6,6 +6,15 @@
 
 This mod adds a Left 4 Dead like incapacitation system where instead of dying you will be incapacitated and someone has to come and revive you before you die, they can also continously bash you while incapacitated until you actually die. Incapacitation doesn't work over death planes, vertical wind, quicksand or lava for obvious reasons.
 
+## Nametags
+
+<img width="600" alt="nametags1" src="https://user-images.githubusercontent.com/44549182/187086954-d8e8ef14-5dad-48ac-8665-f73ca451c774.png">
+<img width="600" alt="nametags2" src="https://user-images.githubusercontent.com/44549182/187086960-135affa8-bfe0-48d4-8bd8-4cf77b3dbec4.png">
+
+This mod adds nametags to sm64ex-coop, this helps to easily identify other players without the player list, nametags can toggled with `/nametags [on|off]`
+
+If you have a color code in your name nametags will automatically change to that color too.
+
 ## Pos Display
 
 <img width="600" alt="pos-display" src="https://user-images.githubusercontent.com/44549182/185991888-269d4823-1d33-4851-b01c-371d4bd967f9.png">
