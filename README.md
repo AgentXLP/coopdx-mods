@@ -26,3 +26,5 @@ To download single file mods click on the link and then press the "Raw" button t
 [Tree Billboard Fix](./mods/tree-billboard-fix.lua)
 
 [Easy Ceiling Cling](./mods/easy-ceiling-cling.lua)
+
+[Everyone Wins](./mods/everyone-wins.lua)

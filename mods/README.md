@@ -32,3 +32,7 @@ In sm64ex, trees uses cylboard instead of billboard which makes them only rotate
 <img width="600" alt="ceilinghang2" src="https://user-images.githubusercontent.com/44549182/189996076-aea3446b-a4d6-4320-a1ee-e2256615249a.png">
 
 This mod adds improved ceiling hang detection system so you can now begin clinging to ceiling from actions outside of just the single and double jump.
+
+## Everyone Wins
+
+This mod makes it so everyone in the Bowser 3 fight will enter the jumbo cutscene when the grand star is collected.
