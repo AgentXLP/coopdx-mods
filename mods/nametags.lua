@@ -168,4 +168,5 @@ if network_is_server() then
     hook_chat_command("nametags", "[on|off] to turn nametags on or off, default is \\#00ff00\\ON", on_nametags_command)
     hook_chat_command("nametag-distance", "[number] set the distance at which nametags disappear, default is 7000", on_nametag_distance_command)
 end
+
 hook_chat_command("show-my-tag", "[on|off] to turn your own nametag on or off, default is \\#ff0000\\OFF", on_show_my_tag_command)
