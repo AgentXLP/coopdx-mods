@@ -103,12 +103,13 @@ function update()
                 gGlobalSyncTable.paddlePosY2 = (height * 0.5) - 30
             end
         else
-
+            -- move ball
             if gGlobalSyncTable.ballSpeedX == 0 then gGlobalSyncTable.ballSpeedX = -1 end
             if gGlobalSyncTable.ballSpeedY == 0 then gGlobalSyncTable.ballSpeedY = -1 end
             gGlobalSyncTable.ballPosX = gGlobalSyncTable.ballPosX + gGlobalSyncTable.ballSpeedX
             gGlobalSyncTable.ballPosY = gGlobalSyncTable.ballPosY + gGlobalSyncTable.ballSpeedY
 
+            -- prevent ball from going off screen
             if gGlobalSyncTable.ballPosY > height - 16 then
                 gGlobalSyncTable.ballPosY = height - 16
                 gGlobalSyncTable.ballSpeedY = gGlobalSyncTable.ballSpeedY * -1
@@ -117,18 +118,21 @@ function update()
                 gGlobalSyncTable.ballSpeedY = gGlobalSyncTable.ballSpeedY * -1
             end
 
+            -- check paddle collision
             if check_collided_with_paddle(10, gGlobalSyncTable.paddlePosY1, gGlobalSyncTable.ballPosX, gGlobalSyncTable.ballPosY) then
                 gGlobalSyncTable.ballPosX = 22
                 gGlobalSyncTable.ballSpeedX = gGlobalSyncTable.ballSpeedX * -1
                 gGlobalSyncTable.ballSpeedModifier = gGlobalSyncTable.ballSpeedModifier + 0.02
                 apply_speed_modifier()
             elseif check_collided_with_paddle(width - 20, gGlobalSyncTable.paddlePosY2, gGlobalSyncTable.ballPosX, gGlobalSyncTable.ballPosY) then
+                -- right paddle was hacky to get working for some reason, had to subtract 35
                 gGlobalSyncTable.ballPosX = width - 35
                 gGlobalSyncTable.ballSpeedX = gGlobalSyncTable.ballSpeedX * -1
                 gGlobalSyncTable.ballSpeedModifier = gGlobalSyncTable.ballSpeedModifier + 0.02
                 apply_speed_modifier()
             end
 
+            -- check to see if someone has won
             if gGlobalSyncTable.ballPosX > width then
                 gPlayerSyncTable[left].won = true
                 gGlobalSyncTable.roundState = ROUND_STATE_INACTIVE
@@ -160,6 +164,7 @@ function on_hud_render()
 
     djui_hud_set_color(255, 255, 255, 255)
 
+    -- if there is no opponent or sync is not valid yet
     if network_player_connected_count() < 2 or not gNetworkPlayers[0].currAreaSyncValid then
         djui_hud_set_font(FONT_NORMAL)
         djui_hud_print_text("Waiting for 2nd player...", centerX - (djui_hud_measure_text("Waiting for 2nd player...") * 0.5), centerY - 20, 1)
@@ -168,12 +173,9 @@ function on_hud_render()
         return
     end
 
-    -- draw score
-    local scoreDisplay = gPlayerSyncTable[left].score .. " / " .. gPlayerSyncTable[right].score
-    djui_hud_print_text(scoreDisplay, centerX - (djui_hud_measure_text(scoreDisplay) * 0.5), 10, 1)
-
     local m = gMarioStates[0]
 
+    -- if is the host or the first person joined, allow paddle control
     if gNetworkPlayers[0].globalIndex < 2 then
         local pos = "paddlePosY" .. gNetworkPlayers[0].globalIndex + 1
         if (m.controller.buttonDown & U_JPAD) ~= 0 or (m.controller.stickY) > 1 then
@@ -193,6 +195,11 @@ function on_hud_render()
     -- draw ball
     djui_hud_render_texture(ballTextures[ballTexture], gGlobalSyncTable.ballPosX, gGlobalSyncTable.ballPosY, 1, 1)
 
+    -- draw score
+    local scoreDisplay = gPlayerSyncTable[left].score .. " / " .. gPlayerSyncTable[right].score
+    djui_hud_print_text(scoreDisplay, centerX - (djui_hud_measure_text(scoreDisplay) * 0.5), 10, 1)
+
+    -- if one of the players won, in the event both players win SOMEHOW, the right will be shown as the winner
     if gPlayerSyncTable[left].won or gPlayerSyncTable[right].won then
         djui_hud_set_font(FONT_NORMAL)
 
@@ -203,6 +210,7 @@ function on_hud_render()
             text = name_without_hex(gNetworkPlayers[right].name) .. " won"
         end
 
+        -- draw player won text
         djui_hud_set_color(255, 255, 0, 255)
         djui_hud_print_text(text, centerX - (djui_hud_measure_text(text) * 0.5), centerY - 20, 1)
     end
@@ -210,10 +218,12 @@ end
 
 --- @param m MarioState
 function mario_update(m)
+    -- prevent mario from doing anything
     set_mario_action(m, ACT_UNINITIALIZED, 0)
 
     if m.playerIndex ~= 0 then return end
 
+    -- remove unnecessary objects that just make noise
     local birds = obj_get_first_with_behavior_id(id_bhvBirdsSoundLoop)
     while birds ~= nil do
         obj_mark_for_deletion(birds)
@@ -224,6 +234,7 @@ function mario_update(m)
         obj_mark_for_deletion(ambience)
         ambience = obj_get_next_with_same_behavior_id(ambience)
     end
+    -- sorry yoshi
     local yoshi = obj_get_first_with_behavior_id(id_bhvYoshi)
     if yoshi ~= nil then obj_mark_for_deletion(yoshi) end
 end
@@ -234,6 +245,7 @@ function on_player_connected(m)
 end
 
 function on_won_changed(tag, oldVal, newVal)
+    -- if you have just won
     if newVal and not oldVal then gPlayerSyncTable[0].score = gPlayerSyncTable[0].score + 1 end
 end
 
