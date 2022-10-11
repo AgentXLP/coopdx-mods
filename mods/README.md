@@ -36,3 +36,7 @@ This mod adds improved ceiling hang detection system so you can now begin clingi
 ## Everyone Wins
 
 This mod makes it so everyone in the Bowser 3 fight will enter the jumbo cutscene when the grand star is collected.
+
+## Pong
+
+This mod adds pong to sm64ex-coop, the first player that joins the game becomes the opponent and the ones after are spectators, this mod is meant to be played in only 2 players and is practically completely custom meaning you're not even technically playing Super Mario 64.
