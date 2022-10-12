@@ -22,8 +22,7 @@ function update_glider_with_turn(m)
 
         if m.forwardVel > (60 + if_then_else(m.vel.y < 0, 0, m.vel.y) * 0.6) then m.forwardVel = (60 + if_then_else(m.vel.y < 0, 0, m.vel.y) * 0.6) end
 
-
-        -- ! Uncapped air speed. Net positive when moving forward.
+        --! Uncapped air speed. Net positive when moving forward.
         if m.forwardVel > dragThreshold then
             m.forwardVel = m.forwardVel - 1
         end
