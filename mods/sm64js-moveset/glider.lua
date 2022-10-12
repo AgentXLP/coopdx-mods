@@ -5,8 +5,8 @@ function update_glider_with_turn(m)
     local intendedMag
 
     if check_horizontal_wind(m) == 0 then
-        dragThreshold = if_then_else(m.action == ACT_LONG_JUMP, 48.0, 32.0)
-        m.forwardVel = approach_number(m.forwardVel, 0.0, 0.35, 0.35)
+        dragThreshold = if_then_else(m.action == ACT_LONG_JUMP, 48, 32)
+        m.forwardVel = approach_number(m.forwardVel, 0, 0.35, 0.35)
 
         if (m.input & INPUT_NONZERO_ANALOG) ~= 0 then
             intendedDYaw = m.intendedYaw - m.faceAngle.y
@@ -16,8 +16,8 @@ function update_glider_with_turn(m)
 
             intendedMag = intendedMag * 3
 
-            m.forwardVel = m.forwardVel + 1.5 * math.cos(intendedDYaw / 0x8000 * math.pi) * intendedMag
-            m.faceAngle.y = m.faceAngle.y + math.floor(512 * math.sin(intendedDYaw / 0x8000 * math.pi) * intendedMag)
+            m.forwardVel = m.forwardVel + 1.5 * coss(intendedDYaw) * intendedMag
+            m.faceAngle.y = m.faceAngle.y + math.floor(512 * sins(intendedDYaw) * intendedMag)
         end
 
         if m.forwardVel > (60 + if_then_else(m.vel.y < 0, 0, m.vel.y) * 0.6) then m.forwardVel = (60 + if_then_else(m.vel.y < 0, 0, m.vel.y) * 0.6) end
@@ -27,12 +27,12 @@ function update_glider_with_turn(m)
         if m.forwardVel > dragThreshold then
             m.forwardVel = m.forwardVel - 1
         end
-        if m.forwardVel < -16.0 then
+        if m.forwardVel < -16 then
             m.forwardVel = m.forwardVel + 2
         end
 
-        m.slideVelX = m.forwardVel * math.sin(m.faceAngle.y / 0x8000 * math.pi)
-        m.slideVelZ = m.forwardVel * math.cos(m.faceAngle.y / 0x8000 * math.pi)
+        m.slideVelX = m.forwardVel * sins(m.faceAngle.y)
+        m.slideVelZ = m.forwardVel * coss(m.faceAngle.y)
         m.vel.x = m.slideVelX
         m.vel.z = m.slideVelZ
     end
@@ -87,7 +87,7 @@ function act_gliding(m)
         return set_mario_action(m, ACT_FREEFALL, 0)
     end
 
-	if m.vel.y < 0.0 and m.actionArg == 0 then
+	if m.vel.y < 0 and m.actionArg == 0 then
         m.actionArg = 1
     end
 
@@ -96,17 +96,17 @@ function act_gliding(m)
     end
 
 	if (m.input & INPUT_A_DOWN) == 0 and m.actionArg == 2 then
-		if (m.vel.y < -35) then
+		if m.vel.y < -35 then
             gPlayerSyncTable[m.playerIndex].targetGlider = (m.vel.y * -0.9)
             m.actionArg = 3
         end
     end
 	if m.actionArg == 3 then
-		if (m.vel.y + 16.0 >= gPlayerSyncTable[m.playerIndex].targetGlider) then
+		if (m.vel.y + 16 >= gPlayerSyncTable[m.playerIndex].targetGlider) then
 			m.vel.y = (gPlayerSyncTable[m.playerIndex].targetGlider - 2)
             m.actionArg = 1
 		else
-			m.vel.y = m.vel.y + 16.0
+			m.vel.y = m.vel.y + 16
 			m.vel.x = m.vel.x * 1.025
 			m.vel.z = m.vel.z * 1.025
         end
@@ -114,9 +114,9 @@ function act_gliding(m)
 
     glider_air_action_step(m, ACT_STOMACH_SLIDE, MARIO_ANIM_SLIDE_DIVE, AIR_STEP_CHECK_LEDGE_GRAB)
 
-	if m.vel.y < if_then_else(m.actionArg == 2, -100.0, -30.0) then m.vel.y = if_then_else(m.actionArg == 2, -100.0, -30.0) end
+	if m.vel.y < if_then_else(m.actionArg == 2, -100.0, -30.0) then m.vel.y = if_then_else(m.actionArg == 2, -100, -30) end
 
-	m.marioObj.header.gfx.angle.x = m.vel.y * -100.0
+	m.marioObj.header.gfx.angle.x = m.vel.y * -100
 
     set_camera_mode(m.area.camera, CAMERA_MODE_FREE_ROAM, 1)
 end
