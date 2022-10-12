@@ -3,7 +3,6 @@
 
 SOUND_CUSTOM_GANGNAM = audio_sample_load("gangnam.mp3")
 
--- support for other characters coming soon trust
 --- @param m MarioState
 function mario_update(m)
     if m.playerIndex ~= 0 then return end
