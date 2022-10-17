@@ -122,13 +122,13 @@ function update()
             if check_collided_with_paddle(10, gGlobalSyncTable.paddlePosY1, gGlobalSyncTable.ballPosX, gGlobalSyncTable.ballPosY) then
                 gGlobalSyncTable.ballPosX = 22
                 gGlobalSyncTable.ballSpeedX = gGlobalSyncTable.ballSpeedX * -1
-                gGlobalSyncTable.ballSpeedModifier = gGlobalSyncTable.ballSpeedModifier + 0.02
+                gGlobalSyncTable.ballSpeedModifier = gGlobalSyncTable.ballSpeedModifier + 0.05
                 apply_speed_modifier()
             elseif check_collided_with_paddle(width - 20, gGlobalSyncTable.paddlePosY2, gGlobalSyncTable.ballPosX, gGlobalSyncTable.ballPosY) then
                 -- right paddle was hacky to get working for some reason, had to subtract 35
                 gGlobalSyncTable.ballPosX = width - 35
                 gGlobalSyncTable.ballSpeedX = gGlobalSyncTable.ballSpeedX * -1
-                gGlobalSyncTable.ballSpeedModifier = gGlobalSyncTable.ballSpeedModifier + 0.02
+                gGlobalSyncTable.ballSpeedModifier = gGlobalSyncTable.ballSpeedModifier + 0.05
                 apply_speed_modifier()
             end
 
@@ -159,8 +159,10 @@ function on_hud_render()
     local right = network_local_index_from_global(1)
 
     -- clear
+    djui_hud_set_resolution(RESOLUTION_DJUI)
     djui_hud_set_color(0, 0, 0, 255)
-    djui_hud_render_rect(-20, -20, width + 20, height + 20)
+    djui_hud_render_rect(-20, -20, djui_hud_get_screen_width() + 20, djui_hud_get_screen_height() + 20)
+    djui_hud_set_resolution(RESOLUTION_N64)
 
     djui_hud_set_color(255, 255, 255, 255)
 
@@ -220,6 +222,7 @@ end
 function mario_update(m)
     -- prevent mario from doing anything
     set_mario_action(m, ACT_UNINITIALIZED, 0)
+    camera_freeze()
 
     if m.playerIndex ~= 0 then return end
 
