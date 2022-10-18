@@ -1,6 +1,7 @@
 .vscode
 tmp
 dynos
+sav
 mods/wip
 *log.txt
 *.cache
