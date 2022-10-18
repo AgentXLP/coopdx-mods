@@ -212,7 +212,7 @@ end
 
 offset = 0
 function on_hud_render()
-    if obj_get_first_with_behavior_id(id_bhvActSelector) ~= nil then return end
+    if obj_get_first_with_behavior_id(id_bhvActSelector) ~= nil or gNetworkPlayers[0].currActNum == 99 or gNetworkPlayers[0].currLevelNum == LEVEL_ENDING then return end
 
     djui_hud_set_resolution(RESOLUTION_N64)
 
