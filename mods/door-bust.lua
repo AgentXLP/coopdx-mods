@@ -1,5 +1,5 @@
 -- name: Door Bust
--- description: Door Bust v1.1\nBy \\#ec7731\\Agent X\\#ffffff\\\n\nThis mod adds busting down doors by slide kicking into them, flying doors can deal damage to other players and normal doors will respawn after 10 seconds.
+-- description: Door Bust v1.1.1\nBy \\#ec7731\\Agent X\\#ffffff\\\n\nThis mod adds busting down doors by slide kicking into them, flying doors can deal damage to other players and normal doors will respawn after 10 seconds.
 
 gGlobalSyncTable.excludeLevels = true
 
@@ -139,6 +139,7 @@ function mario_update(m)
                 play_sound(SOUND_GENERAL_BREAK_BOX, m.marioObj.header.gfx.cameraToObject)
                 targetDoor.oDoorDespawnedTimer = 339
                 targetDoor.oPosY = 9999
+                if m.playerIndex == 0 then set_camera_shake_from_hit(SHAKE_MED_DAMAGE) end
                 spawn_triangle_break_particles(30, 138, 1, 4)
                 spawn_non_sync_object(
                     id_bhvBrokenDoor,
@@ -161,7 +162,7 @@ function mario_update(m)
                         play_sound(SOUND_ACTION_HIT_2, m.marioObj.header.gfx.cameraToObject)
                     end
                 )
-                if starRequirement == 50 then
+                if starRequirement == 50 and m.action == ACT_LONG_JUMP and m.forwardVel <= -80 then
                     set_mario_action(m, ACT_THROWN_BACKWARD, 0)
                     m.forwardVel = -300
                     m.faceAngle.y = -0x8000
@@ -188,7 +189,7 @@ function mario_update(m)
         set_camera_shake_from_hit(SHAKE_LARGE_DAMAGE)
         play_sound(SOUND_GENERAL_METAL_POUND, m.marioObj.header.gfx.cameraToObject)
         if m.actionTimer == 6 then
-            djui_chat_message_create("\\#fbfb7d\\Lakitu\\#ffffff\\: OH SH-")
+            djui_chat_message_create("\\#fbfb7d\\Lakitu:\\#ffffff\\ OH SH-")
         end
     end
 end
