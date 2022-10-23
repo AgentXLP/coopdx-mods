@@ -5,7 +5,10 @@
 function mario_update(m)
     if gNetworkPlayers[0].currLevelNum ~= LEVEL_BOWSER_3 or m.playerIndex == 0 or gMarioStates[0].action == ACT_JUMBO_STAR_CUTSCENE then return end
 
-    if m.action == ACT_JUMBO_STAR_CUTSCENE then set_mario_action(gMarioStates[0], ACT_JUMBO_STAR_CUTSCENE, 0) end
+    if m.action == ACT_JUMBO_STAR_CUTSCENE then
+        obj_mark_for_deletion(obj_get_first_with_behavior_id(id_bhvGrandStar))
+        set_mario_action(gMarioStates[0], ACT_JUMBO_STAR_CUTSCENE, 0)
+    end
 end
 
 hook_event(HOOK_MARIO_UPDATE, mario_update)
