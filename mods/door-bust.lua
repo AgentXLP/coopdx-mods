@@ -1,5 +1,7 @@
 -- name: Door Bust
--- description: Door Bust\nBy \\#ec7731\\Agent X\\#ffffff\\\n\nThis mod adds busting down doors by slide kicking into them, flying doors can deal damage to other players and normal doors will respawn after 10 seconds.
+-- description: Door Bust v1.0.1\nBy \\#ec7731\\Agent X\\#ffffff\\\n\nThis mod adds busting down doors by slide kicking into them, flying doors can deal damage to other players and normal doors will respawn after 10 seconds.
+
+gGlobalSyncTable.excludeLevels = true
 
 define_custom_obj_fields({
     oDoorDespawnedTimer = 'u32',
@@ -61,7 +63,7 @@ id_bhvBrokenDoor = hook_behavior(nil, OBJ_LIST_GENACTOR, true, bhv_broken_door_i
 
 --- @param m MarioState
 function mario_update(m)
-    if gNetworkPlayers[0].currLevelNum == LEVEL_BBH or gNetworkPlayers[0].currLevelNum == LEVEL_HMC then return end -- problematic
+    if gGlobalSyncTable.excludeLevels and (gNetworkPlayers[0].currLevelNum == LEVEL_BBH or gNetworkPlayers[0].currLevelNum == LEVEL_HMC) then return end
 
     local door = nil
     if m.playerIndex == 0 then
@@ -162,5 +164,21 @@ function allow_interact(m, o)
     return true
 end
 
+
+function on_exclude_levels_command(msg)
+    if msg == "on" then
+        gGlobalSyncTable.excludeLevels = true
+        djui_chat_message_create("Exclude Levels status: \\00ff00\\ON")
+    else
+        gGlobalSyncTable.excludeLevels = false
+        djui_chat_message_create("Exclude Levels status: \\ff0000\\OFF")
+    end
+    return true
+end
+
 hook_event(HOOK_MARIO_UPDATE, mario_update)
 hook_event(HOOK_ALLOW_INTERACT, allow_interact)
+
+if network_is_server() then
+    hook_chat_command("exclude-levels", "[on|off] to exclude problematic levels in Door Bust or not", on_exclude_levels_command)
+end
