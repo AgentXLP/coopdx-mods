@@ -218,5 +218,3 @@ hook_event(HOOK_ALLOW_INTERACT, allow_interact)
 if network_is_server() then
     hook_chat_command("exclude-levels", "[on|off] to exclude problematic levels in Door Bust or not", on_exclude_levels_command)
 end
-
-gLevelValues.entryLevel = LEVEL_CASTLE
