@@ -212,6 +212,7 @@ end
 
 offset = 0
 function on_hud_render()
+    hud_hide()
     if obj_get_first_with_behavior_id(id_bhvActSelector) ~= nil or gNetworkPlayers[0].currActNum == 99 or gNetworkPlayers[0].currLevelNum == LEVEL_ENDING then return end
 
     djui_hud_set_resolution(RESOLUTION_N64)
@@ -305,5 +306,3 @@ hook_on_sync_table_change(gGlobalSyncTable, "sm64Health", 0, on_sm64_health_chan
 if network_is_server() then
     hook_chat_command("sm64-health", "[on|off] to use 8 slice health (disables 1 up first aid kits) or convert it into 0-100, default is \\#ff0000\\OFF", on_sm64_health_command)
 end
-
-hud_hide()
