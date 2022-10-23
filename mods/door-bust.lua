@@ -1,5 +1,5 @@
 -- name: Door Bust
--- description: Door Bust v1.0.1\nBy \\#ec7731\\Agent X\\#ffffff\\\n\nThis mod adds busting down doors by slide kicking into them, flying doors can deal damage to other players and normal doors will respawn after 10 seconds.
+-- description: Door Bust v1.1\nBy \\#ec7731\\Agent X\\#ffffff\\\n\nThis mod adds busting down doors by slide kicking into them, flying doors can deal damage to other players and normal doors will respawn after 10 seconds.
 
 gGlobalSyncTable.excludeLevels = true
 
@@ -23,6 +23,13 @@ function approach_number(current, target, inc, dec)
     return current
 end
 
+function lateral_dist_between_object_and_point(obj, pointX, pointY, pointZ)
+    if obj == nil then return 0 end
+    local dx = obj.oPosX - pointX
+    local dz = obj.oPosZ - pointZ
+
+    return math.sqrt(dx * dx + dz * dz)
+end
 
 --- @param o Object
 function bhv_broken_door_init(o)
@@ -93,10 +100,12 @@ function mario_update(m)
     end
 
     if targetDoor ~= nil then
-        -- if (m.action == ACT_SLIDE_KICK or m.action == ACT_JUMP_KICK) and dist_between_objects(m.marioObj, targetDoor) < 160 then
-        if (m.action == ACT_SLIDE_KICK or m.action == ACT_SLIDE_KICK_SLIDE or (m.action == ACT_LONG_JUMP and m.forwardVel < -80)) and dist_between_objects(m.marioObj, targetDoor) < 200 then
+        local dist = 200
+        if m.action == ACT_LONG_JUMP and m.forwardVel <= -70 then dist = 1000 end
+
+        local starRequirement = 0
+        if (m.action == ACT_SLIDE_KICK or m.action == ACT_SLIDE_KICK_SLIDE or (m.action == ACT_LONG_JUMP and m.forwardVel <= -80)) and dist_between_objects(m.marioObj, targetDoor) < dist then
             local model = E_MODEL_CASTLE_CASTLE_DOOR
-            local starRequirement = 0
             -- just make obj_get_model_extended dammit
             if obj_has_model_extended(targetDoor, E_MODEL_CASTLE_DOOR_1_STAR) ~= 0 then
                 model = E_MODEL_CASTLE_DOOR_1_STAR
@@ -123,7 +132,7 @@ function mario_update(m)
             elseif targetDoor.behavior == get_behavior_from_id(id_bhvStarDoor) ~= 0 then
                 -- model = E_MODEL_CASTLE_STAR_DOOR_8_STARS
                 model = E_MODEL_CASTLE_CASTLE_DOOR
-                starRequirement = targetDoor.oBehParams2ndByte
+                starRequirement = targetDoor.oBehParams >> 24
             end
 
             if m.numStars >= starRequirement then
@@ -152,7 +161,34 @@ function mario_update(m)
                         play_sound(SOUND_ACTION_HIT_2, m.marioObj.header.gfx.cameraToObject)
                     end
                 )
+                if starRequirement == 50 then
+                    set_mario_action(m, ACT_THROWN_BACKWARD, 0)
+                    m.forwardVel = -300
+                    m.faceAngle.y = -0x8000
+                    m.vel.y = 20
+                    m.pos.x = -200
+                    m.pos.y = 2350
+                    m.pos.z = 4900
+                end
             end
+        end
+
+        if lateral_dist_between_object_and_point(m.marioObj, -200, 2300, 6977) < 10 and gNetworkPlayers[m.playerIndex].currLevelNum == LEVEL_CASTLE and m.action == ACT_THROWN_BACKWARD then
+            set_mario_action(m, ACT_HARD_BACKWARD_AIR_KB, 0)
+            m.hurtCounter = 4 * 4
+            play_character_sound(m, CHAR_SOUND_ATTACKED)
+            spawn_triangle_break_particles(20, 138, 3, 4)
+            stop_background_music(SEQ_LEVEL_INSIDE_CASTLE)
+        end
+    end
+
+    if gNetworkPlayers[m.playerIndex].currLevelNum == LEVEL_CASTLE and m.action == ACT_HARD_BACKWARD_AIR_KB and m.prevAction == ACT_THROWN_BACKWARD then
+        m.actionTimer = m.actionTimer + 1
+        m.invincTimer = 30
+        set_camera_shake_from_hit(SHAKE_LARGE_DAMAGE)
+        play_sound(SOUND_GENERAL_METAL_POUND, m.marioObj.header.gfx.cameraToObject)
+        if m.actionTimer == 6 then
+            djui_chat_message_create("\\#fbfb7d\\Lakitu\\#ffffff\\: OH SH-")
         end
     end
 end
@@ -182,3 +218,5 @@ hook_event(HOOK_ALLOW_INTERACT, allow_interact)
 if network_is_server() then
     hook_chat_command("exclude-levels", "[on|off] to exclude problematic levels in Door Bust or not", on_exclude_levels_command)
 end
+
+gLevelValues.entryLevel = LEVEL_CASTLE
