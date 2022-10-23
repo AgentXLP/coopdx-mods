@@ -1,1 +1,0 @@
-This blend uses Blender 3.2.0 and the latest zip of Fast64 which you can find in the V5 Beta Testing thread on the Fast64 discord server.
