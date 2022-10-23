@@ -1,6 +1,6 @@
 -- name: Climb the Tower
 -- incompatible: gamemode romhack
--- description: Climb the Tower v1.2\nBy: \\#ec7731\\Agent X\\#ffffff\\\n\nThis gamemode revolves around getting the fastest time and getting to the top of the tower the fastest, you can view the scores with /scoreboard\nIf you wish to play another gamemode on this map (e.g. manhunt / hide and seek) then run /ctt off on host.
+-- description: Climb the Tower v1.3\nBy: \\#ec7731\\Agent X\\#ffffff\\\n\nThis gamemode revolves around getting the fastest time and getting to the top of the tower the fastest, you can view the scores with /scoreboard\nIf you wish to play another gamemode on this map (e.g. manhunt / hide and seek) then run /ctt off on host.
 
 gGlobalSyncTable.gameEnabled = true
 doubleJumps = 3
@@ -38,7 +38,7 @@ function mario_update(m)
 
     if gGlobalSyncTable.gameEnabled == false then return end
 
-    if m.pos.y >= 10889 and (m.action & ACT_FLAG_AIR) == 0 then
+    if m.pos.y >= 10886 and (m.action & ACT_FLAG_AIR) == 0 then
         gPlayerSyncTable[0].finished = true
     end
 
@@ -139,12 +139,11 @@ function on_finished_change(tag, oldVal, newVal)
 end
 
 gLevelValues.entryLevel = LEVEL_PSS
-gLevelValues.fixCollisionBugs = 1
+
 hud_hide()
 smlua_text_utils_secret_star_replace(COURSE_PSS,      "   CLIMB THE TOWER")
 smlua_text_utils_dialog_replace(DIALOG_149, 1, 4, 30, 200, "Welcome to Climb the Tower\
-This level has 2 stars in\
-it. This is a showcase of\
+This is a showcase of\
 sm64ex-coop unst 24's\
 new custom level system.\
 In the skies above Peach's\
