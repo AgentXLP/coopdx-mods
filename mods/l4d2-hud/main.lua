@@ -285,7 +285,7 @@ function on_sm64_health_command(msg)
         djui_chat_message_create("SM64 Health status: \\#00ff00\\ON")
     else
         gGlobalSyncTable.sm64Health = false
-        djui_chat_message_create("SM64 Health status: \\#FF0000\\OFF")
+        djui_chat_message_create("SM64 Health status: \\#ff0000\\OFF")
     end
     return true
 end
