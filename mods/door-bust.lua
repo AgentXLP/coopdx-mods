@@ -139,7 +139,6 @@ function mario_update(m)
                 play_sound(SOUND_GENERAL_BREAK_BOX, m.marioObj.header.gfx.cameraToObject)
                 targetDoor.oDoorDespawnedTimer = 339
                 targetDoor.oPosY = 9999
-                if m.playerIndex == 0 then set_camera_shake_from_hit(SHAKE_MED_DAMAGE) end
                 spawn_triangle_break_particles(30, 138, 1, 4)
                 spawn_non_sync_object(
                     id_bhvBrokenDoor,
@@ -170,6 +169,8 @@ function mario_update(m)
                     m.pos.x = -200
                     m.pos.y = 2350
                     m.pos.z = 4900
+                else
+                    if m.playerIndex == 0 then set_camera_shake_from_hit(SHAKE_SMALL_DAMAGE) end
                 end
             end
         end
@@ -186,7 +187,7 @@ function mario_update(m)
     if gNetworkPlayers[m.playerIndex].currLevelNum == LEVEL_CASTLE and m.action == ACT_HARD_BACKWARD_AIR_KB and m.prevAction == ACT_THROWN_BACKWARD then
         m.actionTimer = m.actionTimer + 1
         m.invincTimer = 30
-        set_camera_shake_from_hit(SHAKE_LARGE_DAMAGE)
+        set_camera_shake_from_hit(SHAKE_MED_DAMAGE)
         play_sound(SOUND_GENERAL_METAL_POUND, m.marioObj.header.gfx.cameraToObject)
         if m.actionTimer == 6 then
             djui_chat_message_create("\\#fbfb7d\\Lakitu:\\#ffffff\\ OH SH-")
