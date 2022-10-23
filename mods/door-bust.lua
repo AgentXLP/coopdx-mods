@@ -164,5 +164,3 @@ end
 
 hook_event(HOOK_MARIO_UPDATE, mario_update)
 hook_event(HOOK_ALLOW_INTERACT, allow_interact)
-
-gLevelValues.entryLevel = LEVEL_BBH
