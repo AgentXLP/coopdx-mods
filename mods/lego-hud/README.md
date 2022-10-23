@@ -1,5 +1,6 @@
 # LEGO HUD
 
-https://user-images.githubusercontent.com/44549182/197371315-68487c46-27d0-4a97-9c26-c4acab657bed.mp4
+<img width="600" alt="legohud1" src="https://user-images.githubusercontent.com/44549182/197371437-cbb50aab-7bef-4525-b3ee-fdae058d6914.png">
+<img width="600" alt="legohud2" src="https://user-images.githubusercontent.com/44549182/197371438-5e649f6e-5133-4bb7-a666-80414d985c3c.png">
 
 This mod adds the LEGO HUD into sm64ex-coop with the stud bar, True Jedi, minikits, bricks and studs.
