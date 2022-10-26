@@ -14,8 +14,6 @@ function act_custom_triple_jump(m)
 
     common_air_action_step(m, ACT_TRIPLE_JUMP_LAND, MARIO_ANIM_FORWARD_SPINNING, 0)
 
-    if m.vel.y < -20 then set_mario_action(m, ACT_TWIRLING, 0) end
-
     if m.actionState == 0 or m.vel.y > 0 then
         if set_mario_animation(m, MARIO_ANIM_FORWARD_SPINNING) == 0 then
             play_sound(SOUND_ACTION_SPIN, m.marioObj.header.gfx.cameraToObject)
