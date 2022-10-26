@@ -69,6 +69,10 @@ function damp(a, b, x, dt) return a + (b - a) * (1.0 - math.exp(-x * dt)) end
 
 function normalize(number) return tostring(number):gsub("-", "M") end
 
+textureHeart = get_texture_info("heart")
+textureHeartHalf = get_texture_info("heart_half")
+textureHeartEmpty = get_texture_info("heart_empty")
+
 gCharGlyphs = {
     [CT_MARIO] = gTextures.mario_head,
     [CT_LUIGI] = gTextures.luigi_head,
@@ -207,35 +211,35 @@ function on_hud_render()
     local health = math.floor(gMarioStates[0].health / 272)
 
     if health >= 2 then
-        djui_hud_render_texture(get_texture_info("heart"), 44, 25, 0.4, 0.4)
+        djui_hud_render_texture(textureHeart, 44, 25, 0.4, 0.4)
     elseif health < 2 and health >= 1 then
-        djui_hud_render_texture(get_texture_info("heart_half"), 44, 25, 0.4, 0.4)
+        djui_hud_render_texture(textureHeartHalf, 44, 25, 0.4, 0.4)
     else
-        djui_hud_render_texture(get_texture_info("heart_empty"), 44, 25, 0.4, 0.4)
+        djui_hud_render_texture(textureHeartEmpty, 44, 25, 0.4, 0.4)
     end
 
     if health >= 4 then
-        djui_hud_render_texture(get_texture_info("heart"), 44 + 13 * 1, 25, 0.4, 0.4)
+        djui_hud_render_texture(textureHeart, 44 + 13 * 1, 25, 0.4, 0.4)
     elseif health < 4 and health >= 3 then
-        djui_hud_render_texture(get_texture_info("heart_half"), 44 + 13 * 1, 25, 0.4, 0.4)
+        djui_hud_render_texture(textureHeartHalf, 44 + 13 * 1, 25, 0.4, 0.4)
     else
-        djui_hud_render_texture(get_texture_info("heart_empty"), 44 + 13 * 1, 25, 0.4, 0.4)
+        djui_hud_render_texture(textureHeartEmpty, 44 + 13 * 1, 25, 0.4, 0.4)
     end
 
     if health >= 6 then
-        djui_hud_render_texture(get_texture_info("heart"), 44 + 13 * 2, 25, 0.4, 0.4)
+        djui_hud_render_texture(textureHeart, 44 + 13 * 2, 25, 0.4, 0.4)
     elseif health < 6 and health >= 5 then
-        djui_hud_render_texture(get_texture_info("heart_half"), 44 + 13 * 2, 25, 0.4, 0.4)
+        djui_hud_render_texture(textureHeartHalf, 44 + 13 * 2, 25, 0.4, 0.4)
     else
-        djui_hud_render_texture(get_texture_info("heart_empty"), 44 + 13 * 2, 25, 0.4, 0.4)
+        djui_hud_render_texture(textureHeartEmpty, 44 + 13 * 2, 25, 0.4, 0.4)
     end
 
     if health >= 8 then
-        djui_hud_render_texture(get_texture_info("heart"), 44 + 13 * 3, 25, 0.4, 0.4)
+        djui_hud_render_texture(textureHeart, 44 + 13 * 3, 25, 0.4, 0.4)
     elseif health < 8 and health >= 7 then
-        djui_hud_render_texture(get_texture_info("heart_half"), 44 + 13 * 3, 25, 0.4, 0.4)
+        djui_hud_render_texture(textureHeartHalf, 44 + 13 * 3, 25, 0.4, 0.4)
     else
-        djui_hud_render_texture(get_texture_info("heart_empty"), 44 + 13 * 3, 25, 0.4, 0.4)
+        djui_hud_render_texture(textureHeartEmpty, 44 + 13 * 3, 25, 0.4, 0.4)
     end
 
     -- timer
