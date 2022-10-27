@@ -139,6 +139,17 @@ end
 
 hud_hide()
 smlua_text_utils_secret_star_replace(COURSE_PSS,      "   CLIMB THE TOWER")
+smlua_text_utils_dialog_replace(DIALOG_149, 1, 4, 30, 200, "Welcome to Climb the Tower\
+This is a showcase of\
+sm64ex-coop unst 24's\
+new custom level system.\
+In the skies above Peach's\
+Castle, we came together\
+and built a big obstacle\
+course for the ones who\
+wish to take the\
+course and unlock their\
+true splendor.")
 
 hook_event(HOOK_MARIO_UPDATE, mario_update)
 hook_event(HOOK_ON_PLAYER_CONNECTED, on_player_connected)
