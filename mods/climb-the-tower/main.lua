@@ -27,7 +27,7 @@ function mario_update(m)
         gPlayerSyncTable[0].finished = false
     end
 
-    if m.pos.y >= 10886 and (m.action & ACT_FLAG_AIR) == 0 then
+    if m.pos.y >= 10860 and (m.action & ACT_FLAG_AIR) == 0 then
         gPlayerSyncTable[0].finished = true
     end
 
