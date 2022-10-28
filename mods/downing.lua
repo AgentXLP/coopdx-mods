@@ -51,6 +51,12 @@ end
 
 function lerp(a,b,t) return a * (1-t) + b * t end
 
+function s16(num)
+    num = math.floor(num) & 0xFFFF
+    if num >= 32768 then return num - 65536 end
+    return num
+end
+
 --- @param m MarioState
 function active_player(m)
     local np = gNetworkPlayers[m.playerIndex]
@@ -124,7 +130,7 @@ function update_fvel(m)
         m.forwardVel = 48
     end
 
-    m.faceAngle.y = approach_s32(m.faceAngle.y, m.intendedYaw, 0x300, 0x300)
+    m.faceAngle.y = s16(approach_s32(m.faceAngle.y, m.intendedYaw, 0x300, 0x300))
     apply_slope_accel(m)
 end
 
@@ -230,10 +236,7 @@ function mario_update(m)
     _G.downHealth[m.playerIndex] = gPlayerSyncTable[m.playerIndex].downHealth
 
     if should_be_downed(m) and not (m.playerIndex == 0 and not gotUp) then
-        if m.action ~= _G.ACT_DOWN then
-            play_character_sound(m, CHAR_SOUND_WAAAOOOW)
-            m.hurtCounter = 0
-        end
+        if m.action ~= _G.ACT_DOWN then play_character_sound(m, CHAR_SOUND_WAAAOOOW) end
         m.action = _G.ACT_DOWN
     end
 
@@ -383,7 +386,7 @@ function on_level_init()
 end
 
 function on_pause_exit()
-    if gPlayerSyncTable[0].downHealth < 300 then return false end
+    if gPlayerSyncTable[0].downHealth < 300 or gMarioStates[0].action == _G.ACT_DOWN then return false end
     return true
 end
 
