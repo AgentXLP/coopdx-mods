@@ -12,7 +12,7 @@ gGlobalSyncTable.customFallDamage = false
 PACKET_REVIVE = 0
 PACKET_POPUP = 1
 
-DOWNING_MIN_PLAYERS = 1
+DOWNING_MIN_PLAYERS = 2
 
 gotUp = false
 
@@ -230,7 +230,10 @@ function mario_update(m)
     _G.downHealth[m.playerIndex] = gPlayerSyncTable[m.playerIndex].downHealth
 
     if should_be_downed(m) and not (m.playerIndex == 0 and not gotUp) then
-        if m.action ~= _G.ACT_DOWN then play_character_sound(m, CHAR_SOUND_WAAAOOOW) end
+        if m.action ~= _G.ACT_DOWN then
+            play_character_sound(m, CHAR_SOUND_WAAAOOOW)
+            m.hurtCounter = 0
+        end
         m.action = _G.ACT_DOWN
     end
 
