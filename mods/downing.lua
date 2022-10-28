@@ -355,7 +355,7 @@ function on_hud_render()
         soundPlayed = false
     end
 
-    if gPlayerSyncTable[0].downHealth ~= nil and gPlayerSyncTable[0].downHealth < 300 then
+    if m.action == _G.ACT_DOWN then
         djui_hud_set_color(0, 0, 0, lerp(255, 0, gPlayerSyncTable[0].downHealth / 300))
         djui_hud_render_rect(0, 0, width + 2, height + 2)
     end
