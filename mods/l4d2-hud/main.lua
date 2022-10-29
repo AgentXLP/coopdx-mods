@@ -94,6 +94,11 @@ function djui_hud_set_adjusted_color(r, g, b, a)
     djui_hud_set_color(r * multiplier, g * multiplier, b * multiplier, a)
 end
 
+-- function by djoslin0
+function mario_health_float(m)
+    return clamp((m.health - 255) / (2176 - 255), 0, 1)
+end
+
 gCharGlyphs = {
     [CT_MARIO] = gTextures.mario_head,
     [CT_LUIGI] = gTextures.luigi_head,
@@ -155,8 +160,7 @@ function render_health_bar(x, m, scale, name)
         end
     end
     -- health bar
-    local health = if_then_else(gGlobalSyncTable.sm64Health, math.floor(m.health / 272), math.ceil(m.health / 21.72) - 1)
-    if not gGlobalSyncTable.sm64Health then health = math.ceil(health - lerp(13, 0, (health / 100))) end
+    local health = if_then_else(gGlobalSyncTable.sm64Health, math.floor(m.health / 272), math.floor(mario_health_float(m) * 100))
 
     djui_hud_set_color(0, 0, 0, 255)
     djui_hud_render_rect(x - (99 * scale), height - (20 * scale), 96 * scale, 11.1 * scale)
