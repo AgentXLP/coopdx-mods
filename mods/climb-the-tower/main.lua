@@ -1,6 +1,5 @@
 -- name: Climb the Tower
--- incompatible: gamemode
--- description: Climb the Tower v1.3\nBy: \\#ec7731\\Agent X\\#ffffff\\\n\nThis gamemode revolves around getting the fastest time and getting to the top of the tower the fastest, you can view the scores with /scoreboard\nIf you wish to play another gamemode on this map (e.g. manhunt / hide and seek) then run /ctt off on host.
+-- description: Climb the Tower v1.3.1\nBy: \\#ec7731\\Agent X\\#ffffff\\\n\nThis gamemode revolves around getting the fastest time and getting to the top of the tower the fastest, you can view the scores with /scoreboard\nIf you wish to play another gamemode on this map (e.g. manhunt / hide and seek) then run /ctt off on host.
 
 LEVEL_CTT = LEVEL_PSS
 
@@ -19,6 +18,9 @@ function mario_update(m)
 
     if not gPlayerSyncTable[0].finished then
         gPlayerSyncTable[0].time = gPlayerSyncTable[0].time + 1
+    else
+        m.health = 0x880
+        doubleJumps = 3
     end
 
     if gNetworkPlayers[0].currLevelNum ~= LEVEL_CTT then

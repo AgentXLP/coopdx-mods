@@ -22,6 +22,7 @@ function bhv_launchpad_loop(o)
                 m.pos.x + m.vel.x, m.pos.y + m.vel.y, m.pos.z + m.vel.z,
                 nil
             )
+            vec3f_set(m.angleVel, 0, 0, 0)
             set_mario_action(m, ACT_FLYING_TRIPLE_JUMP, 0)
             m.forwardVel = m.forwardVel + 45
             m.vel.y = 55
