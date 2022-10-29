@@ -23,7 +23,7 @@ function approach_number(current, target, inc, dec)
     return current
 end
 
-function lateral_dist_between_object_and_point(obj, pointX, pointY, pointZ)
+function lateral_dist_between_object_and_point(obj, pointX, pointZ)
     if obj == nil then return 0 end
     local dx = obj.oPosX - pointX
     local dz = obj.oPosZ - pointZ
@@ -175,7 +175,7 @@ function mario_update(m)
             end
         end
 
-        if lateral_dist_between_object_and_point(m.marioObj, -200, 2300, 6977) < 10 and gNetworkPlayers[m.playerIndex].currLevelNum == LEVEL_CASTLE and m.action == ACT_THROWN_BACKWARD then
+        if lateral_dist_between_object_and_point(m.marioObj, -200, 6977) < 10 and gNetworkPlayers[m.playerIndex].currLevelNum == LEVEL_CASTLE and m.action == ACT_THROWN_BACKWARD then
             set_mario_action(m, ACT_HARD_BACKWARD_AIR_KB, 0)
             m.hurtCounter = 4 * 4
             play_character_sound(m, CHAR_SOUND_ATTACKED)
