@@ -136,7 +136,7 @@ function render_health_bar(x, m, scale, name)
         else x = x - 15 end
 
         djui_hud_set_adjusted_color(143, 47, 0, 255)
-        djui_hud_render_rect(x - (102  * scale), height - (40 * scale), 102 * scale, 45 * scale)
+        djui_hud_render_rect(x - (102 * scale), height - (40 * scale), 102 * scale, 45 * scale)
     end
     -- background
     djui_hud_set_adjusted_color(0, 0, 0, if_then_else(downing and m.action == _G.ACT_DOWN, 255, 200))
