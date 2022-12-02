@@ -34,25 +34,17 @@ function if_then_else(cond, if_true, if_false)
 end
 
 function name_without_hex(name)
-    local nameTable = {}
-    name:gsub(".", function(c) table.insert(nameTable, c) end)
-
-    local removed = false
-    for k, v in pairs(nameTable) do
-        if v == "\\" and not removed then
-            removed = true
-            nameTable[k] = ""     -- \
-            nameTable[k + 1] = "" -- #
-            nameTable[k + 2] = "" -- f
-            nameTable[k + 3] = "" -- f
-            nameTable[k + 4] = "" -- f
-            nameTable[k + 5] = "" -- f
-            nameTable[k + 6] = "" -- f
-            nameTable[k + 7] = "" -- f
-            nameTable[k + 8] = "" -- \
+    local s = ''
+    local inSlash = false
+    for i = 1, #name do
+        local c = name:sub(i,i)
+        if c == '\\' then
+            inSlash = not inSlash
+        elseif not inSlash then
+            s = s .. c
         end
     end
-    return table.concat(nameTable, "")
+    return s
 end
 
 function check_collided_with_paddle(paddleX, paddleY, ballX, ballY)
