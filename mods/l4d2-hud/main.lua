@@ -34,14 +34,6 @@ function clamp(x, a, b)
     return x
 end
 
-function length(table)
-    local count = 0
-    for i in pairs(table) do
-        count = count + 1
-    end
-    return count
-end
-
 --- @param m MarioState
 function active_player(m)
     local np = gNetworkPlayers[m.playerIndex]
@@ -67,25 +59,17 @@ function active_player(m)
 end
 
 function name_without_hex(name)
-    local nameTable = {}
-    name:gsub(".", function(c) table.insert(nameTable, c) end)
-
-    local removed = false
-    for k, v in pairs(nameTable) do
-        if v == "\\" and not removed then
-            removed = true
-            nameTable[k] = ""     -- \
-            nameTable[k + 1] = "" -- #
-            nameTable[k + 2] = "" -- f
-            nameTable[k + 3] = "" -- f
-            nameTable[k + 4] = "" -- f
-            nameTable[k + 5] = "" -- f
-            nameTable[k + 6] = "" -- f
-            nameTable[k + 7] = "" -- f
-            nameTable[k + 8] = "" -- \
+    local s = ''
+    local inSlash = false
+    for i = 1, #name do
+        local c = name:sub(i,i)
+        if c == '\\' then
+            inSlash = not inSlash
+        elseif not inSlash then
+            s = s .. c
         end
     end
-    return table.concat(nameTable, "")
+    return s
 end
 
 function djui_hud_set_adjusted_color(r, g, b, a)
@@ -234,7 +218,7 @@ function on_hud_render()
     end
     if (m.controller.buttonPressed & R_JPAD) ~= 0 then offset = offset + 1 end
     if (m.controller.buttonPressed & L_JPAD) ~= 0 then offset = offset - 1 end
-    offset = clamp(offset, 0, length(gActiveMarioStates) - 3)
+    offset = clamp(offset, 0, #gActiveMarioStates - 3)
     for i = 1, 3 do
         local p = i + offset
         if gActiveMarioStates[p] ~= nil then
