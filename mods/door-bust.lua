@@ -104,7 +104,7 @@ function mario_update(m)
         if m.action == ACT_LONG_JUMP and m.forwardVel <= -70 then dist = 1000 end
 
         local starRequirement = 0
-        if (m.action == ACT_SLIDE_KICK or m.action == ACT_SLIDE_KICK_SLIDE or (m.action == ACT_LONG_JUMP and m.forwardVel <= -80)) and dist_between_objects(m.marioObj, targetDoor) < dist then
+        if (m.action == ACT_SLIDE_KICK or m.action == ACT_SLIDE_KICK_SLIDE or m.action == ACT_JUMP_KICK or (m.action == ACT_LONG_JUMP and m.forwardVel <= -80)) and dist_between_objects(m.marioObj, targetDoor) < dist then
             local model = E_MODEL_CASTLE_CASTLE_DOOR
             -- just make obj_get_model_extended dammit
             if obj_has_model_extended(targetDoor, E_MODEL_CASTLE_DOOR_1_STAR) ~= 0 then
