@@ -14,6 +14,11 @@ for k, v in pairs(gActiveMods) do
     end
 end
 
+function on_or_off(value)
+    if value then return "\\#00ff00\\ON" end
+    return "\\#ff0000\\OFF"
+end
+
 function clamp(x, a, b)
     if x < a then return a end
     if x > b then return b end
@@ -109,10 +114,10 @@ function on_hud_render()
 
     for i = if_then_else(showSelfTag, 0, 1), network_player_connected_count() - 1 do
         local m = gMarioStates[i]
-        if active_player(m) ~= 0 then
+        if active_player(m) ~= 0 and m.action ~= ACT_IN_CANNON then
             if m.playerIndex == 0 and (m.input & INPUT_FIRST_PERSON) ~= 0 then return end
             local out = { x = 0, y = 0, z = 0 }
-            local pos = { x = m.marioObj.header.gfx.pos.x, y = m.marioBodyState.headPos.y + 120, z = m.marioObj.header.gfx.pos.z }
+            local pos = { x = m.marioObj.header.gfx.pos.x, y = m.pos.y + 210, z = m.marioObj.header.gfx.pos.z }
             djui_hud_world_pos_to_screen_pos(pos, out)
 
             local scale = MAX_SCALE
@@ -130,14 +135,9 @@ function on_hud_render()
     end
 end
 
-function on_nametags_command(msg)
-    if msg == "on" then
-        gGlobalSyncTable.nametags = true
-        djui_chat_message_create("Nametag status: \\#00ff00\\ON")
-    else
-        gGlobalSyncTable.nametags = false
-        djui_chat_message_create("Nametag status: \\#ff0000\\OFF")
-    end
+function on_nametags_command()
+    gGlobalSyncTable.nametags = not gGlobalSyncTable.nametags
+    djui_chat_message_create("Nametag status: " .. on_or_off(gGlobalSyncTable.nametags))
     return true
 end
 
@@ -151,22 +151,17 @@ function on_nametag_distance_command(msg)
     return true
 end
 
-function on_show_my_tag_command(msg)
-    if msg == "on" then
-        showSelfTag = true
-        djui_chat_message_create("Show my tag status: \\#00ff00\\ON")
-    else
-        showSelfTag = false
-        djui_chat_message_create("Show my tag status: \\#ff0000\\OFF")
-    end
+function on_show_tag_command()
+    showSelfTag = not showSelfTag
+    djui_chat_message_create("Show my tag status: " .. on_or_off(showSelfTag))
     return true
 end
 
 hook_event(HOOK_ON_HUD_RENDER, on_hud_render)
 
 if network_is_server() then
-    hook_chat_command("nametags", "[on|off] to turn nametags on or off, default is \\#00ff00\\ON", on_nametags_command)
+    hook_chat_command("nametags", "to toggle nametags on or off, default is \\#00ff00\\ON", on_nametags_command)
     hook_chat_command("nametag-distance", "[number] set the distance at which nametags disappear, default is 7000", on_nametag_distance_command)
 end
 
-hook_chat_command("show-my-tag", "[on|off] to turn your own nametag on or off, default is \\#ff0000\\OFF", on_show_my_tag_command)
+hook_chat_command("show-tag", "to toggle your own nametag on or off, default is \\#ff0000\\OFF", on_show_tag_command)
