@@ -7,6 +7,11 @@ E_MODEL_CHALLENGE_MINIKIT = smlua_model_util_get_id("challenge_minikit_geo")
 SOUND_CUSTOM_TRUE_JEDI = audio_sample_load("truejedi.mp3")
 SOUND_CUSTOM_MINIKIT = audio_sample_load("minikit.mp3")
 
+TEX_HEART = get_texture_info("heart")
+TEX_HEART_HALF = get_texture_info("heart_half")
+TEX_HEART_EMPTY = get_texture_info("heart_empty")
+TEX_CIRCLE = get_texture_info("circle")
+
 LOW_STUD_BRIGHTNESS = 25
 
 STUD_BAR_EMPHASIZING = 0
@@ -68,10 +73,6 @@ function lerp(a,b,t) return a * (1-t) + b * t end
 function damp(a, b, x, dt) return a + (b - a) * (1.0 - math.exp(-x * dt)) end
 
 function normalize(number) return tostring(number):gsub("-", "M") end
-
-textureHeart = get_texture_info("heart")
-textureHeartHalf = get_texture_info("heart_half")
-textureHeartEmpty = get_texture_info("heart_empty")
 
 gCharGlyphs = {
     [CT_MARIO] = gTextures.mario_head,
@@ -191,7 +192,7 @@ function on_hud_render()
 
     -- info
     djui_hud_set_adjusted_color(255, 255, 255, 255)
-    djui_hud_render_texture(get_texture_info("circle"), 10, 10, 0.25, 0.25)
+    djui_hud_render_texture(TEX_CIRCLE, 10, 10, 0.25, 0.25)
     djui_hud_render_texture(gCharGlyphs[gMarioStates[0].character.type], 18, 16, 1, 1)
     djui_hud_render_texture(gTextures.coin, 42, 12, 0.75, 0.75)
     djui_hud_set_adjusted_color(255, 240, 0, 255)
@@ -211,35 +212,35 @@ function on_hud_render()
     local health = math.floor(gMarioStates[0].health / 272)
 
     if health >= 2 then
-        djui_hud_render_texture(textureHeart, 44, 25, 0.4, 0.4)
+        djui_hud_render_texture(TEX_HEART, 44, 25, 0.4, 0.4)
     elseif health < 2 and health >= 1 then
-        djui_hud_render_texture(textureHeartHalf, 44, 25, 0.4, 0.4)
+        djui_hud_render_texture(TEX_HEART_HALF, 44, 25, 0.4, 0.4)
     else
-        djui_hud_render_texture(textureHeartEmpty, 44, 25, 0.4, 0.4)
+        djui_hud_render_texture(TEX_HEART_EMPTY, 44, 25, 0.4, 0.4)
     end
 
     if health >= 4 then
-        djui_hud_render_texture(textureHeart, 44 + 13 * 1, 25, 0.4, 0.4)
+        djui_hud_render_texture(TEX_HEART, 44 + 13 * 1, 25, 0.4, 0.4)
     elseif health < 4 and health >= 3 then
-        djui_hud_render_texture(textureHeartHalf, 44 + 13 * 1, 25, 0.4, 0.4)
+        djui_hud_render_texture(TEX_HEART_HALF, 44 + 13 * 1, 25, 0.4, 0.4)
     else
-        djui_hud_render_texture(textureHeartEmpty, 44 + 13 * 1, 25, 0.4, 0.4)
+        djui_hud_render_texture(TEX_HEART_EMPTY, 44 + 13 * 1, 25, 0.4, 0.4)
     end
 
     if health >= 6 then
-        djui_hud_render_texture(textureHeart, 44 + 13 * 2, 25, 0.4, 0.4)
+        djui_hud_render_texture(TEX_HEART, 44 + 13 * 2, 25, 0.4, 0.4)
     elseif health < 6 and health >= 5 then
-        djui_hud_render_texture(textureHeartHalf, 44 + 13 * 2, 25, 0.4, 0.4)
+        djui_hud_render_texture(TEX_HEART_HALF, 44 + 13 * 2, 25, 0.4, 0.4)
     else
-        djui_hud_render_texture(textureHeartEmpty, 44 + 13 * 2, 25, 0.4, 0.4)
+        djui_hud_render_texture(TEX_HEART_EMPTY, 44 + 13 * 2, 25, 0.4, 0.4)
     end
 
     if health >= 8 then
-        djui_hud_render_texture(textureHeart, 44 + 13 * 3, 25, 0.4, 0.4)
+        djui_hud_render_texture(TEX_HEART, 44 + 13 * 3, 25, 0.4, 0.4)
     elseif health < 8 and health >= 7 then
-        djui_hud_render_texture(textureHeartHalf, 44 + 13 * 3, 25, 0.4, 0.4)
+        djui_hud_render_texture(TEX_HEART_HALF, 44 + 13 * 3, 25, 0.4, 0.4)
     else
-        djui_hud_render_texture(textureHeartEmpty, 44 + 13 * 3, 25, 0.4, 0.4)
+        djui_hud_render_texture(TEX_HEART_EMPTY, 44 + 13 * 3, 25, 0.4, 0.4)
     end
 
     -- timer
