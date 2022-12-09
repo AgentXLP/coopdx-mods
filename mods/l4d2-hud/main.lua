@@ -2,6 +2,11 @@
 -- incompatible: hud
 -- description: Left 4 Dead 2 HUD\nBy \\#ec7731\\Agent X\\#ffffff\\\n\nThis mod adds the Left 4 Dead 2 HUD into sm64ex-coop with other health bars to the left too, you can cycle through them with DPad left and DPad right. This mod is fully cross compatible with Downing too meaning incapacitated players will also be accounted for.\nIf SM64 health is off (by default it is) you can pick up and use 1 ups as healing. Toggle SM64 health with\n\\#ffff00\\/sm64-health [on|off]
 
+TEX_BOX_SQUARE = get_texture_info("boxsquare")
+TEX_NO_1UP = get_texture_info("no1up")
+TEX_1UP = get_texture_info("1up")
+TEX_PAC = get_texture_info("pac")
+
 gGlobalSyncTable.sm64Health = false
 
 _G.l4dBarTexture = get_texture_info("gradient")
@@ -138,7 +143,7 @@ function render_health_bar(x, m, scale, name)
         if m.health > 0xff then djui_hud_set_adjusted_color(255, 255, 255, 255)
         else djui_hud_set_adjusted_color(230, 0, 0, 255) end
         if gNetworkPlayers[0].name:find("Spoomples") then
-            djui_hud_render_texture(get_texture_info("pac"), x - (126.2 * scale), height - (33.6 * scale), 0.1 * scale, 0.1 * scale)
+            djui_hud_render_texture(TEX_PAC, x - (126.2 * scale), height - (33.6 * scale), 0.1 * scale, 0.1 * scale)
         else
             djui_hud_render_texture(glyphs[m.character.type], x - (126.2 * scale), height - (33.6 * scale), 0.1 * scale, 0.1 * scale)
         end
@@ -234,9 +239,9 @@ function on_hud_render()
     if not gGlobalSyncTable.sm64Health then
         local boxLeft = width - 27
         djui_hud_set_color(0, 0, 0, 150)
-        djui_hud_render_texture(get_texture_info("boxsquare"), boxLeft, height + 21, 1.06, 1.06)
-        local tex = get_texture_info("no1up")
-        if gPlayerSyncTable[0].firstAid then tex = get_texture_info("1up") end
+        djui_hud_render_texture(TEX_BOX_SQUARE, boxLeft, height + 21, 1.06, 1.06)
+        local tex = TEX_NO_1UP
+        if gPlayerSyncTable[0].firstAid then tex = TEX_1UP end
         djui_hud_set_adjusted_color(255, 255, 255, 255)
         djui_hud_render_texture(tex, boxLeft + 1.5, height + 22.5, 0.9, 0.9)
     end
