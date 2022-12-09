@@ -28,6 +28,11 @@ function check_for_mod(name, find)
     return has
 end
 
+function on_or_off(value)
+    if value then return "\\#00ff00\\ON" end
+    return "\\#ff0000\\OFF"
+end
+
 function clamp(x, a, b)
     if x < a then return a end
     if x > b then return b end
@@ -234,12 +239,7 @@ function mario_update(m)
 
     if m.action == _G.ACT_DOWN then network_player_set_description(gNetworkPlayers[0], "Down", 255, 0, 0, 255) else network_player_set_description(gNetworkPlayers[0], "", 255, 255, 255, 255) end
 
-    if m.playerIndex ~= 0 or player_alive_count() < DOWNING_MIN_PLAYERS then return end
-
-    if (m.action & ACT_GROUP_MASK) ~= ACT_GROUP_CUTSCENE then gotUp = true end
-
-    local heart = obj_get_nearest_object_with_behavior_id(m.marioObj, id_bhvRecoveryHeart)
-    if heart ~= nil and obj_check_if_collided_with_object(m.marioObj, heart) ~= 0 and gPlayerSyncTable[0].downHealth < 300 then undown(m) end
+    if m.playerIndex ~= 0  then return end
 
     if gGlobalSyncTable.customFallDamage then
         m.peakHeight = m.pos.y
@@ -249,7 +249,7 @@ function mario_update(m)
             m.vel.y = m.vel.y - extraVel
         end
 
-        if (m.prevAction & ACT_FLAG_AIR) ~= 0 and m.prevAction ~= ACT_TWIRLING and m.prevAction ~= ACT_SHOT_FROM_CANNON and (m.action & ACT_FLAG_AIR) == 0 and m.vel.y <= -90 and m.floor.type ~= SURFACE_BURNING and m.floor.type ~= SURFACE_INSTANT_QUICKSAND then
+        if (m.prevAction & ACT_FLAG_AIR) ~= 0 and m.action ~= ACT_LEDGE_GRAB and m.prevAction ~= ACT_TWIRLING and m.prevAction ~= ACT_SHOT_FROM_CANNON and (m.action & ACT_FLAG_AIR) == 0 and m.vel.y <= -90 and m.floor.type ~= SURFACE_BURNING and m.floor.type ~= SURFACE_INSTANT_QUICKSAND then
             local dmgMult = get_fall_damage_multiplier(math.abs(m.vel.y))
             if dmgMult == 15 then
                 m.health = 383
@@ -265,6 +265,13 @@ function mario_update(m)
 
         if (m.action & ACT_FLAG_AIR) == 0 then extraVel = 0 end
     end
+
+    if player_alive_count() < DOWNING_MIN_PLAYERS then return end
+
+    if (m.action & ACT_GROUP_MASK) ~= ACT_GROUP_CUTSCENE then gotUp = true end
+
+    local heart = obj_get_nearest_object_with_behavior_id(m.marioObj, id_bhvRecoveryHeart)
+    if heart ~= nil and obj_check_if_collided_with_object(m.marioObj, heart) ~= 0 and gPlayerSyncTable[0].downHealth < 300 then undown(m) end
 end
 
 --- @param m MarioState
@@ -359,16 +366,16 @@ function on_hud_render()
     end
 end
 
-function on_packet_receive(table)
+function on_packet_receive(dataTable)
     local m = gMarioStates[0]
 
-    if table.id == PACKET_REVIVE then
-        if network_global_index_from_local(m.playerIndex) == table.global then
+    if dataTable.id == PACKET_REVIVE then
+        if network_global_index_from_local(m.playerIndex) == dataTable.global then
             undown(m)
-            vec3f_copy(m.pos, gMarioStates[network_local_index_from_global(table.savior)].pos)
+            vec3f_copy(m.pos, gMarioStates[network_local_index_from_global(dataTable.savior)].pos)
         end
-    elseif table.id == PACKET_POPUP then
-        djui_popup_create(table.msg, 1)
+    elseif dataTable.id == PACKET_POPUP then
+        djui_popup_create(dataTable.msg, 1)
     end
 end
 
@@ -386,15 +393,9 @@ function on_downhealth_changed(tag, oldVal, newVal)
     if oldVal == 300 and newVal ~= 300 then djui_popup_create(gNetworkPlayers[tag].name .. "\\#ffff00\\ is down!", 1) end
 end
 
-function on_custom_fall_damage_command(msg)
-    if msg == "on" then
-        gGlobalSyncTable.customFallDamage = true
-        djui_chat_message_create("Custom fall damage status: \\#00ff00\\ON")
-    else
-        gGlobalSyncTable.customFallDamage = false
-        djui_chat_message_create("Custom fall damage status: \\#ff0000\\OFF")
-
-    end
+function on_custom_fall_damage_command()
+    gGlobalSyncTable.customFallDamage = not gGlobalSyncTable.customFallDamage
+    djui_chat_message_create("Custom fall damage status: " .. on_or_off(gGlobalSyncTable.customFallDamage))
     return true
 end
 
@@ -413,7 +414,7 @@ end
 hook_mario_action(_G.ACT_DOWN, act_down, INTERACT_PLAYER)
 
 if network_is_server() then
-    hook_chat_command("custom-fall-damage", "[on|off] to turn Left 4 Dead like fall damage on or off", on_custom_fall_damage_command)
+    hook_chat_command("custom-fall-damage", "to toggle Left 4 Dead like fall damage on or off", on_custom_fall_damage_command)
 end
 
 gServerSettings.bubbleDeath = 0
