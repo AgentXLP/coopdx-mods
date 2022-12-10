@@ -19,6 +19,7 @@ define_custom_obj_fields({
     oArenaItemHeldOwner = 'u32',
 })
 
+--- @param obj Object
 function bhv_arena_item_held_init(obj)
     obj.oFlags = OBJ_FLAG_UPDATE_GFX_POS_AND_ANGLE
     obj.oOpacity = 255
@@ -28,6 +29,7 @@ function bhv_arena_item_held_init(obj)
     cur_obj_hide()
 end
 
+--- @param obj Object
 function bhv_arena_item_held_loop(obj)
     local m = gMarioStates[obj.oArenaItemHeldOwner]
     local s = gPlayerSyncTable[obj.oArenaItemHeldOwner]
@@ -45,7 +47,7 @@ function bhv_arena_item_held_loop(obj)
         return
     end
 
-    -- update pallet
+    -- update pallete
     local np = gNetworkPlayers[obj.oArenaItemHeldOwner]
     if np ~= nil then
         obj.globalPlayerIndex = np.globalIndex
@@ -92,6 +94,8 @@ function on_level_init()
     end
 end
 
+--- @param obj Object
+--- @param m MarioState
 function dot_along_angle(obj, m, angle)
     local v1 = {
         x = obj.oPosX - m.pos.x,
@@ -107,6 +111,7 @@ function dot_along_angle(obj, m, angle)
     return vec3f_dot(v1, v2)
 end
 
+--- @param obj Object
 function bhv_arena_item_held_hammer_render(obj)
     local m = gMarioStates[obj.oArenaItemHeldOwner]
     local e = gMarioStateExtras[obj.oArenaItemHeldOwner]
@@ -177,6 +182,7 @@ function bhv_arena_item_held_hammer_render(obj)
     end
 end
 
+--- @param obj Object
 function on_object_render(obj)
     if get_id_from_behavior(obj.behavior) ~= id_bhvArenaItemHeld then
         return

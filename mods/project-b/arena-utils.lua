@@ -1,4 +1,4 @@
-
+--- @param m MarioState
 function active_player(m)
     local np = gNetworkPlayers[m.playerIndex]
     if m.playerIndex == 0 then
@@ -24,10 +24,12 @@ function clamp(val, min, max)
     return val
 end
 
+--- @param m MarioState
 function mario_health_float(m)
     return clamp((m.health - 255) / (2176 - 255), 0, 1)
 end
 
+--- @param m MarioState
 function global_index_hurts_mario_state(globalIndex, m)
     if globalIndex == gNetworkPlayers[m.playerIndex].globalIndex then
         return false
@@ -47,6 +49,7 @@ function global_index_hurts_mario_state(globalIndex, m)
     return sAttacker.team ~= sVictim.team
 end
 
+--- @param m MarioState
 function is_invuln_or_intang(m)
     local invuln = ((m.action & ACT_FLAG_INVULNERABLE) ~= 0) or (m.invincTimer ~= 0)
     local intang = ((m.action & ACT_FLAG_INTANGIBLE) ~= 0)
@@ -99,6 +102,7 @@ end
 
 ------------
 
+--- @param obj Object
 function spawn_mist(obj, scale)
     local spi = obj_get_temp_spawn_particles_info(E_MODEL_MIST)
     if spi == nil then
@@ -141,6 +145,7 @@ function spawn_balls(obj, scale)
     cur_obj_spawn_particles(spi)
 end
 
+--- @param obj Object
 function spawn_triangles(obj)
     spawn_non_sync_object(id_bhvTriangleParticleSpawner, E_MODEL_NONE,
         obj.oPosX,
@@ -177,6 +182,7 @@ end
 
 --------
 
+--- @param obj Object
 function bhv_debug_pos_init(obj)
     obj.oFlags = OBJ_FLAG_UPDATE_GFX_POS_AND_ANGLE
     obj.oOpacity = 255
@@ -185,6 +191,7 @@ function bhv_debug_pos_init(obj)
     obj_scale(obj, 0.5)
 end
 
+--- @param obj Object
 function bhv_debug_pos_loop(obj)
     obj.oTimer = obj.oTimer + 1
     if obj.oTimer > 1 then

@@ -1,5 +1,6 @@
 sArenaKothPoints = {}
 
+--- @param obj Object
 function bhv_arena_koth_init(obj)
     table.insert(sArenaKothPoints, {
         pos = { x = obj.oPosX, y = obj.oPosY, z = obj.oPosZ },
@@ -23,11 +24,13 @@ end
 gArenaKothActiveObj = nil
 sArenaKothActiveLastRewardM = nil
 
+--- @param obj Object
 function bhv_arena_koth_active_init(obj)
     obj.oFlags = OBJ_FLAG_UPDATE_GFX_POS_AND_ANGLE
     cur_obj_hide()
 end
 
+--- @param obj Object
 function bhv_arena_koth_active_loop(obj)
     -- sanity check like crazy
     if gGlobalSyncTable.gameMode ~= GAME_MODE_KOTH and gGlobalSyncTable.gameMode ~= GAME_MODE_TKOTH then

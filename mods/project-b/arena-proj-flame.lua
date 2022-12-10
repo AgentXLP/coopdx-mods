@@ -4,6 +4,7 @@ define_custom_obj_fields({
 
 local sArenaChildFlameLife = 30 * 1.5
 
+--- @param obj Object
 function bhv_arena_child_flame_init(obj)
     obj.oFlags = OBJ_FLAG_UPDATE_GFX_POS_AND_ANGLE
     if global_index_hurts_mario_state(obj.oArenaFlameGlobalOwner, gMarioStates[0]) then
@@ -42,6 +43,7 @@ function bhv_arena_child_flame_init(obj)
 
 end
 
+--- @param obj Object
 function bhv_arena_child_flame_loop(obj)
     obj.activeFlags = obj.activeFlags | ACTIVE_FLAG_UNK10
 
@@ -68,6 +70,7 @@ id_bhvArenaChildFlame = hook_behavior(nil, OBJ_LIST_GENACTOR, true, bhv_arena_ch
 
 local sArenaFlameLife = 30 * 5
 
+--- @param obj Object
 function bhv_arena_flame_init(obj)
     obj.oFlags = OBJ_FLAG_UPDATE_GFX_POS_AND_ANGLE
     if global_index_hurts_mario_state(obj.oArenaFlameGlobalOwner, gMarioStates[0]) then
@@ -108,6 +111,7 @@ function bhv_arena_flame_init(obj)
     network_init_object(obj, false, nil)
 end
 
+--- @param obj Object
 function bhv_arena_flame_loop(obj)
     obj.activeFlags = obj.activeFlags | ACTIVE_FLAG_UNK10
     cur_obj_update_floor_and_walls();

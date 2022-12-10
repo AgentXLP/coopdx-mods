@@ -2,6 +2,7 @@ define_custom_obj_fields({
     oArenaBobombGlobalOwner = 'u32',
 })
 
+--- @param obj Object
 function bhv_arena_bobomb_init(obj)
     obj.oAction = 0
     obj.oFlags = OBJ_FLAG_UPDATE_GFX_POS_AND_ANGLE
@@ -15,12 +16,14 @@ function bhv_arena_bobomb_init(obj)
     network_init_object(obj, false, nil)
 end
 
-function bhv_arena_bobomb_intersects_player(obj, m, pos, radius)
+--- @param m MarioState
+function bhv_arena_bobomb_intersects_player(m, pos, radius)
     local mPos1 = { x = m.pos.x, y = m.pos.y + 50,  z = m.pos.z }
     local mPos2 = { x = m.pos.x, y = m.pos.y + 150, z = m.pos.z }
     return (vec3f_dist(pos, mPos1) < radius or vec3f_dist(pos, mPos2) < radius)
 end
 
+--- @param obj Object
 function bhv_arena_bobomb_expode(obj)
     obj.oAction = 1
     obj.oFlags = OBJ_FLAG_UPDATE_GFX_POS_AND_ANGLE
@@ -39,13 +42,14 @@ function bhv_arena_bobomb_expode(obj)
     local validAttack = global_index_hurts_mario_state(obj.oArenaBobombGlobalOwner, m) or np.globalIndex == obj.oArenaBobombGlobalOwner
     local radius = 650
     if np.globalIndex == obj.oArenaBobombGlobalOwner then radius = 200 end
-    if validAttack and bhv_arena_bobomb_intersects_player(obj, m, a, radius) and mario_health_float(m) > 0 then
+    if validAttack and bhv_arena_bobomb_intersects_player(m, a, radius) and mario_health_float(m) > 0 then
         obj.oDamageOrCoinValue = 3
         interact_damage(m, INTERACT_DAMAGE, obj)
         e.lastDamagedByGlobal = obj.oArenaBobombGlobalOwner
     end
 end
 
+--- @param obj Object
 function bhv_arena_bobomb_thrown_loop(obj)
     local a   = { x = obj.oPosX, y = obj.oPosY, z = obj.oPosZ }
     local dir = { x = obj.oVelX, y = obj.oVelY, z = obj.oVelZ }
@@ -55,7 +59,7 @@ function bhv_arena_bobomb_thrown_loop(obj)
     for i = 0, MAX_PLAYERS - 1 do
         local m = gMarioStates[i]
         if active_player(m) and global_index_hurts_mario_state(obj.oArenaBobombGlobalOwner, m) and not is_invuln_or_intang(m) then
-            if bhv_arena_bobomb_intersects_player(obj, m, a, 200) then
+            if bhv_arena_bobomb_intersects_player(m, a, 200) then
                 bhv_arena_bobomb_expode(obj)
                 return
             end
@@ -67,7 +71,7 @@ function bhv_arena_bobomb_thrown_loop(obj)
             dir.x, dir.y, dir.z)
 
     local floorHeight = find_floor_height(obj.oPosX, obj.oPosY + 100, obj.oPosZ)
-            
+
     if obj.oTimer > 30 * 1 or info.surface ~= nil or obj.oPosY < floorHeight then
         bhv_arena_bobomb_expode(obj)
         return
@@ -78,6 +82,7 @@ function bhv_arena_bobomb_thrown_loop(obj)
     end
 end
 
+--- @param obj Object
 function bhv_arena_bobomb_explode_loop(obj)
     if obj.oTimer >= 9 then
         obj.activeFlags = ACTIVE_FLAG_DEACTIVATED
@@ -88,6 +93,7 @@ function bhv_arena_bobomb_explode_loop(obj)
     obj.oAnimState = obj.oAnimState + 1
 end
 
+--- @param obj Object
 function bhv_arena_bobomb_loop(obj)
     if obj.oAction == 0 then
         bhv_arena_bobomb_thrown_loop(obj)

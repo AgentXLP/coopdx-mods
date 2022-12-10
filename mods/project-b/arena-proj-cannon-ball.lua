@@ -4,6 +4,7 @@ define_custom_obj_fields({
     oArenaCannonBallDamages = 'u32',
 })
 
+--- @param obj Object
 function bhv_arena_cannon_ball_init(obj)
     obj.oFlags = OBJ_FLAG_UPDATE_GFX_POS_AND_ANGLE
     obj.oArenaCannonBallDamages = 1
@@ -17,6 +18,7 @@ function bhv_arena_cannon_ball_init(obj)
     network_init_object(obj, false, nil)
 end
 
+--- @param obj Object
 function bhv_arena_cannon_ball_intersects_local(obj, pos)
     local m = gMarioStates[0]
     local mPos1 = { x = m.pos.x, y = m.pos.y + 50,  z = m.pos.z }
@@ -25,11 +27,12 @@ function bhv_arena_cannon_ball_intersects_local(obj, pos)
     return (vec3f_dist(pos, mPos1) < radius or vec3f_dist(pos, mPos2) < radius)
 end
 
+--- @param obj Object
 function bhv_arena_cannon_ball_loop(obj)
     local a   = { x = obj.oPosX, y = obj.oPosY, z = obj.oPosZ }
     local dir = { x = obj.oVelX, y = obj.oVelY, z = obj.oVelZ }
 
-    -- update pallet
+    -- update pallete
     local np = gNetworkPlayers[obj.oArenaCannonBallGlobalOwner]
     if np ~= nil then
         obj.globalPlayerIndex = np.globalIndex
@@ -37,10 +40,10 @@ function bhv_arena_cannon_ball_loop(obj)
 
     local m = gMarioStates[0]
     if global_index_hurts_mario_state(obj.oArenaCannonBallGlobalOwner, m) and not is_invuln_or_intang(m) then
-        local b = { x = a.x + dir.x / 2, y = a.y + dir.y / 2, z = a.z + dir.z / 2 }
+        local b = { x = a.x + dir.x * 0.5, y = a.y + dir.y * 0.5, z = a.z + dir.z * 0.5 }
         if bhv_arena_cannon_ball_intersects_local(obj, a) or bhv_arena_cannon_ball_intersects_local(obj, b) then
             if obj.oArenaCannonBallDamages ~= 0 then
-                obj.oDamageOrCoinValue = clamp(obj.oArenaCannonBallSize * 8, 1, 5)
+                obj.oDamageOrCoinValue = clamp(obj.oArenaCannonBallSize * 4, 1, 5)
                 interact_damage(m, INTERACT_DAMAGE, obj)
                 obj.oArenaCannonBallDamages = 0
             end

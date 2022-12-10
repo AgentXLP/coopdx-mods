@@ -1,4 +1,4 @@
-local arenaItemTimeout = 30 * 15 -- 15 seconds
+arenaItemTimeout = 30 * 15 -- 15 seconds
 
 -----------------
 
@@ -7,12 +7,13 @@ define_custom_obj_fields({
     oArenaItemTouched = 'u32',
 })
 
+--- @param obj Object
 function bhv_arena_item_init(obj)
     obj.oFlags = OBJ_FLAG_UPDATE_GFX_POS_AND_ANGLE
     obj.oOpacity = 255
     obj.oArenaItemType = (obj.oBehParams >> 24) % ITEM_MAX
 
-    -- update pallet
+    -- update pallete
     obj.globalPlayerIndex = gNetworkPlayers[0].globalIndex
 
     local data = gItemData[obj.oArenaItemType]
@@ -25,6 +26,7 @@ function bhv_arena_item_init(obj)
     })
 end
 
+--- @param obj Object
 function bhv_arena_item_collect(obj)
     spawn_sparkles(obj.oPosX, obj.oPosY, obj.oPosZ)
     spawn_mist(obj, 2)
@@ -39,6 +41,7 @@ function bhv_arena_item_collect(obj)
     s.item = obj.oArenaItemType
 end
 
+--- @param obj Object
 function bhv_arena_item_collect_metal_cap(obj)
     spawn_sparkles(obj.oPosX, obj.oPosY, obj.oPosZ)
     spawn_mist(obj, 2)
@@ -49,7 +52,7 @@ function bhv_arena_item_collect_metal_cap(obj)
     local m = gMarioStates[0]
     m.flags = m.flags & (~MARIO_CAP_ON_HEAD & ~MARIO_CAP_IN_HAND)
 
-    local capTime = 600 * 2.5
+    local capTime = 1500
     local capMusic = SEQUENCE_ARGS(4, SEQ_EVENT_METAL_CAP)
 
     if capTime > m.capTimer then
@@ -64,6 +67,7 @@ function bhv_arena_item_collect_metal_cap(obj)
     play_cap_music(capMusic)
 end
 
+--- @param obj Object
 function bhv_arena_item_collect_coin(obj)
     spawn_sparkles(obj.oPosX, obj.oPosY, obj.oPosZ)
     spawn_mist(obj, 2)
@@ -78,6 +82,7 @@ function bhv_arena_item_collect_coin(obj)
     m.healCounter = m.healCounter + 8
 end
 
+--- @param obj Object
 function bhv_arena_item_update_touch(obj)
     local data = gItemData[obj.oArenaItemType]
     if obj.oArenaItemTouched == 1 then
@@ -102,6 +107,7 @@ function bhv_arena_item_update_touch(obj)
     end
 end
 
+--- @param obj Object
 function bhv_arena_item_update_model(obj)
     local data = gItemData[obj.oArenaItemType]
     if data == nil then return end
@@ -127,12 +133,14 @@ function bhv_arena_item_update_model(obj)
     end
 end
 
+--- @param obj Object
 function bhv_arena_item_update_rotation(obj)
     obj.oFaceAngleYaw   = obj.oFaceAngleYaw + 600
     obj.oFaceAngleRoll  = 0
     obj.oFaceAnglePitch = 0
 end
 
+--- @param obj Object
 function bhv_arena_item_check_collect(obj)
     local data = gItemData[obj.oArenaItemType]
     local m = nearest_mario_state_to_object(obj)
@@ -141,7 +149,7 @@ function bhv_arena_item_check_collect(obj)
         local player = m.marioObj
         local yDist = math.abs(obj.oPosY - player.oPosY)
         local xzDist = math.sqrt((obj.oPosX - player.oPosX) ^ 2 + (obj.oPosZ - player.oPosZ) ^ 2)
-        if xzDist < 160 and yDist < 250 then
+        if xzDist < 170 and yDist < 250 then
             if data ~= nil and data.customCollectionFunc ~= nil then
                 data.customCollectionFunc(obj)
             elseif s.item == ITEM_NONE and s.item == ITEM_NONE and s.item == ITEM_NONE then
@@ -151,6 +159,7 @@ function bhv_arena_item_check_collect(obj)
     end
 end
 
+--- @param obj Object
 function bhv_arena_item_loop(obj)
     -- update touch
     if bhv_arena_item_update_touch(obj) then

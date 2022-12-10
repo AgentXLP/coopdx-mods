@@ -10,6 +10,7 @@ define_custom_obj_fields({
     oArenaFlagAtBase = 'u32',
 })
 
+--- @param obj Object
 function bhv_arena_flag_init(obj)
     local team = (obj.oBehParams >> 24) & 0xFF
 
@@ -44,6 +45,7 @@ function bhv_arena_flag_init(obj)
     })
 end
 
+--- @param obj Object
 function bhv_arena_flag_update_pos_rot(obj)
     -- spin
     obj.oFaceAngleYaw   = obj.oFaceAngleYaw - 600
@@ -83,6 +85,7 @@ function bhv_arena_flag_update_pos_rot(obj)
     obj.oFaceAngleRoll = -0x400
 end
 
+--- @param obj Object
 function bhv_arena_flag_update_score(obj)
     if gGlobalSyncTable.gameMode ~= GAME_MODE_FT and gGlobalSyncTable.gameMode ~= GAME_MODE_TFT then
         return
@@ -124,12 +127,14 @@ function bhv_arena_flag_update_score(obj)
     end
 end
 
+--- @param obj Object
 function bhv_arena_flag_update_rotation(obj)
     if obj.oArenaFlagHeldByGlobal ~= ARENA_FLAG_INVALID_GLOBAL then
         return
     end
 end
 
+--- @param obj Object
 function bhv_arena_flag_return(obj, showMessage)
     if obj.oArenaFlagAtBase == 1 then
         return
@@ -149,6 +154,8 @@ function bhv_arena_flag_return(obj, showMessage)
     end
 end
 
+--- @param obj Object
+--- @param m MarioState
 function bhv_arena_flag_collect(obj, m)
     local data = gArenaFlagInfo[obj.oArenaFlagTeam]
     local s  = gPlayerSyncTable[m.playerIndex]
@@ -216,6 +223,7 @@ function bhv_arena_flag_collect(obj, m)
     return true
 end
 
+--- @param obj Object
 function bhv_arena_flag_check_collect(obj)
     if not network_is_server() then
         return
@@ -238,6 +246,7 @@ function bhv_arena_flag_check_collect(obj)
     end
 end
 
+--- @param obj Object
 function bhv_arena_update_scale(obj)
     local np = gNetworkPlayers[0]
     if obj.oArenaFlagHeldByGlobal == np.globalIndex then
@@ -247,6 +256,7 @@ function bhv_arena_update_scale(obj)
     end
 end
 
+--- @param obj Object
 function bhv_arena_flag_check_drop(obj)
     if not network_is_server() then
         return
@@ -280,6 +290,7 @@ function bhv_arena_flag_check_drop(obj)
     end
 end
 
+--- @param npVictim NetworkPlayer
 function bhv_arena_flag_check_death(npVictim)
     if not network_is_server() then
         return
@@ -295,6 +306,7 @@ function bhv_arena_flag_check_death(npVictim)
     end
 end
 
+--- @param obj Object
 function bhv_arena_flag_check_return(obj)
     if not network_is_server() then
         return
@@ -320,6 +332,7 @@ function bhv_arena_flag_reset()
     end
 end
 
+--- @param obj Object
 function bhv_arena_flag_hide(obj)
     if gGlobalSyncTable.gameMode == GAME_MODE_CTF and (obj.oArenaFlagTeam == 1 or obj.oArenaFlagTeam == 2) then
         cur_obj_unhide()
@@ -333,6 +346,7 @@ function bhv_arena_flag_hide(obj)
     end
 end
 
+--- @param m MarioState
 function is_holding_flag(m)
     local np = gNetworkPlayers[m.playerIndex]
     for teamNum = 0, 2 do
@@ -344,6 +358,7 @@ function is_holding_flag(m)
     return false
 end
 
+--- @param obj Object
 function bhv_arena_flag_loop(obj)
     if bhv_arena_flag_hide(obj) then
         return

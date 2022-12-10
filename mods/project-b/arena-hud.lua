@@ -73,7 +73,7 @@ function render_game_mode()
     elseif gGlobalSyncTable.gameMode == GAME_MODE_TKOTH then
         txt = string.format("%s | First team to %d points", gGameModes[gGlobalSyncTable.gameMode].name, scoreCap)
     end
-    local scale = 0.25
+    local scale = 0.3
     local width = (djui_hud_measure_text(txt) + 8) * scale
     local height = 4 * scale + 28 * scale
     local x = 4 * scale
@@ -106,7 +106,7 @@ function render_single_team_score(team)
     end
     djui_hud_render_rect(x, y, width, height)
 
-    x = x + (width - textWidth) / 2
+    x = x + (width - textWidth) * 0.5
     djui_hud_set_color(0, 0, 0, 255)
     djui_hud_print_text(txt, x + 2 * scale, y + 2 * scale, scale)
     djui_hud_set_color(255, 255, 255, 255)
@@ -137,7 +137,7 @@ function render_local_rank()
     else
         rankTxt = string.format("%s | %d kills | %d deaths", rank_str(s.rank), s.kills, s.deaths)
     end
-    local scale = 0.25
+    local scale = 0.3
     local width = (djui_hud_measure_text(rankTxt) + 8) * scale
     local height = 4 * scale + 28 * scale
 
@@ -166,8 +166,8 @@ function render_server_message()
     local scale = 1
     local width = (djui_hud_measure_text(txt) + 8) * scale
     local height = 4 * scale + 28 * scale
-    local x = (screenWidth - width) / 2
-    local y = (screenHeight / 4)
+    local x = (screenWidth - width) * 0.5
+    local y = (screenHeight * 0.25)
 
     djui_hud_set_color(0, 0, 0, 128)
     djui_hud_render_rect(x, y, width, height)
@@ -187,7 +187,7 @@ function render_health()
     local scale = 1
     local width = 128 * scale
     local height = 16 * scale
-    local x = math.floor((screenWidth - width) / 2)
+    local x = math.floor((screenWidth - width) * 0.5)
     local y = math.floor(screenHeight - height - 4 * scale)
 
     djui_hud_set_color(0, 0, 0, 128)
@@ -203,6 +203,12 @@ function render_health()
     gscale = clamp((health ^ 2) * 2, 0, 1)
     djui_hud_set_color(255 * rscale, 255 * gscale, 0, 128)
     djui_hud_render_rect(x, y, width, height)
+
+    djui_hud_set_font(FONT_MENU)
+    djui_hud_set_color(0, 255, 0, 255)
+    djui_hud_print_text(tostring(math.floor(health * 100)), x, y - 2, 0.25)
+    --reset
+    djui_hud_set_font(FONT_NORMAL)
 end
 
 function render_hud_icon(obj, hudIcon)

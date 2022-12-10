@@ -5,6 +5,7 @@ define_custom_obj_fields({
     oArenaSparkleOffsetZ = 'f32',
 })
 
+--- @param obj Object
 function bhv_arena_sparkle_init(obj)
     obj.oFlags = OBJ_FLAG_UPDATE_GFX_POS_AND_ANGLE
     obj.oAnimState = -1
@@ -15,7 +16,8 @@ function bhv_arena_sparkle_init(obj)
     obj_scale_random(obj, 1, 0)
 end
 
-function bhv_arena_sparkle_loop(obj) 
+--- @param obj Object
+function bhv_arena_sparkle_loop(obj)
     obj.oAnimState = obj.oAnimState + 1
     if obj.oTimer > 9 then
         obj.activeFlags = ACTIVE_FLAG_DEACTIVATED;

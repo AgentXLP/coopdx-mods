@@ -1,5 +1,6 @@
 sArenaSpawns = {}
 
+--- @param obj Object
 function bhv_arena_spawn_init(obj)
     table.insert(sArenaSpawns, {
         pos = { x = obj.oPosX, y = obj.oPosY, z = obj.oPosZ },

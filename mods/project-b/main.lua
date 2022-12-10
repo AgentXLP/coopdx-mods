@@ -14,21 +14,21 @@ GAME_MODE_KOTH  = 6
 GAME_MODE_TKOTH = 7
 
 gGameModes = {
-    [GAME_MODE_DM]    = { shortName = 'DM',    name = 'Deathmatch',            teams = false, teamSpawns = false, useScore = false, scoreCap = 10,  minPlayers = 0, maxPlayers = 99 },
-    [GAME_MODE_TDM]   = { shortName = 'TDM',   name = 'Team Deathmatch',       teams = true,  teamSpawns = false, useScore = false, scoreCap = 20,  minPlayers = 4, maxPlayers = 99 },
-    [GAME_MODE_CTF]   = { shortName = 'CTF',   name = 'Capture the Flag',      teams = true,  teamSpawns = true,  useScore = false, scoreCap =  3,  minPlayers = 4, maxPlayers = 99 },
-    [GAME_MODE_FT]    = { shortName = 'FT',    name = 'Flag Tag',              teams = false, teamSpawns = false, useScore = true,  scoreCap = 60,  minPlayers = 0, maxPlayers = 99 },
-    [GAME_MODE_TFT]   = { shortName = 'TFT',   name = 'Team Flag Tag',         teams = true,  teamSpawns = false, useScore = true,  scoreCap = 120, minPlayers = 4, maxPlayers = 99 },
-    [GAME_MODE_KOTH]  = { shortName = 'KOTH',  name = 'King of the Hill',      teams = false, teamSpawns = false, useScore = true,  scoreCap = 45,  minPlayers = 0, maxPlayers = 6  },
-    [GAME_MODE_TKOTH] = { shortName = 'TKOTH', name = 'Team King of the Hill', teams = true,  teamSpawns = false, useScore = true,  scoreCap = 90,  minPlayers = 4, maxPlayers = 99 },
+    [GAME_MODE_DM]    = { shortName = "DM",    name = "Deathmatch",            teams = false, teamSpawns = false, useScore = false, scoreCap = 10,  minPlayers = 0, maxPlayers = 99 },
+    [GAME_MODE_TDM]   = { shortName = "TDM",   name = "Team Deathmatch",       teams = true,  teamSpawns = false, useScore = false, scoreCap = 20,  minPlayers = 4, maxPlayers = 99 },
+    [GAME_MODE_CTF]   = { shortName = "CTF",   name = "Capture the Flag",      teams = true,  teamSpawns = true,  useScore = false, scoreCap =  3,  minPlayers = 4, maxPlayers = 99 },
+    [GAME_MODE_FT]    = { shortName = "FT",    name = "Flag Tag",              teams = false, teamSpawns = false, useScore = true,  scoreCap = 60,  minPlayers = 0, maxPlayers = 99 },
+    [GAME_MODE_TFT]   = { shortName = "TFT",   name = "Team Flag Tag",         teams = true,  teamSpawns = false, useScore = true,  scoreCap = 120, minPlayers = 4, maxPlayers = 99 },
+    [GAME_MODE_KOTH]  = { shortName = "KOTH",  name = "King of the Hill",      teams = false, teamSpawns = false, useScore = true,  scoreCap = 45,  minPlayers = 0, maxPlayers = 6  },
+    [GAME_MODE_TKOTH] = { shortName = "TKOTH", name = "Team King of the Hill", teams = true,  teamSpawns = false, useScore = true,  scoreCap = 90,  minPlayers = 4, maxPlayers = 99 },
 }
 
 gGameLevels = {
-    { level = LEVEL_BOB, name = 'Origin'    },
-    { level = LEVEL_CCM, name = 'Sky Beach' },
-    { level = LEVEL_WF,  name = 'Pillars' },
-    { level = LEVEL_JRB, name = 'Forts' },
-    { level = LEVEL_DDD, name = 'Platforms' },
+    { level = LEVEL_BOB, name = "Origin"    },
+    { level = LEVEL_CCM, name = "Sky Beach" },
+    { level = LEVEL_WF,  name = "Pillars" },
+    { level = LEVEL_JRB, name = "Forts" },
+    { level = LEVEL_DDD, name = "Platforms" },
 }
 
 smlua_text_utils_course_acts_replace(COURSE_BOB, " 1 Origin", "?", "?", "?", "?", "?", "?")
@@ -45,7 +45,8 @@ gGlobalSyncTable.roundsPerShuffle = 3
 gGlobalSyncTable.capTeam1 = 0
 gGlobalSyncTable.capTeam2 = 0
 gGlobalSyncTable.kothPoint = -1
-gGlobalSyncTable.message = ' '
+gGlobalSyncTable.message = " "
+gGlobalSyncTable.iframes = true
 sWaitTimerMax = 15 * 30 -- 15 seconds
 sWaitTimer = 0
 sRoundCount = 0
@@ -129,6 +130,7 @@ function calculate_team_score(teamNum)
     return score
 end
 
+--- @param m MarioState
 function pick_team_on_join(m)
     -- no teams
     if not gGameModes[gGlobalSyncTable.gameMode].teams then
@@ -188,7 +190,7 @@ function shuffle_teams()
     local team2Count = 0
     local oddS = nil
     for i, s in ipairs(t) do
-        if (i - 1) < count / 2 then
+        if (i - 1) < count * 0.5 then
             s.team = 1
             team1Count = team1Count + 1
             oddS = s
@@ -205,7 +207,7 @@ function shuffle_teams()
 end
 
 function round_begin()
-    gGlobalSyncTable.message = ' '
+    gGlobalSyncTable.message = " "
     gGlobalSyncTable.gameState = GAME_STATE_ACTIVE
     gGlobalSyncTable.capTeam1 = 0
     gGlobalSyncTable.capTeam2 = 0
@@ -289,22 +291,22 @@ function round_end()
 
         if winner ~= nil then
             local winnerNp = gNetworkPlayers[winner.playerIndex]
-            gGlobalSyncTable.message = strip_colors(winnerNp.name) .. ' Wins!'
+            gGlobalSyncTable.message = strip_colors(winnerNp.name) .. " Wins!"
         else
-            gGlobalSyncTable.message = 'Round Ended'
+            gGlobalSyncTable.message = "Round Ended"
         end
     elseif gGlobalSyncTable.gameMode == GAME_MODE_TDM or gGlobalSyncTable.gameMode == GAME_MODE_CTF or gGlobalSyncTable.gameMode == GAME_MODE_TFT or gGlobalSyncTable.gameMode == GAME_MODE_TKOTH then
         local redScore  = calculate_team_score(1)
         local blueScore = calculate_team_score(2)
         if redScore > blueScore then
-            gGlobalSyncTable.message = 'Red Team Wins!'
+            gGlobalSyncTable.message = "Red Team Wins!"
         elseif blueScore > redScore then
-            gGlobalSyncTable.message = 'Blue Team Wins!'
+            gGlobalSyncTable.message = "Blue Team Wins!"
         else
-            gGlobalSyncTable.message = 'Round Ended'
+            gGlobalSyncTable.message = "Round Ended"
         end
     else
-        gGlobalSyncTable.message = 'Round Ended'
+        gGlobalSyncTable.message = "Round Ended"
     end
 end
 
@@ -322,7 +324,7 @@ function on_arena_player_death(victimGlobalId, attackerGlobalId)
     local sVictim = gPlayerSyncTable[npVictim.localIndex]
     local sAttacker = nil
     if npAttacker ~= nil then sAttacker = gPlayerSyncTable[npAttacker.localIndex] end
-    local normalColor = '\\#dcdcdc\\'
+    local normalColor = "\\#dcdcdc\\"
 
     if npAttacker == nil or npVictim == npAttacker then
         -- create popup
@@ -358,7 +360,7 @@ function on_arena_player_death(victimGlobalId, attackerGlobalId)
             if sAttacker.team ~= 0 then
                 local teamScore = calculate_team_score(sAttacker.team)
                 if teamScore >= gGameModes[gGlobalSyncTable.gameMode].scoreCap then
-                    round_end()                    
+                    round_end()
                 end
             end
         end
@@ -404,7 +406,7 @@ function on_sync_valid()
     end
 end
 
-function on_pause_exit(exitToCastle)
+function on_pause_exit()
     return false
 end
 
@@ -434,7 +436,6 @@ function on_update()
 end
 
 function on_gamemode_command(msg)
-
     local setMode = nil
 
     for i, gm in ipairs(gGameModes) do
@@ -443,8 +444,8 @@ function on_gamemode_command(msg)
         end
     end
 
-    if msg == 'random' then
-        djui_chat_message_create('Setting to random gamemode.')
+    if msg == "random" then
+        djui_chat_message_create("Setting to random gamemode.")
         sRandomizeMode = true
         round_end()
         sWaitTimer = 1
@@ -453,7 +454,7 @@ function on_gamemode_command(msg)
     end
 
     if setMode ~= nil then
-        djui_chat_message_create('Setting game mode.')
+        djui_chat_message_create("Setting game mode.")
         gGlobalSyncTable.gameMode = setMode
         sRandomizeMode = false
         round_end()
@@ -466,7 +467,6 @@ function on_gamemode_command(msg)
 end
 
 function on_level_command(msg)
-
     local setLevel = nil
 
     for i, gl in ipairs(gGameLevels) do
@@ -486,27 +486,42 @@ function on_level_command(msg)
     return false
 end
 
+function on_iframes_command(msg)
+    if msg == "on" then
+        gGlobalSyncTable.iframes = true
+        djui_chat_message_create("Invincibility frames status: \\#00ff00\\ON")
+        return true
+    elseif msg == "off" then
+        gGlobalSyncTable.iframes = false
+        djui_chat_message_create("Invincibility frames status: \\#7f0000\\OFF")
+        return true
+    end
+
+    return false
+end
+
 hook_event(HOOK_ON_SYNC_VALID, on_sync_valid)
 hook_event(HOOK_ON_PAUSE_EXIT, on_pause_exit)
 hook_event(HOOK_UPDATE, on_update)
 
-sGameModeShortTimes = ''
+sGameModeShortTimes = ""
 for i, gm in ipairs(gGameModes) do
     if string.len(sGameModeShortTimes) > 0 then
-        sGameModeShortTimes = sGameModeShortTimes .. '|'
+        sGameModeShortTimes = sGameModeShortTimes .. "|"
     end
     sGameModeShortTimes = sGameModeShortTimes .. gm.shortName
 end
 
-sLevelChoices = ''
+sLevelChoices = ""
 for i, gl in ipairs(gGameLevels) do
     if string.len(sLevelChoices) > 0 then
-        sLevelChoices = sLevelChoices .. '|'
+        sLevelChoices = sLevelChoices .. "|"
     end
     sLevelChoices = sLevelChoices .. gl.name
 end
 
 if network_is_server() then
-    hook_chat_command('arena-gamemode', string.format("[%s|random] sets gamemode", sGameModeShortTimes), on_gamemode_command)
-    hook_chat_command('arena-level', string.format('[%s] sets level', sLevelChoices), on_level_command)
+    hook_chat_command("arena-gamemode", string.format("[%s|random] sets gamemode", sGameModeShortTimes), on_gamemode_command)
+    hook_chat_command("arena-level", string.format("[%s] sets level", sLevelChoices), on_level_command)
+    hook_chat_command("arena-iframes", "[on|off] turns invincibility frames on or off", on_iframes_command)
 end

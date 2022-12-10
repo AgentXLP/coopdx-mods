@@ -41,6 +41,7 @@ function mario_hammer_is_attack(action)
     return false
 end
 
+--- @param m MarioState
 function mario_hammer_position(m)
     local held = gItemHeld[m.playerIndex]
     if held == nil then
@@ -51,6 +52,7 @@ function mario_hammer_position(m)
     return set_dist_and_angle(origin, 100, 0x4000 + -held.oFaceAnglePitch, held.oFaceAngleYaw)
 end
 
+--- @param m MarioState
 function mario_hammer_pound(m)
     local v = {
         x = m.pos.x + sins(m.faceAngle.y) * 200,
@@ -62,6 +64,7 @@ function mario_hammer_pound(m)
     cur_obj_shake_screen(SHAKE_POS_MEDIUM)
 end
 
+--- @param m MarioState
 function mario_hammer_on_set_action(m)
     if m.action == ACT_PUNCHING or m.action == ACT_MOVE_PUNCHING or m.action == ACT_JUMP_KICK then
         play_sound(SOUND_ACTION_TWIRL, m.marioObj.header.gfx.cameraToObject)
@@ -70,6 +73,7 @@ function mario_hammer_on_set_action(m)
     end
 end
 
+--- @param m MarioState
 function mario_hammer_update(m)
     local e = gMarioStateExtras[m.playerIndex]
     local s = gPlayerSyncTable[m.playerIndex]
@@ -97,6 +101,7 @@ function mario_hammer_update(m)
     end
 end
 
+--- @param m MarioState
 function mario_local_hammer_check(m)
     local np = gNetworkPlayers[m.playerIndex]
     local e = gMarioStateExtras[m.playerIndex]
@@ -153,6 +158,7 @@ end
 -- fire flower --
 -----------------
 
+--- @param m MarioState
 function mario_fire_flower_use(m)
     local np = gNetworkPlayers[m.playerIndex]
     local e = gMarioStateExtras[m.playerIndex]
@@ -186,6 +192,7 @@ end
 -- bobomb --
 ------------
 
+--- @param m MarioState
 function mario_bobomb_use(m)
     local np = gNetworkPlayers[m.playerIndex]
     local e = gMarioStateExtras[m.playerIndex]
@@ -210,7 +217,7 @@ function mario_bobomb_use(m)
         set_mario_action(m, ACT_PUNCHING, 0)
     end
 
-    e.attackCooldown = 15
+    e.attackCooldown = 30
     s.ammo = s.ammo - 1
 end
 
@@ -218,6 +225,7 @@ end
 -- cannon box --
 ----------------
 
+--- @param m MarioState
 function mario_cannon_box_update(m)
     local np = gNetworkPlayers[m.playerIndex]
     local e = gMarioStateExtras[m.playerIndex]
@@ -227,7 +235,7 @@ function mario_cannon_box_update(m)
         s.charging = get_network_area_timer()
     end
 
-    if (m.controller.buttonDown & Y_BUTTON) ~= 0 and s.charging > 0 then
+    if (m.controller.buttonDown & Y_BUTTON) ~= 0 and m.health > 0xff and s.charging > 0 then
         local held = gItemHeld[m.playerIndex]
         if held ~= nil then
             for i = 0, 2 do
@@ -236,6 +244,19 @@ function mario_cannon_box_update(m)
                     function (obj)
                         obj.oArenaSparkleOwner = m.playerIndex
                     end)
+            end
+        end
+        if get_network_area_timer() - s.charging > 250 then
+            m.particleFlags = m.particleFlags | PARTICLE_FIRE
+            if get_network_area_timer() - s.charging == 300 then
+                spawn_sync_object(
+                    id_bhvExplosion,
+                    E_MODEL_EXPLOSION,
+                    m.pos.x, m.pos.y, m.pos.z,
+                    nil
+                )
+                s.charging = 0
+                s.ammo = s.ammo - 1
             end
         end
     elseif m.playerIndex == 0 and s.charging > 0 then
@@ -255,7 +276,9 @@ end
 -----------
 -- hooks --
 -----------
-
+--[[
+--- @param attacker MarioState
+--- @param victim MarioState
 function allow_pvp_attack(attacker, victim)
     local npAttacker = gNetworkPlayers[attacker.playerIndex]
     local sAttacker = gPlayerSyncTable[attacker.playerIndex]
@@ -268,7 +291,9 @@ function allow_pvp_attack(attacker, victim)
     -- check teams
     return global_index_hurts_mario_state(npAttacker.globalIndex, victim)
 end
-
+]]
+--- @param attacker MarioState
+--- @param victim MarioState
 function on_pvp_attack(attacker, victim)
     if victim.playerIndex == 0 then
         local e = gMarioStateExtras[victim.playerIndex]
@@ -286,6 +311,7 @@ function on_interact(interactor, interactee, interactType, interactValue)
     e.lastDamagedByGlobal = interactee.oArenaFlameGlobalOwner
 end
 
+--- @param m MarioState
 function on_set_mario_action(m)
     local e = gMarioStateExtras[m.playerIndex]
     local s = gPlayerSyncTable[m.playerIndex]
@@ -300,6 +326,7 @@ function on_set_mario_action(m)
 
 end
 
+--- @param m MarioState
 function mario_local_update(m)
     local np = gNetworkPlayers[m.playerIndex]
     local s = gPlayerSyncTable[m.playerIndex]
@@ -321,7 +348,7 @@ function mario_local_update(m)
     end
 
     -- use the bobomb
-    if e.attackCooldown <= 0 and s.item == ITEM_BOBOMB and (m.controller.buttonPressed & Y_BUTTON) ~= 0 then
+    if e.attackCooldown <= 0 and s.item == ITEM_BOBOMB and (m.controller.buttonPressed & Y_BUTTON) ~= 0 and m.health > 0xff then
         mario_bobomb_use(m)
     end
 
@@ -338,7 +365,7 @@ function mario_local_update(m)
     -- reduce damage when metal
     if s.metal then
         if m.hurtCounter > e.prevHurtCounter then
-            m.hurtCounter = m.hurtCounter / 2
+            m.hurtCounter = m.hurtCounter * 0.5
         end
     end
 
@@ -352,15 +379,23 @@ function mario_local_update(m)
     end
 
     e.prevHurtCounter = m.hurtCounter
+    m.peakHeight = m.pos.y
+
+    if vec3f_dist(m.pos, m.area.camera.pos) < 500 then
+        m.marioBodyState.modelState = m.marioBodyState.modelState | MODEL_STATE_NOISE_ALPHA
+    end
 end
 
+--- @param m MarioState
 function mario_update(m)
     local e  = gMarioStateExtras[m.playerIndex]
     local s  = gPlayerSyncTable[m.playerIndex]
     local np = gNetworkPlayers[m.playerIndex]
 
-    -- clear invincibilities
-    m.invincTimer = 0
+    -- clear invincibilities if you hate fun
+    if not gGlobalSyncTable.iframes then
+        m.invincTimer = 0
+    end
     if m.knockbackTimer > 5 then
         m.knockbackTimer = 5
     end
@@ -400,6 +435,7 @@ function mario_update(m)
     end
 end
 
+--- @param m MarioState
 function player_reset_sync_table(m)
     local s  = gPlayerSyncTable[m.playerIndex]
     s.item     = ITEM_NONE
@@ -413,6 +449,7 @@ function player_reset_sync_table(m)
     s.team     = pick_team_on_join(m)
 end
 
+--- @param m MarioState
 function player_respawn(m)
     local np = gNetworkPlayers[m.playerIndex]
     local e  = gMarioStateExtras[m.playerIndex]
@@ -444,6 +481,7 @@ function player_respawn(m)
     stop_cap_music()
 end
 
+--- @param m MarioState
 function on_death(m)
     if m.playerIndex ~= 0 then return end
     local np = gNetworkPlayers[m.playerIndex]
@@ -458,6 +496,7 @@ function on_death(m)
     return false
 end
 
+--- @param m MarioState
 function on_player_connected(m)
     local np = gNetworkPlayers[m.playerIndex]
     local e = gMarioStateExtras[m.playerIndex]
@@ -470,6 +509,7 @@ function on_player_connected(m)
     end
 end
 
+--- @param m MarioState
 function on_player_disconnected(m)
     local s = gPlayerSyncTable[m.playerIndex]
     if network_is_server() then
@@ -477,6 +517,7 @@ function on_player_disconnected(m)
     end
 end
 
+--- @param m MarioState
 function before_phys_step(m)
     local hScale = 1.0
 
@@ -488,7 +529,7 @@ function before_phys_step(m)
     m.vel.z = m.vel.z * hScale
 end
 
-hook_event(HOOK_ALLOW_PVP_ATTACK, allow_pvp_attack)
+-- hook_event(HOOK_ALLOW_PVP_ATTACK, allow_pvp_attack)
 hook_event(HOOK_ON_PVP_ATTACK, on_pvp_attack)
 hook_event(HOOK_ON_INTERACT, on_interact)
 hook_event(HOOK_ON_SET_MARIO_ACTION, on_set_mario_action)
