@@ -34,3 +34,5 @@ To download single file mods click on the link and then press the "Raw" button t
 [LEGO HUD](./mods/lego-hud/lego-hud.zip)
 
 [LGBT Goombas](./mods/lgbt-goombas/lgbt-goombas.zip)
+
+[Hugging](./mods/hugging.lua)
