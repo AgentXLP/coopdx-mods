@@ -233,10 +233,8 @@ function on_packet_receive(dataTable)
 
     local m = gMarioStates[0]
     if dataTable.hug then
-        -- print("setting hug action from packet")
         set_mario_action(m, ACT_HUGGING, 0)
     else
-        -- print("setting idle action from packet")
         set_mario_action(m, ACT_IDLE, 0)
     end
 end
