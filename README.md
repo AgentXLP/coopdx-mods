@@ -36,3 +36,5 @@ To download single file mods click on the link and then press the "Raw" button t
 [LGBT Goombas](./mods/lgbt-goombas/lgbt-goombas.zip)
 
 [Hugging](./mods/hugging.lua)
+
+[Completion Percentage](./mods/completion-percentage.lua)

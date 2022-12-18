@@ -54,3 +54,7 @@ This mod adds busting down doors by slide kicking into them, flying doors can de
 <img width="600" alt="blockymybeloved" src="https://user-images.githubusercontent.com/44549182/208311383-e5003dd1-427f-410f-aa76-ea5fe9cb8f29.png">
 
 This mod adds hugging to sm64ex-coop, to hug someone walk up to them and press Y. If the person you're hugging is your beloved, you can press A to kiss them, kissing slowly regenerates health.
+
+## Completion Percentage
+
+This mod adds a completion percentage to sm64ex-coop in the pause menu, when you're not in a course and pause the game there will be a percentage near the middle of the screen.
