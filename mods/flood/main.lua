@@ -361,7 +361,7 @@ end
 function on_speed_command(msg)
     if tonumber(msg) then
         djui_chat_message_create("Water speed set to " .. msg)
-        gGlobalSyncTable.speedModifier = tonumber(msg)
+        gGlobalSyncTable.speedMultiplier = tonumber(msg)
     else
         djui_chat_message_create("\\#ff0000\\Failed to set speed to " .. msg)
     end
@@ -413,10 +413,6 @@ function on_round_state_changed(tag, oldVal, newVal)
     end
 end
 
-function on_pause_exit()
-
-end
-
 hud_hide()
 
 hook_event(HOOK_UPDATE, update)
@@ -436,5 +432,5 @@ hook_chat_command("scoreboard", "[1-10] to show the scoreboard of one of the 10 
 
 if network_is_server() then
     hook_chat_command("start", "[random|1-10] to set the level to a random one or a specific one, you can also leave it empty for normal progression.", on_start_command)
-    hook_chat_command("speed", "[number (0.5 to 1.5 preferably)] to set the water speed multiplier, default is \\#00ff00\\1.75", on_speed_command)
+    hook_chat_command("speed", "[number] to set the water speed multiplier", on_speed_command)
 end
