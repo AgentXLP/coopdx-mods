@@ -57,4 +57,6 @@ This mod adds hugging to sm64ex-coop, to hug someone walk up to them and press Y
 
 ## Completion Percentage
 
+<img width="600" alt="percent" src="https://user-images.githubusercontent.com/44549182/208311588-ad3d543a-d490-4ebe-8491-2a275df990ed.png">
+
 This mod adds a completion percentage to sm64ex-coop in the pause menu, when you're not in a course and pause the game there will be a percentage near the middle of the screen.
