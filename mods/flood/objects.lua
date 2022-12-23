@@ -4,17 +4,12 @@ E_MODEL_CTT = smlua_model_util_get_id("ctt_geo") -- easter egg in the distance
 --- @param o Object
 function bhv_water_init(o)
     o.oFlags = OBJ_FLAG_UPDATE_GFX_POS_AND_ANGLE
+    o.oAnimState = levels[map()].type
 
     o.header.gfx.skipInViewCheck = true
 
     o.oFaceAnglePitch = 0
     o.oFaceAngleRoll = 0
-
-    if map() == LEVEL_PSS or map() == LEVEL_LLL then
-        o.oAnimState = 1
-    elseif map() == LEVEL_SSL then
-        o.oAnimState = 2
-    end
 end
 
 --- @param o Object
@@ -55,3 +50,21 @@ function bhv_final_star_loop(o)
 end
 
 id_bhvFinalStar = hook_behavior(nil, OBJ_LIST_GENACTOR, true, bhv_final_star_init, bhv_final_star_loop)
+
+--- @param obj Object
+function obj_mark_for_deletion_on_sync(obj)
+    if gNetworkPlayers[0].currAreaSyncValid then obj_mark_for_deletion(obj) end
+end
+
+hook_behavior(id_bhvHoot, OBJ_LIST_UNIMPORTANT, true, nil, obj_mark_for_deletion_on_sync)
+hook_behavior(id_bhvStar, OBJ_LIST_UNIMPORTANT, true, nil, obj_mark_for_deletion_on_sync)
+hook_behavior(id_bhvCannon, OBJ_LIST_UNIMPORTANT, true, nil, obj_mark_for_deletion_on_sync)
+hook_behavior(id_bhvRedCoin, OBJ_LIST_UNIMPORTANT, true, nil, obj_mark_for_deletion_on_sync)
+hook_behavior(id_bhvWarpPipe, OBJ_LIST_UNIMPORTANT, true, nil, obj_mark_for_deletion_on_sync)
+hook_behavior(id_bhvFadingWarp, OBJ_LIST_UNIMPORTANT, true, nil, obj_mark_for_deletion_on_sync)
+hook_behavior(id_bhvEyerokBoss, OBJ_LIST_UNIMPORTANT, true, nil, obj_mark_for_deletion_on_sync)
+hook_behavior(id_bhvBalconyBigBoo, OBJ_LIST_UNIMPORTANT, true, nil, obj_mark_for_deletion_on_sync)
+hook_behavior(id_bhvRecoveryHeart, OBJ_LIST_UNIMPORTANT, true, nil, obj_mark_for_deletion_on_sync)
+hook_behavior(id_bhvExclamationBox, OBJ_LIST_UNIMPORTANT, true, nil, obj_mark_for_deletion_on_sync)
+hook_behavior(id_bhvUkiki, OBJ_LIST_UNIMPORTANT, true, nil, obj_mark_for_deletion_on_sync)
+hook_behavior(id_bhvChuckya, OBJ_LIST_UNIMPORTANT, true, nil, obj_mark_for_deletion_on_sync)

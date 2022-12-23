@@ -66,19 +66,6 @@ function name_without_hex(name)
     return s
 end
 
--- potential cause of some object pool jank? unsure but I don't trust this game
-hook_behavior(id_bhvHoot, OBJ_LIST_UNIMPORTANT, true, obj_mark_for_deletion, nil)
-hook_behavior(id_bhvStar, OBJ_LIST_UNIMPORTANT, true, obj_mark_for_deletion, nil)
-hook_behavior(id_bhvCannon, OBJ_LIST_UNIMPORTANT, true, obj_mark_for_deletion, nil)
-hook_behavior(id_bhvRedCoin, OBJ_LIST_UNIMPORTANT, true, obj_mark_for_deletion, nil)
-hook_behavior(id_bhvWarpPipe, OBJ_LIST_UNIMPORTANT, true, obj_mark_for_deletion, nil)
-hook_behavior(id_bhvFadingWarp, OBJ_LIST_UNIMPORTANT, true, obj_mark_for_deletion, nil)
-hook_behavior(id_bhvEyerokBoss, OBJ_LIST_UNIMPORTANT, true, obj_mark_for_deletion, nil)
-hook_behavior(id_bhvBalconyBigBoo, OBJ_LIST_UNIMPORTANT, true, obj_mark_for_deletion, nil)
-hook_behavior(id_bhvRecoveryHeart, OBJ_LIST_UNIMPORTANT, true, obj_mark_for_deletion, nil)
-hook_behavior(id_bhvExclamationBox, OBJ_LIST_UNIMPORTANT, true, obj_mark_for_deletion, nil)
-hook_behavior(id_bhvUkiki, OBJ_LIST_UNIMPORTANT, true, obj_mark_for_deletion, nil) -- ass clown
-
 smlua_audio_utils_replace_sequence(SEQ_LEVEL_SLIDE, 37, 80, "00_pinball_custom")
 
 -- dynos moment

@@ -8,6 +8,7 @@ function bhv_launchpad_init(o)
     o.collisionData = COL_LAUNCHPAD
     obj_scale(o, 0.85)
 end
+
 function bhv_launchpad_loop(o)
     local m = nearest_mario_state_to_object(o)
     if m.marioObj.platform == o then
@@ -31,4 +32,5 @@ function bhv_launchpad_loop(o)
     end
     load_object_collision_model()
 end
+
 id_bhvLaunchpad = hook_behavior(nil, OBJ_LIST_SURFACE, true, bhv_launchpad_init, bhv_launchpad_loop)
