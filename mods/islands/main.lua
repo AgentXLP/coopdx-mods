@@ -1,3 +1,3 @@
 -- name: Islands
--- description: Islands\nBy \\#ff7f00\\Agent X\\#ffffff\\\n\nThis mod just replaces Wing Mario Over the Rainbow with my own custom sunset themed map.
+-- description: Islands\nBy \\#ff7f00\\Agent X\\#dddddd\\\n\nThis mod just replaces Wing Mario Over the Rainbow with my own custom sunset themed map.
 -- gLevelValues.entryLevel = LEVEL_WMOTR

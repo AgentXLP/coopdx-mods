@@ -1,5 +1,5 @@
 -- name: Mario Style
--- description: Mario Style\n\\#ffffff\\By \\#ff7f00\\Agent X\\#ffff00\\\n\nFirst released mod to use DynOS custom\nanimations!\\#ffffff\\\nThis mod adds a custom star dance animation (Mario Style) as well as a tune to go along with it.\n\nIf you have a custom character model and wish for it to be compatible with Mario Style you must place the anims folder (the zip is on my GitHub) in your model's folder, this also works with DynOS packs so if you want to have Mario Style locally then you can use that.
+-- description: Mario Style\n\\#dddddd\\By \\#ff7f00\\Agent X\\#ffff00\\\n\nFirst released mod to use DynOS custom\nanimations!\\#dddddd\\\nThis mod adds a custom star dance animation (Mario Style) as well as a tune to go along with it.\n\nIf you have a custom character model and wish for it to be compatible with Mario Style you must place the anims folder (the zip is on my GitHub) in your model's folder, this also works with DynOS packs so if you want to have Mario Style locally then you can use that.
 
 SOUND_CUSTOM_GANGNAM = audio_sample_load("gangnam.mp3")
 

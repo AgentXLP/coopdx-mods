@@ -1,6 +1,6 @@
 -- name: Flood
 -- incompatible: gamemode
--- description: Flood v1.1.1\nBy \\#ec7731\\Agent X\\#ffffff\\\n\nThis mod adds a flood escape gamemode to sm64ex-coop, you must escape the flood and reach the top of the level before everything is flooded.
+-- description: Flood v1.1.1\nBy \\#ec7731\\Agent X\\#dddddd\\\n\nThis mod adds a flood escape gamemode to sm64ex-coop, you must escape the flood and reach the top of the level before everything is flooded.
 -- climb the tower 2 (climb the level) real
 
 FLOOD_WATER = 0

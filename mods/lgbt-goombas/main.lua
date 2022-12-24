@@ -1,6 +1,6 @@
 -- name: LGBT Goombas
 -- incompatible: moveset
--- description: LGBT Goombas\nBy \\#ec7731\\Agent X\\#ffffff\\\n\nThis mod adds LGBT flag Goombas, toggle with /lgbt [on|off]\n\nPan Goomba: Faster in snow levels, roll\nreplaces slide kick.\n\nBi Goomba: Improved moveset Goomba, has a spin jump and good air control.\n\nTrans Goomba: Loosely based off of Celeste's moveset with double jumps, dashing and wall climbing.\n\nAce Goomba: Crouch and hold down X or\nY to charge up a power jump.\n\nLesbian Goomba: Swims faster and has a special spin attack.\n\n\nSpecial thanks to 0x2480 for creating the strawberry model that goes over stars.
+-- description: LGBT Goombas\nBy \\#ec7731\\Agent X\\#dddddd\\\n\nThis mod adds LGBT flag Goombas, toggle with /lgbt [on|off]\n\nPan Goomba: Faster in snow levels, roll\nreplaces slide kick.\n\nBi Goomba: Improved moveset Goomba, has a spin jump and good air control.\n\nTrans Goomba: Loosely based off of Celeste's moveset with double jumps, dashing and wall climbing.\n\nAce Goomba: Crouch and hold down X or\nY to charge up a power jump.\n\nLesbian Goomba: Swims faster and has a special spin attack.\n\n\nSpecial thanks to 0x2480 for creating the strawberry model that goes over stars.
 
 goombas = {
     [CT_MARIO] = smlua_model_util_get_id("goomba_pan_geo"),

@@ -1,5 +1,5 @@
 -- name: Tree Billboard Fix
--- description: Tree Billboard Fix\nBy \\#ec7731\\Agent X\\#ffffff\\\n\nIn sm64ex, trees uses cylboard instead of billboard which makes them only rotate in relation the camera horizontally, this mod fixes that.
+-- description: Tree Billboard Fix\nBy \\#ec7731\\Agent X\\#dddddd\\\n\nIn sm64ex, trees uses cylboard instead of billboard which makes them only rotate in relation the camera horizontally, this mod fixes that.
 
 --- @param o Object
 function bhv_tree_init(o)

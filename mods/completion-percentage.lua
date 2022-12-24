@@ -1,5 +1,5 @@
 -- name: Completion Percentage
--- description: Completion Percentage\nBy \\#ec7731\\Agent X\\#ffffff\\\n\nThis mod adds a completion percentage to sm64ex-coop in the pause menu, when you're not in a course and pause the game there will be a percentage near the middle of the screen.
+-- description: Completion Percentage\nBy \\#ec7731\\Agent X\\#dddddd\\\n\nThis mod adds a completion percentage to sm64ex-coop in the pause menu, when you're not in a course and pause the game there will be a percentage near the middle of the screen.
 
 NUM_STARS = 120
 -- stars, ddd moved back, moat drained, 3 caps, 9 unlockable doors
