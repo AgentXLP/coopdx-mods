@@ -1,6 +1,6 @@
 -- name: Flood
 -- incompatible: gamemode
--- description: Flood v1.1\nBy \\#ec7731\\Agent X\\#ffffff\\\n\nThis mod adds a flood escape gamemode to sm64ex-coop, you must escape the flood and reach the top of the level before everything is flooded.
+-- description: Flood v1.1.1\nBy \\#ec7731\\Agent X\\#ffffff\\\n\nThis mod adds a flood escape gamemode to sm64ex-coop, you must escape the flood and reach the top of the level before everything is flooded.
 -- climb the tower 2 (climb the level) real
 
 FLOOD_WATER = 0
@@ -11,17 +11,17 @@ score = tonumber(mod_storage_load("score")) or 0
 if gServerSettings.enableCheats ~= 0 then score = 0 end
 
 levels = {
-    [LEVEL_BOB]   = { stop = 4200,  speed = 3, area = 1, type = FLOOD_WATER, spectate = true,  points = 2, name = "Bob-Omb Battlefield" },
-    [LEVEL_WF]    = { stop = 5250,  speed = 4, area = 1, type = FLOOD_WATER, spectate = true,  points = 2, name = "Whomp's Fortress" },
-    [LEVEL_BITDW] = { stop = 2750,  speed = 4, area = 1, type = FLOOD_WATER, spectate = true,  points = 3, name = "Bowser in the Dark World" },
-    [LEVEL_BBH]   = { stop = 2500,  speed = 4, area = 1, type = FLOOD_WATER, spectate = true,  points = 3, name = "Big Boo's Haunt" },
-    [LEVEL_LLL]   = { stop = 3538,  speed = 4, area = 2, type = FLOOD_LAVA,  spectate = true,  points = 3, name = "Lethal Lava Land" },
-    [LEVEL_SSL]   = { stop = 4800,  speed = 3, area = 2, type = FLOOD_SAND,  spectate = true,  points = 4, name = "Shifting Sand Land" },
-    [LEVEL_TTM]   = { stop = 2300,  speed = 3, area = 1, type = FLOOD_WATER, spectate = true,  points = 4, name = "Tall, Tall Mountain" },
-    [LEVEL_THI]   = { stop = 3890,  speed = 2, area = 1, type = FLOOD_WATER, spectate = true,  points = 5, name = "Tiny Huge Island" },
-    [LEVEL_BITS]  = { stop = 6500,  speed = 4, area = 1, type = FLOOD_LAVA,  spectate = false, points = 5, name = "Bowser in the Sky" },
-    [LEVEL_PSS]   = { stop = 10878, speed = 5, area = 1, type = FLOOD_LAVA,  spectate = false, points = 6, name = "Climb The Tower EX" },
-    [LEVEL_TTC]   = { stop = 6100,  speed = 4, area = 1, type = FLOOD_WATER, spectate = true,  points = 8, name = "Tick Tock Clock (Bonus)" }
+    [LEVEL_BOB]   = { stop = 4200,  speed = 2.5, area = 1, type = FLOOD_WATER, spectate = true,  points = 2, name = "Bob-Omb Battlefield" },
+    [LEVEL_WF]    = { stop = 5250,  speed = 4.0, area = 1, type = FLOOD_WATER, spectate = true,  points = 2, name = "Whomp's Fortress" },
+    [LEVEL_BITDW] = { stop = 2750,  speed = 4.0, area = 1, type = FLOOD_WATER, spectate = true,  points = 3, name = "Bowser in the Dark World" },
+    [LEVEL_BBH]   = { stop = 2500,  speed = 4.0, area = 1, type = FLOOD_WATER, spectate = true,  points = 3, name = "Big Boo's Haunt" },
+    [LEVEL_LLL]   = { stop = 3538,  speed = 4.0, area = 2, type = FLOOD_LAVA,  spectate = true,  points = 3, name = "Lethal Lava Land" },
+    [LEVEL_SSL]   = { stop = 4800,  speed = 3.0, area = 2, type = FLOOD_SAND,  spectate = true,  points = 4, name = "Shifting Sand Land" },
+    [LEVEL_TTM]   = { stop = 2300,  speed = 3.0, area = 1, type = FLOOD_WATER, spectate = true,  points = 4, name = "Tall, Tall Mountain" },
+    [LEVEL_THI]   = { stop = 3890,  speed = 2.0, area = 1, type = FLOOD_WATER, spectate = true,  points = 5, name = "Tiny Huge Island" },
+    [LEVEL_BITS]  = { stop = 6500,  speed = 4.0, area = 1, type = FLOOD_LAVA,  spectate = false, points = 5, name = "Bowser in the Sky" },
+    [LEVEL_PSS]   = { stop = 10878, speed = 5.0, area = 1, type = FLOOD_LAVA,  spectate = false, points = 6, name = "Climb The Tower EX" },
+    [LEVEL_TTC]   = { stop = 6100,  speed = 4.0, area = 1, type = FLOOD_WATER, spectate = true,  points = 8, name = "Tick Tock Clock (Bonus)" }
 }
 
 mapRotation = {
@@ -54,6 +54,7 @@ sOverrideCameraModes = {
 ROUND_STATE_INACTIVE = 0
 ROUND_STATE_ACTIVE   = 1
 ROUND_COOLDOWN       = 600
+
 LEVEL_LOBBY = LEVEL_CASTLE_GROUNDS
 
 MAX_HEALTH = 80
@@ -208,7 +209,7 @@ function mario_update(m)
         gPlayerSyncTable[0].health = gPlayerSyncTable[0].health - m.hurtCounter * 3
         m.hurtCounter = 0
     end
-    if m.healCounter > 0 and not gPlayerSyncTable[0].won and gPlayerSyncTable[0].health < MAX_HEALTH then
+    if m.healCounter > 0 and not gPlayerSyncTable[0].won and gPlayerSyncTable[0].health < MAX_HEALTH and gPlayerSyncTable[0].health > 0 then
         gPlayerSyncTable[0].health = gPlayerSyncTable[0].health + m.healCounter * 2
         m.healCounter = 0
         play_sound(SOUND_MENU_POWER_METER, m.marioObj.header.gfx.cameraToObject)
@@ -389,7 +390,7 @@ function on_round_state_changed(tag, oldVal, newVal)
         end
         if won ~= 0 then
             gGlobalSyncTable.map = gGlobalSyncTable.map + 1
-            if gGlobalSyncTable.map == 11 then gGlobalSyncTable.map = 1 end
+            if gGlobalSyncTable.map >= 11 then gGlobalSyncTable.map = 1 end
         else
             djui_chat_message_create("\\#ff0000\\None")
         end
