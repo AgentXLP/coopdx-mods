@@ -274,6 +274,15 @@ function mario_update(m)
     end
 end
 
+function before_phys_step(m)
+    if m.playerIndex ~= 0 then return end
+
+    local water = obj_get_first_with_behavior_id(id_bhvWater)
+    if water ~= nil and m.pos.y + 40 < water.oPosY and gNetworkPlayers[m.playerIndex].currLevelNum == map() then
+        m.vel.y = m.vel.y + 2
+    end
+end
+
 function on_hud_render()
     if gPlayerSyncTable[0]["time" .. gGlobalSyncTable.map] == nil then return end
 
@@ -459,11 +468,11 @@ camera_set_use_course_specific_settings(false)
 
 hook_event(HOOK_UPDATE, update)
 hook_event(HOOK_MARIO_UPDATE, mario_update)
+hook_event(HOOK_BEFORE_PHYS_STEP, before_phys_step)
 hook_event(HOOK_ON_HUD_RENDER, on_hud_render)
 hook_event(HOOK_ON_PLAYER_CONNECTED, on_player_connected)
 hook_event(HOOK_ALLOW_INTERACT, allow_interact)
 hook_event(HOOK_ON_LEVEL_INIT, on_level_init)
-hook_event(HOOK_BEFORE_PHYS_STEP, function(m) if m.pos.y + 40 < gGlobalSyncTable.waterLevel and gNetworkPlayers[m.playerIndex].currLevelNum == map() then m.vel.y = m.vel.y + 2 end end)
 hook_event(HOOK_ON_DEATH, function() return false end)
 hook_event(HOOK_ON_PAUSE_EXIT,  function() return false end)
 
