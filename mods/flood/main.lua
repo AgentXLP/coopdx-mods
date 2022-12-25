@@ -1,6 +1,6 @@
 -- name: Flood
 -- incompatible: gamemode
--- description: Flood v1.1.1\nBy \\#ec7731\\Agent X\\#dddddd\\\n\nThis mod adds a flood escape gamemode to sm64ex-coop, you must escape the flood and reach the top of the level before everything is flooded.
+-- description: Flood v1.1.2\nBy \\#ec7731\\Agent X\\#dddddd\\\n\nThis mod adds a flood escape gamemode to sm64ex-coop, you must escape the flood and reach the top of the level before everything is flooded.
 -- climb the tower 2 (climb the level) real
 
 FLOOD_WATER = 0
@@ -95,7 +95,8 @@ function act_dead(m)
     m.faceAngle.x = 0
     m.faceAngle.z = 0
 
-    m.pos.y = gGlobalSyncTable.waterLevel - 25
+    local water = obj_get_first_with_behavior_id(id_bhvWater)
+    if water ~= nil then m.pos.y = water.oPosY - 25 end
     vec3f_copy(m.marioObj.header.gfx.pos, m.pos)
 end
 
@@ -336,7 +337,7 @@ end
 --- @param m MarioState
 --- @param o Object
 function allow_interact(m, o)
-    if gNetworkPlayers[m.playerIndex].currLevelNum == LEVEL_CASTLE_GROUNDS then return false end
+    if gNetworkPlayers[m.playerIndex].currLevelNum == LEVEL_CASTLE_GROUNDS and o.oInteractType ~= INTERACT_PLAYER then return false end
     if obj_has_behavior_id(o, id_bhvStar) ~= 0
     or obj_has_behavior_id(o, id_bhvDoorWarp) ~= 0
     or obj_has_behavior_id(o, id_bhvWarp) ~= 0 then return false end
@@ -350,7 +351,7 @@ function on_level_init()
 
     if gGlobalSyncTable.roundState == ROUND_STATE_ACTIVE then
         if gNetworkPlayers[0].currLevelNum == map() then
-            gGlobalSyncTable.waterLevel = gMarioStates[0].spawnInfo.startPos.y - 1200
+            gGlobalSyncTable.waterLevel = gMarioStates[0].floorHeight - 1200
             spawn_non_sync_object(
                 id_bhvWater,
                 E_MODEL_FLOOD,
