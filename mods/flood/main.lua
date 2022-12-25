@@ -1,6 +1,6 @@
 -- name: Flood
 -- incompatible: gamemode
--- description: Flood v1.1.2\nBy \\#ec7731\\Agent X\\#dddddd\\\n\nThis mod adds a flood escape gamemode to sm64ex-coop, you must escape the flood and reach the top of the level before everything is flooded.
+-- description: Flood v1.1.3\nBy \\#ec7731\\Agent X\\#dddddd\\\n\nThis mod adds a flood escape gamemode to sm64ex-coop, you must escape the flood and reach the top of the level before everything is flooded.
 -- climb the tower 2 (climb the level) real
 
 FLOOD_WATER = 0
@@ -11,17 +11,17 @@ score = tonumber(mod_storage_load("score")) or 0
 if gServerSettings.enableCheats ~= 0 then score = 0 end
 
 levels = {
-    [LEVEL_BOB]   = { stop = 4200,  speed = 2.5, area = 1, type = FLOOD_WATER, spectate = true,  points = 2, name = "Bob-Omb Battlefield" },
-    [LEVEL_WF]    = { stop = 5250,  speed = 4.0, area = 1, type = FLOOD_WATER, spectate = true,  points = 2, name = "Whomp's Fortress" },
-    [LEVEL_BITDW] = { stop = 2750,  speed = 4.0, area = 1, type = FLOOD_WATER, spectate = true,  points = 3, name = "Bowser in the Dark World" },
-    [LEVEL_BBH]   = { stop = 2500,  speed = 4.0, area = 1, type = FLOOD_WATER, spectate = true,  points = 3, name = "Big Boo's Haunt" },
-    [LEVEL_LLL]   = { stop = 3538,  speed = 4.0, area = 2, type = FLOOD_LAVA,  spectate = true,  points = 3, name = "Lethal Lava Land" },
-    [LEVEL_SSL]   = { stop = 4800,  speed = 3.0, area = 2, type = FLOOD_SAND,  spectate = true,  points = 4, name = "Shifting Sand Land" },
-    [LEVEL_TTM]   = { stop = 2300,  speed = 3.0, area = 1, type = FLOOD_WATER, spectate = true,  points = 4, name = "Tall, Tall Mountain" },
-    [LEVEL_THI]   = { stop = 3890,  speed = 2.0, area = 1, type = FLOOD_WATER, spectate = true,  points = 5, name = "Tiny Huge Island" },
-    [LEVEL_BITS]  = { stop = 6500,  speed = 4.0, area = 1, type = FLOOD_LAVA,  spectate = false, points = 5, name = "Bowser in the Sky" },
-    [LEVEL_PSS]   = { stop = 10878, speed = 5.0, area = 1, type = FLOOD_LAVA,  spectate = false, points = 6, name = "Climb The Tower EX" },
-    [LEVEL_TTC]   = { stop = 6100,  speed = 4.0, area = 1, type = FLOOD_WATER, spectate = true,  points = 8, name = "Tick Tock Clock (Bonus)" }
+    [LEVEL_BOB]   = { useFloorHeight = true,  stop = 4200,  speed = 2.5, area = 1, type = FLOOD_WATER, spectate = true,  points = 2, name = "Bob-Omb Battlefield" },
+    [LEVEL_WF]    = { useFloorHeight = true,  stop = 5250,  speed = 4.0, area = 1, type = FLOOD_WATER, spectate = true,  points = 2, name = "Whomp's Fortress" },
+    [LEVEL_BITDW] = { useFloorHeight = true,  stop = 2750,  speed = 4.0, area = 1, type = FLOOD_WATER, spectate = true,  points = 3, name = "Bowser in the Dark World" },
+    [LEVEL_BBH]   = { useFloorHeight = true,  stop = 2500,  speed = 4.0, area = 1, type = FLOOD_WATER, spectate = true,  points = 3, name = "Big Boo's Haunt" },
+    [LEVEL_LLL]   = { useFloorHeight = false, stop = 3538,  speed = 4.0, area = 2, type = FLOOD_LAVA,  spectate = true,  points = 3, name = "Lethal Lava Land" },
+    [LEVEL_SSL]   = { useFloorHeight = true,  stop = 4800,  speed = 3.0, area = 2, type = FLOOD_SAND,  spectate = true,  points = 4, name = "Shifting Sand Land" },
+    [LEVEL_TTM]   = { useFloorHeight = true,  stop = 2300,  speed = 3.0, area = 1, type = FLOOD_WATER, spectate = true,  points = 4, name = "Tall, Tall Mountain" },
+    [LEVEL_THI]   = { useFloorHeight = true,  stop = 3890,  speed = 2.0, area = 1, type = FLOOD_WATER, spectate = true,  points = 5, name = "Tiny Huge Island" },
+    [LEVEL_BITS]  = { useFloorHeight = true,  stop = 6500,  speed = 4.0, area = 1, type = FLOOD_LAVA,  spectate = false, points = 5, name = "Bowser in the Sky" },
+    [LEVEL_PSS]   = { useFloorHeight = true,  stop = 10878, speed = 5.0, area = 1, type = FLOOD_LAVA,  spectate = false, points = 6, name = "Climb The Tower EX" },
+    [LEVEL_TTC]   = { useFloorHeight = true,  stop = 6100,  speed = 4.0, area = 1, type = FLOOD_WATER, spectate = true,  points = 8, name = "Tick Tock Clock (Bonus)" }
 }
 
 mapRotation = {
@@ -360,7 +360,8 @@ function on_level_init()
 
     if gGlobalSyncTable.roundState == ROUND_STATE_ACTIVE then
         if gNetworkPlayers[0].currLevelNum == map() then
-            gGlobalSyncTable.waterLevel = gMarioStates[0].floorHeight - 1200
+            gGlobalSyncTable.waterLevel = if_then_else(levels[map()].useFloorHeight, gMarioStates[0].floorHeight - 1200, gMarioStates[0].spawnInfo.startPos.y - 1200)
+
             spawn_non_sync_object(
                 id_bhvWater,
                 E_MODEL_FLOOD,
