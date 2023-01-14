@@ -8,7 +8,6 @@ This mod adds a Left 4 Dead like incapacitation system where instead of dying yo
 
 ## Nametags
 
-<img width="600" alt="nametags1" src="https://user-images.githubusercontent.com/44549182/187086954-d8e8ef14-5dad-48ac-8665-f73ca451c774.png">
 <img width="600" alt="nametags2" src="https://user-images.githubusercontent.com/44549182/187086960-135affa8-bfe0-48d4-8bd8-4cf77b3dbec4.png">
 
 This mod adds nametags to sm64ex-coop, this helps to easily identify other players without the player list, nametags can toggled with `/nametags [on|off]`
