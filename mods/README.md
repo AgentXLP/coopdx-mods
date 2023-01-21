@@ -62,5 +62,7 @@ This mod adds a completion percentage to sm64ex-coop in the pause menu, when you
 
 ## Achievements
 
+<img width="600" alt="achievements" src="https://user-images.githubusercontent.com/44549182/213894105-bae49e5a-de22-4ec3-ad7a-80730c5f4d97.png">
+
 This mod adds savable achievements to sm64ex-coop. There are 10 achievements so far in this demo to collect over the game, two requiring the use of bugs.
 The achievements menu is in the pause menu, use DPad Left and DPad Right to cycle through achievements.
