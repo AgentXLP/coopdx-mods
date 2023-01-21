@@ -40,3 +40,5 @@ To download single file mods click on the link and then press the "Raw" button t
 [Completion Percentage](./mods/completion-percentage.lua)
 
 [Flood](./mods/flood/flood.zip)
+
+[Achievements](./mods/achievements.lua)
