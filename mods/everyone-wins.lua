@@ -1,5 +1,5 @@
 -- name: Everyone Wins
--- description: Everyone Wins\nBy \\#ec7731\\Agent X\\#dddddd\\\n\nThis mod makes it so everyone in the Bowser 3 fight will enter the jumbo cutscene when the grand star is collected.
+-- description: Everyone Wins\nBy \\#ec7731\\Agent X\\#dcdcdc\\\n\nThis mod makes it so everyone in the Bowser 3 fight will enter the jumbo cutscene when the grand star is collected.
 
 --- @param m MarioState
 function mario_update(m)

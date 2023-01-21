@@ -1,5 +1,5 @@
 -- name: Hugging
--- description: Hugging\nBy \\#ec7731\\Agent X\\#dddddd\\\n\nThis mod adds hugging to sm64ex-coop, to hug someone walk up to them and press Y. If the person you're hugging is your beloved, you can press A to kiss them, kissing slowly regenerates health.
+-- description: Hugging\nBy \\#ec7731\\Agent X\\#dcdcdc\\\n\nThis mod adds hugging to sm64ex-coop, to hug someone walk up to them and press Y. If the person you're hugging is your beloved, you can press A to kiss them, kissing slowly regenerates health.
 
 KISS_HEALTH_GAIN = 3
 

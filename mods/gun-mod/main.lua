@@ -1,6 +1,6 @@
 -- name: Gun Mod
 -- incompatible: weapon
--- description: Gun Mod v2.0.4\nBy \\#ec7731\\Agent X\\#dddddd\\\nSpecial thanks to \\#f296af\\PeachyPeach\\#dddddd\\ too\n\nThis mod adds guns to sm64ex-coop. You will automatically obtain a gun, shoot it by pressing [\\#3040ff\\Y\\#ffffff\\] and swap between the pistol and the magnum with DPad Up.
+-- description: Gun Mod v2.0.4\nBy \\#ec7731\\Agent X\\#dcdcdc\\\nSpecial thanks to \\#f296af\\PeachyPeach\\#dcdcdc\\ too\n\nThis mod adds guns to sm64ex-coop. You will automatically obtain a gun, shoot it by pressing [\\#3040ff\\Y\\#ffffff\\] and swap between the pistol and the magnum with DPad Up.
 
 sPlayerFirstPerson = { enabled = false, freecam = camera_config_is_free_cam_enabled(), pitch = 0, yaw = 0 }
 

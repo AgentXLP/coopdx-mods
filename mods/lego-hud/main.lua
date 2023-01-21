@@ -1,6 +1,6 @@
 -- name: LEGO HUD
 -- incompatible: hud
--- description: Left 4 Dead 2 HUD\nBy \\#ec7731\\Agent X\\#dddddd\\\n\nThis mod adds the LEGO HUD into sm64ex-coop with the stud bar, True Jedi, minikits, bricks and studs.
+-- description: Left 4 Dead 2 HUD\nBy \\#ec7731\\Agent X\\#dcdcdc\\\n\nThis mod adds the LEGO HUD into sm64ex-coop with the stud bar, True Jedi, minikits, bricks and studs.
 
 E_MODEL_CHALLENGE_MINIKIT = smlua_model_util_get_id("challenge_minikit_geo")
 

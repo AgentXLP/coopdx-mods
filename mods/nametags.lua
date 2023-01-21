@@ -1,6 +1,6 @@
 -- name: Nametags
 -- incompatible: nametags
--- description: Nametags\nBy \\#ec7731\\Agent X\\#dddddd\\\n\nThis mod adds nametags to sm64ex-coop, this helps to easily identify other players without the player list, nametags can toggled with \\#ffff00\\/nametags [on|off]\\#ffffff\\
+-- description: Nametags\nBy \\#ec7731\\Agent X\\#dcdcdc\\\n\nThis mod adds nametags to sm64ex-coop, this helps to easily identify other players without the player list, nametags can toggled with \\#ffff00\\/nametags [on|off]
 
 MAX_SCALE = 0.32
 

@@ -1,5 +1,5 @@
 -- name: Pos Display
--- description: Pos Display\nBy \\#ec7731\\Agent X\\#dddddd\\\n\nThis mod renders your coordinates to the screen.
+-- description: Pos Display\nBy \\#ec7731\\Agent X\\#dcdcdc\\\n\nThis mod renders your coordinates to the screen.
 
 function on_hud_render()
     djui_hud_set_resolution(RESOLUTION_N64)

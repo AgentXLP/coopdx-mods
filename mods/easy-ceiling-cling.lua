@@ -1,5 +1,5 @@
 -- name: Easy Ceiling Cling
--- description: Easy Ceiling Cling\nBy \\#ec7731\\Agent X\\#dddddd\\\n\nThis mod adds improved ceiling hang detection system so you can now begin clinging to ceiling from actions outside\nof just the single and double jump.
+-- description: Easy Ceiling Cling\nBy \\#ec7731\\Agent X\\#dcdcdc\\\n\nThis mod adds improved ceiling hang detection system so you can now begin clinging to ceiling from actions outside\nof just the single and double jump.
 
 --- @param m MarioState
 function before_phys_step(m)

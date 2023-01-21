@@ -1,6 +1,6 @@
 -- name: Pong
 -- incompatible: gamemode
--- description: Pong\nBy \\#ec7731\\Agent X\\#dddddd\\\n\nThis mod adds pong to sm64ex-coop, the first player that joins the game becomes the opponent and the ones after are spectators, this mod is meant to be played in only 2 players and is practically completely custom meaning you're not even technically playing Super Mario 64.
+-- description: Pong\nBy \\#ec7731\\Agent X\\#dcdcdc\\\n\nThis mod adds pong to sm64ex-coop, the first player that joins the game becomes the opponent and the ones after are spectators, this mod is meant to be played in only 2 players and is practically completely custom meaning you're not even technically playing Super Mario 64.
 
 ROUND_STATE_INACTIVE = 0
 ROUND_STATE_ACTIVE = 1

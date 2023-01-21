@@ -1,5 +1,5 @@
 -- name: Climb the Tower
--- description: Climb the Tower v1.3.1\nBy: \\#ec7731\\Agent X\\#dddddd\\\n\nThis gamemode revolves around getting the fastest time and getting to the top of the tower the fastest, you can view the scores with /scoreboard\nIf you wish to play another gamemode on this map (e.g. manhunt / hide and seek) then run /ctt off on host.
+-- description: Climb the Tower v1.3.1\nBy: \\#ec7731\\Agent X\\#dcdcdc\\\n\nThis gamemode revolves around getting the fastest time and getting to the top of the tower the fastest, you can view the scores with /scoreboard\nIf you wish to play another gamemode on this map (e.g. manhunt / hide and seek) then run /ctt off on host.
 
 LEVEL_CTT = LEVEL_PSS
 
