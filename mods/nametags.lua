@@ -1,16 +1,18 @@
 -- name: Nametags
 -- incompatible: nametags
--- description: Nametags\nBy \\#ec7731\\Agent X\\#dcdcdc\\\n\nThis mod adds nametags to sm64ex-coop, this helps to easily identify other players without the player list, nametags can toggled with \\#ffff00\\/nametags [on|off]
+-- description: Nametags\nBy \\#ec7731\\Agent X\\#dcdcdc\\\n\nThis mod adds nametags to sm64ex-coop, this helps to easily identify other players without the player list, nametags can toggled on and off with \\#ffff00\\/nametag-distance 7000\\#dcdcdc\\ and \\#ffff00\\/nametag-distance 0\\#dcdcdc\\ respectively.
 
 MAX_SCALE = 0.32
 
-gGlobalSyncTable.nametags = true
 gGlobalSyncTable.dist = 7000
+gGlobalSyncTable.health = true
+
+showSelfTag = false
 
 for k, v in pairs(gActiveMods) do
     local name = v.name:lower()
     if v.enabled and (name:find("hide") or name:find("hns") or name:find("hunt")) then
-        gGlobalSyncTable.nametags = false
+        gGlobalSyncTable.dist = 0
     end
 end
 
@@ -60,9 +62,9 @@ function djui_hud_set_adjusted_color(r, g, b, a)
     djui_hud_set_color(r * multiplier, g * multiplier, b * multiplier, a)
 end
 
-function djui_hud_print_outlined_text(text, x, y, scale, r, g, b, outlineDarkness)
+function djui_hud_print_outlined_text(text, x, y, scale, r, g, b, a, outlineDarkness)
     -- render outline
-    djui_hud_set_adjusted_color(r * outlineDarkness, g * outlineDarkness, b * outlineDarkness, 255)
+    djui_hud_set_adjusted_color(r * outlineDarkness, g * outlineDarkness, b * outlineDarkness, a)
     djui_hud_print_text(text, x - (1*(scale*2)), y, scale)
     djui_hud_print_text(text, x + (1*(scale*2)), y, scale)
     djui_hud_print_text(text, x, y - (1*(scale*2)), scale)
@@ -73,49 +75,29 @@ function djui_hud_print_outlined_text(text, x, y, scale, r, g, b, outlineDarknes
     djui_hud_set_color(255, 255, 255, 255)
 end
 
-function name_and_hex(name)
-    local nameTable = {}
-    name:gsub(".", function(c) table.insert(nameTable, c) end)
-
-    local removed = false
-    local color = "000000"
-    for k, v in pairs(nameTable) do
-        if v == "\\" and not removed then
-            removed = true
-            nameTable[k] = ""     -- \
-            nameTable[k + 1] = "" -- #
-            if nameTable[k + 2] ~= nil and nameTable[k + 3] ~= nil and nameTable[k + 4] ~= nil and nameTable[k + 5] ~= nil and nameTable[k + 6] ~= nil and nameTable[k + 7] ~= nil then
-                color = nameTable[k + 2] .. nameTable[k + 3] .. nameTable[k + 4] .. nameTable[k + 5] .. nameTable[k + 6] .. nameTable[k + 7]
-            end
-            nameTable[k + 2] = "" -- f
-            nameTable[k + 3] = "" -- f
-            nameTable[k + 4] = "" -- f
-            nameTable[k + 5] = "" -- f
-            nameTable[k + 6] = "" -- f
-            nameTable[k + 7] = "" -- f
-            nameTable[k + 8] = "" -- \
+function name_without_hex(name)
+    local s = ''
+    local inSlash = false
+    for i = 1, #name do
+        local c = name:sub(i,i)
+        if c == '\\' then
+            inSlash = not inSlash
+        elseif not inSlash then
+            s = s .. c
         end
     end
-    return { name = table.concat(nameTable, ""), color = color }
+    return s
 end
 
-function hex_to_rgb(hex)
-    local hexTable = {}
-    hex:gsub("..", function(c) table.insert(hexTable, c) end)
-    return { r = tonumber(hexTable[1], 16), g = tonumber(hexTable[2], 16), b = tonumber(hexTable[3], 16) }
-end
-
-showSelfTag = false
 function on_hud_render()
-    if not gGlobalSyncTable.nametags or not gNetworkPlayers[0].currAreaSyncValid or obj_get_first_with_behavior_id(id_bhvActSelector) ~= nil then return end
+    if gGlobalSyncTable.dist == 0 or not gNetworkPlayers[0].currAreaSyncValid or obj_get_first_with_behavior_id(id_bhvActSelector) ~= nil then return end
 
     djui_hud_set_resolution(RESOLUTION_N64)
     djui_hud_set_font(FONT_NORMAL)
 
     for i = if_then_else(showSelfTag, 0, 1), network_player_connected_count() - 1 do
         local m = gMarioStates[i]
-        if active_player(m) ~= 0 and m.action ~= ACT_IN_CANNON then
-            if m.playerIndex == 0 and (m.input & INPUT_FIRST_PERSON) ~= 0 then return end
+        if active_player(m) ~= 0 and m.action ~= ACT_IN_CANNON and (m.playerIndex ~= 0 or (m.playerIndex == 0 and m.action ~= ACT_FIRST_PERSON)) then
             local out = { x = 0, y = 0, z = 0 }
             local pos = { x = m.marioObj.header.gfx.pos.x, y = m.pos.y + 210, z = m.marioObj.header.gfx.pos.z }
             djui_hud_world_pos_to_screen_pos(pos, out)
@@ -126,28 +108,35 @@ function on_hud_render()
                 scale = scale + vec3f_dist(gMarioStates[0].pos, m.pos) / gGlobalSyncTable.dist
                 scale = clamp(1 - scale, 0, MAX_SCALE)
             end
-            local info = name_and_hex(gNetworkPlayers[i].name)
+            local name = name_without_hex(gNetworkPlayers[i].name)
             local color = { r = 162, g = 202, b = 234 }
             network_player_palette_to_color(gNetworkPlayers[i], SHIRT, color)
-            local measure = djui_hud_measure_text(info.name) * scale * 0.5
-            djui_hud_print_outlined_text(info.name, out.x - measure, out.y, scale, color.r, color.g, color.b, 0.25)
+            local measure = djui_hud_measure_text(name) * scale * 0.5
+            local alpha = if_then_else(m.action ~= ACT_CROUCHING and m.action ~= ACT_START_CRAWLING and m.action ~= ACT_CRAWLING and m.action ~= ACT_STOP_CRAWLING, 255, 100)
+            djui_hud_print_outlined_text(name, out.x - measure, out.y, scale, color.r, color.g, color.b, alpha, 0.25)
+
+            if m.playerIndex ~= 0 and gGlobalSyncTable.health then
+                djui_hud_set_adjusted_color(255, 255, 255, alpha)
+                local healthScale = 75 * scale
+                hud_render_power_meter(m.health, out.x - (healthScale * 0.5), out.y - healthScale, healthScale, healthScale)
+            end
         end
     end
 end
 
-function on_nametags_command()
-    gGlobalSyncTable.nametags = not gGlobalSyncTable.nametags
-    djui_chat_message_create("Nametag status: " .. on_or_off(gGlobalSyncTable.nametags))
-    return true
+function on_nametag_distance_command(msg)
+    local dist = tonumber(msg)
+    if dist ~= nil then
+        djui_chat_message_create("Set nametag distance to " .. msg)
+        gGlobalSyncTable.dist = dist
+        return true
+    end
+    return false
 end
 
-function on_nametag_distance_command(msg)
-    if tonumber(msg) ~= nil then
-        djui_chat_message_create("Set distance to " .. msg)
-        gGlobalSyncTable.dist = tonumber(msg)
-    else
-        djui_chat_message_create("\\#ff0000\\Failed to set distance to " .. msg)
-    end
+function on_show_health_command()
+    gGlobalSyncTable.health = not gGlobalSyncTable.health
+    djui_chat_message_create("Show health status: " .. on_or_off(gGlobalSyncTable.health))
     return true
 end
 
@@ -160,8 +149,8 @@ end
 hook_event(HOOK_ON_HUD_RENDER, on_hud_render)
 
 if network_is_server() then
-    hook_chat_command("nametags", "to toggle nametags on or off, default is \\#00ff00\\ON", on_nametags_command)
-    hook_chat_command("nametag-distance", "[number] set the distance at which nametags disappear, default is 7000", on_nametag_distance_command)
+    hook_chat_command("nametag-distance", "[number] set the distance at which nametags disappear, default is 7000, 0 turns nametags off", on_nametag_distance_command)
+    hook_chat_command("show-health", "to toggle showing health above the nametag, default is \\#00ff00\\ON", on_show_health_command)
 end
 
 hook_chat_command("show-tag", "to toggle your own nametag on or off, default is \\#ff0000\\OFF", on_show_tag_command)
