@@ -153,7 +153,7 @@ function act_hugging(m)
             m.marioObj.header.gfx.animInfo.animFrame = 10
             m.actionArg = 0
             if (m.input & INPUT_A_PRESSED) ~= 0 or (m2.action == ACT_HUGGING and m2.actionState == 1) then
-                m.actionState = 1
+                m.actionState = 1 -- kiss :chomped:
             end
         end,
         [1] = function()
