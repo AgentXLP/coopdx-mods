@@ -42,3 +42,5 @@ To download single file mods click on the link and then press the "Raw" button t
 [Flood](./mods/flood/flood.zip)
 
 [Achievements](./mods/achievements.lua)
+
+[Galaxy Star Select](./mods/galaxy-star-select/galaxy-star-select.zip)
