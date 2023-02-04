@@ -1,4 +1,5 @@
 -- name: Galaxy Star Select
+-- incompatible: star-select
 -- description: Galaxy Star Select\nBy \\#ec7731\\Agent X\\#dcdcdc\\\n\nThis mod adds the Super Mario Galaxy star select screen that replaces the original SM64 one.
 
 LEVEL_STAR_SELECT = level_register("level_star_select_entry", COURSE_NONE, "Star Select", "ss", 28000, 0x28, 0x28, 0x28)
@@ -21,14 +22,6 @@ gPaintingPositions = {
     [LEVEL_TTM] = { { x = -546.816,   y =  1356.8,   z =  3813.376} },
     [LEVEL_TTC] = { { x =  0.0,       y =  2713.6,   z =  7232.5122 } },
     [LEVEL_SL]  = { { x =  3179.52,   y =  1408.0,   z = -271.36 } },
-}
-
-gCharGlyphs = {
-    [CT_MARIO] = gTextures.mario_head,
-    [CT_LUIGI] = gTextures.luigi_head,
-    [CT_TOAD] = gTextures.toad_head,
-    [CT_WALUIGI] = gTextures.waluigi_head,
-    [CT_WARIO] = gTextures.wario_head
 }
 
 djui_hud_set_resolution(RESOLUTION_N64)
@@ -141,7 +134,7 @@ function on_hud_render()
         djui_hud_print_text("Best Score", width - 142, sStarSelectHUD.bottomBarY + 24, 0.5)
 
         djui_hud_set_font(FONT_HUD)
-        djui_hud_render_texture(gCharGlyphs[gMarioStates[0].character.type], (width * 0.5) - 16, sStarSelectHUD.bottomBarY + 24, 1, 1)
+        djui_hud_render_texture(gMarioStates[0].character.hudHeadTexture, (width * 0.5) - 16, sStarSelectHUD.bottomBarY + 24, 1, 1)
         djui_hud_print_text("x", width * 0.5, sStarSelectHUD.bottomBarY + 24, 1)
         djui_hud_print_text(normalize(hud_get_value(HUD_DISPLAY_LIVES)), (width * 0.5) + 16, sStarSelectHUD.bottomBarY + 24, 1)
 

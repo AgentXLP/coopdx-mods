@@ -74,14 +74,6 @@ function damp(a, b, x, dt) return a + (b - a) * (1.0 - math.exp(-x * dt)) end
 
 function normalize(number) return tostring(number):gsub("-", "M") end
 
-gCharGlyphs = {
-    [CT_MARIO] = gTextures.mario_head,
-    [CT_LUIGI] = gTextures.luigi_head,
-    [CT_TOAD] = gTextures.toad_head,
-    [CT_WALUIGI] = gTextures.waluigi_head,
-    [CT_WARIO] = gTextures.wario_head
-}
-
 function update()
     local obj = obj_get_first_with_behavior_id(id_bhvRedCoin)
     while obj ~= nil do
@@ -193,7 +185,7 @@ function on_hud_render()
     -- info
     djui_hud_set_adjusted_color(255, 255, 255, 255)
     djui_hud_render_texture(TEX_CIRCLE, 10, 10, 0.25, 0.25)
-    djui_hud_render_texture(gCharGlyphs[gMarioStates[0].character.type], 18, 16, 1, 1)
+    djui_hud_render_texture(gMarioStates[0].character.hudHeadTexture, 18, 16, 1, 1)
     djui_hud_render_texture(gTextures.coin, 42, 12, 0.75, 0.75)
     djui_hud_set_adjusted_color(255, 240, 0, 255)
     djui_hud_print_text(tostring(coinsBuffer), 53, 10, 0.25)

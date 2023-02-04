@@ -88,14 +88,6 @@ function mario_health_float(m)
     return clamp((m.health - 255) / (2176 - 255), 0, 1)
 end
 
-gCharGlyphs = {
-    [CT_MARIO] = gTextures.mario_head,
-    [CT_LUIGI] = gTextures.luigi_head,
-    [CT_TOAD] = gTextures.toad_head,
-    [CT_WALUIGI] = gTextures.waluigi_head,
-    [CT_WARIO] = gTextures.wario_head
-}
-
 glyphs = {
     [CT_MARIO] = get_texture_info("mario"),
     [CT_LUIGI] = get_texture_info("luigi"),
@@ -232,9 +224,9 @@ function on_hud_render()
         end
     end
     -- side bar
-    render_info_box(42, gTextures.star,   tostring("x" .. hud_get_value(HUD_DISPLAY_STARS)))
-    render_info_box(21, gTextures.coin,   tostring("x" .. hud_get_value(HUD_DISPLAY_COINS)))
-    render_info_box(0,  gCharGlyphs[m.character.type], tostring("x" .. hud_get_value(HUD_DISPLAY_LIVES)))
+    render_info_box(42, gTextures.star, tostring("x" .. hud_get_value(HUD_DISPLAY_STARS)))
+    render_info_box(21, gTextures.coin, tostring("x" .. hud_get_value(HUD_DISPLAY_COINS)))
+    render_info_box(0, m.character.hudHeadTexture, tostring("x" .. hud_get_value(HUD_DISPLAY_LIVES)))
     -- first aid
     if not gGlobalSyncTable.sm64Health then
         local boxLeft = width - 27
