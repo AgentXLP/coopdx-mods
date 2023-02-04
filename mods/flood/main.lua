@@ -1,6 +1,6 @@
 -- name: Flood
 -- incompatible: gamemode
--- description: Flood v1.1.3\nBy \\#ec7731\\Agent X\\#dddddd\\\n\nThis mod adds a flood escape gamemode to sm64ex-coop, you must escape the flood and reach the top of the level before everything is flooded.
+-- description: Flood v1.2\nBy \\#ec7731\\Agent X\\#dcdcdc\\\n\nThis mod adds a flood escape gamemode\nto sm64ex-coop, you must escape the flood and reach the top of the level before everything is flooded.
 -- climb the tower 2 (climb the level) real
 
 FLOOD_WATER = 0
@@ -11,22 +11,24 @@ score = tonumber(mod_storage_load("score")) or 0
 if gServerSettings.enableCheats ~= 0 then score = 0 end
 
 levels = {
-    [LEVEL_BOB]   = { useFloorHeight = true,  stop = 4200,  speed = 2.5, area = 1, type = FLOOD_WATER, spectate = true,  points = 2, name = "Bob-Omb Battlefield" },
-    [LEVEL_WF]    = { useFloorHeight = true,  stop = 5250,  speed = 4.0, area = 1, type = FLOOD_WATER, spectate = true,  points = 2, name = "Whomp's Fortress" },
-    [LEVEL_BITDW] = { useFloorHeight = true,  stop = 2750,  speed = 4.0, area = 1, type = FLOOD_WATER, spectate = true,  points = 3, name = "Bowser in the Dark World" },
-    [LEVEL_BBH]   = { useFloorHeight = true,  stop = 2500,  speed = 4.0, area = 1, type = FLOOD_WATER, spectate = true,  points = 3, name = "Big Boo's Haunt" },
-    [LEVEL_LLL]   = { useFloorHeight = false, stop = 3538,  speed = 4.0, area = 2, type = FLOOD_LAVA,  spectate = true,  points = 3, name = "Lethal Lava Land" },
-    [LEVEL_SSL]   = { useFloorHeight = true,  stop = 4800,  speed = 3.0, area = 2, type = FLOOD_SAND,  spectate = true,  points = 4, name = "Shifting Sand Land" },
-    [LEVEL_TTM]   = { useFloorHeight = true,  stop = 2300,  speed = 3.0, area = 1, type = FLOOD_WATER, spectate = true,  points = 4, name = "Tall, Tall Mountain" },
-    [LEVEL_THI]   = { useFloorHeight = true,  stop = 3890,  speed = 2.0, area = 1, type = FLOOD_WATER, spectate = true,  points = 5, name = "Tiny Huge Island" },
-    [LEVEL_BITS]  = { useFloorHeight = true,  stop = 6500,  speed = 4.0, area = 1, type = FLOOD_LAVA,  spectate = false, points = 5, name = "Bowser in the Sky" },
-    [LEVEL_PSS]   = { useFloorHeight = true,  stop = 10878, speed = 5.0, area = 1, type = FLOOD_LAVA,  spectate = false, points = 6, name = "Climb The Tower EX" },
-    [LEVEL_TTC]   = { useFloorHeight = true,  stop = 6100,  speed = 4.0, area = 1, type = FLOOD_WATER, spectate = true,  points = 8, name = "Tick Tock Clock (Bonus)" }
+    [LEVEL_BOB]   = { customStartPos = nil,                                        stop = 4200,  speed = 2.5, area = 1, type = FLOOD_WATER, spectate = true,  fixedCollision = 0, points = 2, name = "Bob-Omb Battlefield" },
+    [LEVEL_WF]    = { customStartPos = nil,                                        stop = 5250,  speed = 4.0, area = 1, type = FLOOD_WATER, spectate = true,  fixedCollision = 0, points = 2, name = "Whomp's Fortress" },
+    [LEVEL_CCM]   = { customStartPos = { x = 3336, y = -4200, z = 0, a = 0x0000 }, stop = 3380,  speed = 5.0, area = 1, type = FLOOD_WATER, spectate = true,  fixedCollision = 0, points = 3, name = "Cool, Cool Mountain" },
+    [LEVEL_BITDW] = { customStartPos = nil,                                        stop = 2750,  speed = 4.0, area = 1, type = FLOOD_WATER, spectate = true,  fixedCollision = 0, points = 3, name = "Bowser in the Dark World" },
+    [LEVEL_BBH]   = { customStartPos = nil,                                        stop = 2500,  speed = 4.0, area = 1, type = FLOOD_WATER, spectate = true,  fixedCollision = 0, points = 3, name = "Big Boo's Haunt" },
+    [LEVEL_LLL]   = { customStartPos = nil,                                        stop = 3538,  speed = 4.0, area = 2, type = FLOOD_LAVA,  spectate = true,  fixedCollision = 0, points = 3, name = "Lethal Lava Land" },
+    [LEVEL_SSL]   = { customStartPos = nil,                                        stop = 4800,  speed = 3.0, area = 2, type = FLOOD_SAND,  spectate = true,  fixedCollision = 0, points = 4, name = "Shifting Sand Land" },
+    [LEVEL_TTM]   = { customStartPos = nil,                                        stop = 2300,  speed = 3.0, area = 1, type = FLOOD_WATER, spectate = true,  fixedCollision = 0, points = 4, name = "Tall, Tall Mountain" },
+    [LEVEL_THI]   = { customStartPos = nil,                                        stop = 3890,  speed = 2.0, area = 1, type = FLOOD_WATER, spectate = true,  fixedCollision = 0, points = 5, name = "Tiny Huge Island" },
+    [LEVEL_BITS]  = { customStartPos = nil,                                        stop = 6500,  speed = 4.5, area = 1, type = FLOOD_LAVA,  spectate = false, fixedCollision = 0, points = 5, name = "Bowser in the Sky" },
+    [LEVEL_PSS]   = { customStartPos = nil,                                        stop = 10878, speed = 5.0, area = 1, type = FLOOD_LAVA,  spectate = false, fixedCollision = 0, points = 6, name = "Climb The Tower EX" },
+    [LEVEL_TTC]   = { customStartPos = nil,                                        stop = 6100,  speed = 4.0, area = 1, type = FLOOD_WATER, spectate = true,  fixedCollision = 1, points = 8, name = "Tick Tock Clock (Bonus)" }
 }
 
 mapRotation = {
     LEVEL_BOB,
     LEVEL_WF,
+    LEVEL_CCM,
     LEVEL_BITDW,
     LEVEL_BBH,
     LEVEL_LLL,
@@ -63,7 +65,7 @@ gGlobalSyncTable.roundState = ROUND_STATE_INACTIVE
 gGlobalSyncTable.roundCooldown = ROUND_COOLDOWN
 gGlobalSyncTable.map = 1
 gGlobalSyncTable.speedMultiplier = 1
-gGlobalSyncTable.waterLevel = 0
+gGlobalSyncTable.waterLevel = -11000
 
 function map()
     return mapRotation[gGlobalSyncTable.map] -- I don't feel like typing this out 500 times
@@ -77,9 +79,8 @@ end
 -- runs serverside
 function round_start()
     gGlobalSyncTable.roundState = ROUND_STATE_ACTIVE
-    -- gGlobalSyncTable.waterLevel = levels[map()].start
     gGlobalSyncTable.roundCooldown = 100
-    if gGlobalSyncTable.map == 10 then gGlobalSyncTable.roundCooldown = 740 end
+    if map() == LEVEL_PSS then gGlobalSyncTable.roundCooldown = 740 end
 end
 
 -- runs serverside
@@ -176,6 +177,7 @@ function update()
         if gNetworkPlayers[0].currLevelNum ~= map() then
             reset_stats()
             warp(map(), levels[map()].area, 6)
+            gLevelValues.fixCollisionBugs = levels[map()].fixedCollision
             gPlayerSyncTable[0]["time" .. gGlobalSyncTable.map] = 0
         end
     end
@@ -185,9 +187,13 @@ end
 
 --- @param m MarioState
 function mario_update(m)
-    local color = { r = 0, g = 255, b = 0 }
-    if m.action == ACT_DEAD then color = { r = 255, g = 0, b = 0 } end
-    network_player_set_description(gNetworkPlayers[m.playerIndex], tostring(gPlayerSyncTable[m.playerIndex].score), color.r, color.g, color.b, 255)
+    if gPlayerSyncTable[m.playerIndex].score ~= nil then
+        if gPlayerSyncTable[m.playerIndex].score > 0 then
+            local color = { r = 0, g = 255, b = 0 }
+            if m.action == ACT_DEAD then color = { r = 255, g = 0, b = 0 } end
+            network_player_set_description(gNetworkPlayers[m.playerIndex], tostring(gPlayerSyncTable[m.playerIndex].score), color.r, color.g, color.b, 255)
+        end
+    end
     sparkle_if_twirling(m)
 
     -- shh
@@ -215,9 +221,14 @@ function mario_update(m)
         m.healCounter = 0
         play_sound(SOUND_MENU_POWER_METER, m.marioObj.header.gfx.cameraToObject)
     end
+    if m.action == ACT_QUICKSAND_DEATH then gPlayerSyncTable[0].health = 0 end
 
-    if m.pos.y + 40 < gGlobalSyncTable.waterLevel and not gPlayerSyncTable[0].won then
-        if gPlayerSyncTable[0].health > 0 then gPlayerSyncTable[0].health = gPlayerSyncTable[0].health - 1.5 end
+    local water = obj_get_first_with_behavior_id(id_bhvWater)
+    if water ~= nil and m.pos.y + 40 < water.oPosY and not gPlayerSyncTable[0].won then
+        if gPlayerSyncTable[0].health > 0 then
+            local dmg = if_then_else(m.area.terrainType == TERRAIN_SNOW, 2, 1.5)
+            gPlayerSyncTable[0].health = gPlayerSyncTable[0].health - dmg
+        end
     end
     if (m.floor.type == SURFACE_DEATH_PLANE or m.floor.type == SURFACE_VERTICAL_WIND) and m.pos.y < m.floorHeight + 3000 and gNetworkPlayers[0].currLevelNum ~= LEVEL_TTC then
         gPlayerSyncTable[0].health = 0
@@ -360,7 +371,14 @@ function on_level_init()
 
     if gGlobalSyncTable.roundState == ROUND_STATE_ACTIVE then
         if gNetworkPlayers[0].currLevelNum == map() then
-            gGlobalSyncTable.waterLevel = if_then_else(levels[map()].useFloorHeight, gMarioStates[0].floorHeight - 1200, gMarioStates[0].spawnInfo.startPos.y - 1200)
+            local start = levels[map()].customStartPos
+            if network_is_server() then
+                if start ~= nil then
+                    gGlobalSyncTable.waterLevel = find_floor_height(start.x, start.y, start.z) - 1200
+                else
+                    gGlobalSyncTable.waterLevel = find_floor_height(gMarioStates[0].pos.x, gMarioStates[0].pos.y, gMarioStates[0].pos.z) - 1200
+                end
+            end
 
             spawn_non_sync_object(
                 id_bhvWater,
@@ -388,10 +406,21 @@ function on_level_init()
     end
 end
 
+function on_warp()
+    if gGlobalSyncTable.roundState == ROUND_STATE_ACTIVE and gNetworkPlayers[0].currLevelNum == map() then
+        local m = gMarioStates[0]
+        local start = levels[map()].customStartPos
+        if start ~= nil then
+            vec3f_set(m.pos, start.x, start.y, start.z)
+            m.faceAngle.y = start.a
+        end
+    end
+end
+
 function on_round_state_changed(tag, oldVal, newVal)
     if newVal == ROUND_STATE_INACTIVE and oldVal == ROUND_STATE_ACTIVE then
         local won = 0
-        djui_chat_message_create(if_then_else(gGlobalSyncTable.map ~= 10, "Survivors:", "\\#ffff00\\Ultimate Survivors:"))
+        djui_chat_message_create("Survivors:")
         for i = 0, network_player_connected_count() - 1 do
             if gPlayerSyncTable[i].won then
                 djui_chat_message_create(gNetworkPlayers[i].name)
@@ -401,7 +430,7 @@ function on_round_state_changed(tag, oldVal, newVal)
         end
         if won ~= 0 then
             gGlobalSyncTable.map = gGlobalSyncTable.map + 1
-            if gGlobalSyncTable.map >= 11 then gGlobalSyncTable.map = 1 end
+            if gGlobalSyncTable.map > #mapRotation then gGlobalSyncTable.map = 1 end
         else
             djui_chat_message_create("\\#ff0000\\None")
         end
@@ -411,16 +440,11 @@ end
 
 function on_start_command(msg)
     if msg == "random" then
-        gGlobalSyncTable.map = math.random(1, 10)
+        gGlobalSyncTable.map = math.random(1, #mapRotation)
     else
         local override = tonumber(msg)
-        if override == 11 then
-            gGlobalSyncTable.map = 11
-            round_start()
-            return true
-        end
-        if override ~= nil and override <= 10 and override > 0 then
-            override = math.floor(override)
+        if override ~= nil then
+            override = clamp(math.floor(override), 1, #mapRotation)
             gGlobalSyncTable.map = override
         end
     end
@@ -467,6 +491,8 @@ end
 hud_hide()
 camera_set_use_course_specific_settings(false)
 
+-- gLevelValues.fixCollisionBugs = 1
+
 hook_event(HOOK_UPDATE, update)
 hook_event(HOOK_MARIO_UPDATE, mario_update)
 hook_event(HOOK_BEFORE_PHYS_STEP, before_phys_step)
@@ -474,6 +500,7 @@ hook_event(HOOK_ON_HUD_RENDER, on_hud_render)
 hook_event(HOOK_ON_PLAYER_CONNECTED, on_player_connected)
 hook_event(HOOK_ALLOW_INTERACT, allow_interact)
 hook_event(HOOK_ON_LEVEL_INIT, on_level_init)
+hook_event(HOOK_ON_WARP, on_warp)
 hook_event(HOOK_ON_DEATH, function() return false end)
 hook_event(HOOK_ON_PAUSE_EXIT,  function() return false end)
 

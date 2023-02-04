@@ -28,8 +28,8 @@ function update_spectator(m)
 
     local specTable = spectate_table()
     local specLength = #specTable
-    -- buggy
-    --[[if specLength > 0 then
+    -- uncommented again because peer pressure
+    if specLength > 0 then
         if (m.controller.buttonPressed & L_JPAD) ~= 0 then
             specTarget = specTarget - 1
             if specTarget < 1 then specTarget = specLength end
@@ -37,7 +37,7 @@ function update_spectator(m)
             specTarget = specTarget + 1
             if specTarget > specLength then specTarget = 1 end
         end
-    end]]
+    end
 
     local m2 = if_then_else(specLength == 0, dead_table()[1], specTable[specTarget])
 
