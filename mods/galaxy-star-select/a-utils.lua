@@ -97,21 +97,25 @@ function update_djui_transitions()
 end
 
 --- @param o Object
-function obj_nearest_painting_level(o)
+function obj_nearest_painting_info(o)
     if o == nil then return LEVEL_NONE end
     local nearest = LEVEL_NONE
     local nearestDist = 0
     for k, v in pairs(gPaintingPositions) do
         local dist = 0
+        local area = 1
         if v[2] ~= nil then
             local dist1 = vec3f_dist({x = o.oPosX, y = o.oPosY, z = o.oPosZ }, v[1])
             local dist2 = vec3f_dist({x = o.oPosX, y = o.oPosY, z = o.oPosZ }, v[2])
             dist = math.min(dist1, dist2)
+            if dist2 < dist1 then
+                area = 2
+            end
         else
             dist = vec3f_dist({x = o.oPosX, y = o.oPosY, z = o.oPosZ }, v[1])
         end
         if nearest == LEVEL_NONE or dist < nearestDist then
-            nearest = k
+            nearest = { level = k, area = area }
             nearestDist = dist
         end
     end

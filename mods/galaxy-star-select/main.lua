@@ -18,7 +18,7 @@ gPaintingPositions = {
     [LEVEL_HMC] = { { x =  2099.2,    y = -1484.8,   z = -2278.4 } },
     [LEVEL_DDD] = { { x =  3456.0,    y = -1075.2,   z =  1587.2 } },
     [LEVEL_WDW] = { { x = -966.656,   y =  1305.6,   z = -143.36 } },
-    [LEVEL_THI] = { { x = -4598.7842, y =  1354.752, z =  3005.44 }, { x = -5614.5918, y = 1510.4, z = -3292.16 } },
+    [LEVEL_THI] = { { x = -5614.5918, y =  1510.4,    z = -3292.16 }, { x = -4598.7842, y = 1354.752, z = 3005.44 } },
     [LEVEL_TTM] = { { x = -546.816,   y =  1356.8,   z =  3813.376} },
     [LEVEL_TTC] = { { x =  0.0,       y =  2713.6,   z =  7232.5122 } },
     [LEVEL_SL]  = { { x =  3179.52,   y =  1408.0,   z = -271.36 } },
@@ -30,6 +30,7 @@ sStarSelectHUD = {
     bottomBarY = djui_hud_get_screen_height(), -- y position of the bottom bar
     topBarY = -64, -- y position of the top bar
     targetLevel = LEVEL_BOB, -- the level to warp to
+    targetArea = 1, -- the target area to warp to, used for THI
     stars = { nil, nil, nil, nil, nil, nil }, -- star object table
     timeSinceMovedStick = 0, -- amount of time in frames since the stick was moved and changed the selected star, resets when between when 10 frames have passed
     selectedStar = 1, -- the selected star
@@ -77,7 +78,9 @@ function mario_update(m)
     if m.playerIndex ~= 0 then return end
 
     if ((m.floor ~= nil and m.floor.type >= 0x00D3 and m.floor.type <= 0x00FC) or gNetworkPlayers[0].currAreaIndex == 3 and m.pos.y < -1600) and sDjuiTransition.fadeAlpha < 0 and gNetworkPlayers[0].currLevelNum == LEVEL_CASTLE and m.action == ACT_DISAPPEARED and not is_game_paused() then
-        sStarSelectHUD.targetLevel = obj_nearest_painting_level(m.marioObj)
+        local info = obj_nearest_painting_info(m.marioObj)
+        sStarSelectHUD.targetLevel = info.level
+        sStarSelectHUD.targetArea = info.area
         play_djui_transition(false, 40, 255, 255, 255)
     end
     if sDjuiTransition.fadeAlpha == 255 and not sDjuiTransition.fadeIn and gNetworkPlayers[0].currLevelNum == LEVEL_CASTLE then

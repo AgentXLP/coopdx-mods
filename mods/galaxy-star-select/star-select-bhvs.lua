@@ -22,7 +22,7 @@ function bhv_galaxy_act_selector_star_loop(o)
                     o.oAction = 1
                 else
                     if sDjuiTransition.fadeAlpha == 255 then
-                        warp_to_level(sStarSelectHUD.targetLevel, 1, sStarSelectHUD.selectedStar)
+                        warp_to_level(sStarSelectHUD.targetLevel, sStarSelectHUD.targetArea, sStarSelectHUD.selectedStar)
                         play_djui_transition(true, 30, 255, 255, 255)
                     end
                 end
