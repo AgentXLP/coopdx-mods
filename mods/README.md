@@ -42,12 +42,6 @@ This mod makes it so everyone in the Bowser 3 fight will enter the jumbo cutscen
 
 This mod adds pong to sm64ex-coop, the first player that joins the game becomes the opponent and the ones after are spectators, this mod is meant to be played in only 2 players and is practically completely custom meaning you're not even technically playing Super Mario 64.
 
-## Door Bust
-
-https://user-images.githubusercontent.com/44549182/197370948-e8e0cb0a-8c7e-4ee7-956e-071cbf25ef31.mp4
-
-This mod adds busting down doors by slide kicking into them, flying doors can deal damage to other players and normal doors will respawn after 10 seconds.
-
 ## Hugging
 
 <img width="600" alt="blockymybeloved" src="https://user-images.githubusercontent.com/44549182/208311383-e5003dd1-427f-410f-aa76-ea5fe9cb8f29.png">
