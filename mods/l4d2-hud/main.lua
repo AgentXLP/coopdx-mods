@@ -210,7 +210,7 @@ function on_hud_render()
     render_health_bar(width, m, 1, false)
     local spot = 0
     local gActiveMarioStates = {}
-    for i = 1, network_player_connected_count() - 1 do
+    for i = 1, (MAX_PLAYERS - 1) do
         if active_player(gMarioStates[i]) ~= 0 then table.insert(gActiveMarioStates, gMarioStates[i]) end
     end
     if (m.controller.buttonPressed & R_JPAD) ~= 0 then offset = offset + 1 end
