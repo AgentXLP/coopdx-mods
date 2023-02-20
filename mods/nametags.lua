@@ -95,7 +95,7 @@ function on_hud_render()
     djui_hud_set_resolution(RESOLUTION_N64)
     djui_hud_set_font(FONT_NORMAL)
 
-    for i = if_then_else(showSelfTag, 0, 1), network_player_connected_count() - 1 do
+    for i = if_then_else(showSelfTag, 0, 1), (MAX_PLAYERS - 1) do
         local m = gMarioStates[i]
         if active_player(m) ~= 0 and m.action ~= ACT_IN_CANNON and (m.playerIndex ~= 0 or (m.playerIndex == 0 and m.action ~= ACT_FIRST_PERSON)) then
             local out = { x = 0, y = 0, z = 0 }
