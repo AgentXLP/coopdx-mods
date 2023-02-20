@@ -7,3 +7,4 @@ mods/wip
 mod.cache
 sm64_save_file*
 sm64config.txt
+*.bat
