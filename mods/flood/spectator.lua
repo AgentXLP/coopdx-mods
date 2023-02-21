@@ -1,61 +1,151 @@
-spectator = false
-specTarget = 1
+marioHeadPos = 120
 
-function spectate_table()
-    local t = {}
-    for i = 1, network_player_connected_count() - 1 do
-        if gMarioStates[i].action ~= ACT_DEAD and gMarioStates[i].action ~= ACT_DISAPPEARED then
-            table.insert(t, gMarioStates[i])
-        end
-    end
-    return t
-end
-
-function dead_table()
-    local t = {}
-    for i = 0, network_player_connected_count() - 1 do
-        if gMarioStates[i].action == ACT_DEAD then
-            table.insert(t, gMarioStates[i])
-        end
-    end
-    return t
-end
+sPlayerFirstPerson = {
+    pos = { x = 0, y = 0, z = 0 },
+    freecam = camera_config_is_free_cam_enabled(),
+    pitch = 0,
+    yaw = 0,
+    fov = 70
+}
 
 --- @param m MarioState
-function update_spectator(m)
-    spectator = true
-    camera_freeze()
+function update_fp_camera(m)
+    gLakituState.mode = CAMERA_MODE_FREE_ROAM
+    gLakituState.defMode = CAMERA_MODE_FREE_ROAM
 
-    local specTable = spectate_table()
-    local specLength = #specTable
-    -- uncommented again because peer pressure
-    if specLength > 0 then
-        if (m.controller.buttonPressed & L_JPAD) ~= 0 then
-            specTarget = specTarget - 1
-            if specTarget < 1 then specTarget = specLength end
-        elseif (m.controller.buttonPressed & R_JPAD) ~= 0 then
-            specTarget = specTarget + 1
-            if specTarget > specLength then specTarget = 1 end
+    local sensX = 0.3 * camera_config_get_x_sensitivity()
+    local sensY = 0.4 * camera_config_get_y_sensitivity()
+    local invX = if_then_else(camera_config_is_x_inverted(), 1, -1)
+    local invY = if_then_else(camera_config_is_y_inverted(), 1, -1)
+
+    if not is_game_paused() then
+        -- update pitch
+        sPlayerFirstPerson.pitch = sPlayerFirstPerson.pitch - sensY * (invY * m.controller.extStickY - 1.5 * djui_hud_get_raw_mouse_y())
+        sPlayerFirstPerson.pitch = clamp(sPlayerFirstPerson.pitch, -0x3F00, 0x3F00)
+
+        -- update yaw
+        if (m.controller.buttonPressed & L_TRIG) ~= 0 then
+            sPlayerFirstPerson.yaw = m.faceAngle.y + 0x8000
+        else
+            sPlayerFirstPerson.yaw = sPlayerFirstPerson.yaw + sensX * (invX * m.controller.extStickX - 1.5 * djui_hud_get_raw_mouse_x())
         end
+        sPlayerFirstPerson.yaw = (sPlayerFirstPerson.yaw + 0x10000) % 0x10000
     end
 
-    local m2 = if_then_else(specLength == 0, dead_table()[1], specTable[specTarget])
+    gLakituState.yaw = sPlayerFirstPerson.yaw
+    m.area.camera.yaw = sPlayerFirstPerson.yaw
 
-    if m2 ~= nil then
-        gLakituState.pos.x = m2.pos.x + sins(m2.faceAngle.y) * -1000
-        gLakituState.pos.y = m2.pos.y + 500
-        gLakituState.pos.z = m2.pos.z + coss(m2.faceAngle.y) * -1000
-        vec3f_copy(gLakituState.focus, m2.pos)
-    end
+    -- update pos
+    gLakituState.pos.x = sPlayerFirstPerson.pos.x + coss(sPlayerFirstPerson.pitch) * sins(sPlayerFirstPerson.yaw)
+    gLakituState.pos.y = sPlayerFirstPerson.pos.y + sins(sPlayerFirstPerson.pitch) + marioHeadPos
+    gLakituState.pos.z = sPlayerFirstPerson.pos.z + coss(sPlayerFirstPerson.pitch) * coss(sPlayerFirstPerson.yaw)
     vec3f_copy(m.area.camera.pos, gLakituState.pos)
     vec3f_copy(gLakituState.curPos, gLakituState.pos)
     vec3f_copy(gLakituState.goalPos, gLakituState.pos)
+
+    -- update focus
+    gLakituState.focus.x = sPlayerFirstPerson.pos.x - 100 * coss(sPlayerFirstPerson.pitch) * sins(sPlayerFirstPerson.yaw)
+    gLakituState.focus.y = sPlayerFirstPerson.pos.y - 100 * sins(sPlayerFirstPerson.pitch) + marioHeadPos
+    gLakituState.focus.z = sPlayerFirstPerson.pos.z - 100 * coss(sPlayerFirstPerson.pitch) * coss(sPlayerFirstPerson.yaw)
     vec3f_copy(m.area.camera.focus, gLakituState.focus)
     vec3f_copy(gLakituState.curFocus, gLakituState.focus)
     vec3f_copy(gLakituState.goalFocus, gLakituState.focus)
+
+    -- set other values
+    gLakituState.posHSpeed = 0
+    gLakituState.posVSpeed = 0
+    gLakituState.focHSpeed = 0
+    gLakituState.focVSpeed = 0
 end
 
-function reset_spectator()
-    spectator = false
-    camera_unfreeze()
+--- @param m MarioState
+function set_mario_spectator(m)
+    if m.action ~= ACT_SPECTATOR then
+        sPlayerFirstPerson.pos = { x = m.pos.x, y = if_then_else(m.health > 0xff, m.pos.y, gGlobalSyncTable.waterLevel), z = m.pos.z }
+    end
+    m.action = ACT_SPECTATOR
 end
+
+--- @param m MarioState
+function act_spectator(m)
+    set_mario_animation(m, MARIO_ANIM_DYING_ON_STOMACH)
+    m.marioBodyState.eyeState = MARIO_EYES_DEAD
+    m.faceAngle.x = 0
+    m.faceAngle.z = 0
+
+    if gPlayerSyncTable[m.playerIndex].finished then
+        m.marioObj.header.gfx.node.flags = m.marioObj.header.gfx.node.flags & ~GRAPH_RENDER_ACTIVE
+        local goalPos = gLevels[gGlobalSyncTable.level].goalPos
+        vec3f_set(m.pos, goalPos.x, goalPos.y + 600, goalPos.z)
+        mario_set_full_health(m)
+    else
+        m.pos.y = gGlobalSyncTable.waterLevel - 25
+        vec3f_copy(m.marioObj.header.gfx.pos, m.pos)
+        vec3f_copy(m.marioObj.header.gfx.angle, m.faceAngle)
+        m.marioObj.header.gfx.angle.y = 0
+        m.health = 0xff
+        m.healCounter = 0
+        m.hurtCounter = 0
+    end
+
+    if m.playerIndex ~= 0 then return end
+
+    if not is_game_paused() then
+        local forward = { x = sins(m.faceAngle.y), y = 0, z = coss(m.faceAngle.y) }
+        local right = { x = sins(m.faceAngle.y - 0x4000), y = 0, z = coss(m.faceAngle.y - 0x4000) }
+        local dir = { x = forward.x * m.controller.stickY + right.x * m.controller.stickX, y = 0, z = forward.z * m.controller.stickY + right.z * m.controller.stickX }
+        local speed = if_then_else((m.controller.buttonDown & B_BUTTON) ~= 0, 2, 1)
+        dir = vec3f_mul(dir, speed)
+
+        sPlayerFirstPerson.pos.x = sPlayerFirstPerson.pos.x + dir.x
+        sPlayerFirstPerson.pos.z = sPlayerFirstPerson.pos.z + dir.z
+
+        if (m.input & INPUT_A_DOWN) ~= 0 then
+            sPlayerFirstPerson.pos.y = sPlayerFirstPerson.pos.y + (50 * speed)
+        end
+        if (m.input & INPUT_Z_DOWN) ~= 0 then
+            sPlayerFirstPerson.pos.y = sPlayerFirstPerson.pos.y - (50 * speed)
+        end
+    end
+
+    m.faceAngle.y = m.area.camera.yaw + 0x8000
+
+    djui_hud_set_mouse_locked(not is_game_paused())
+
+    camera_freeze()
+    update_fp_camera(m)
+end
+
+--- @param m MarioState
+function on_set_mario_action(m)
+    if m.playerIndex ~= 0 then return end
+
+    if m.action == ACT_SPECTATOR then
+        sPlayerFirstPerson.freecam = camera_config_is_free_cam_enabled()
+        camera_freeze()
+        set_override_near(45)
+        set_override_fov(sPlayerFirstPerson.fov)
+        sPlayerFirstPerson.pitch = 0
+        sPlayerFirstPerson.yaw = m.faceAngle.y + 0x8000
+    else
+        if sPlayerFirstPerson.freecam then
+            gLakituState.mode = CAMERA_MODE_NEWCAM
+            gLakituState.defMode = CAMERA_MODE_NEWCAM
+        end
+        camera_unfreeze()
+        set_override_near(0)
+        set_override_fov(0)
+        sPlayerFirstPerson.pitch = 0
+        sPlayerFirstPerson.yaw = 0
+        if not camera_config_is_mouse_look_enabled() then
+            djui_hud_set_mouse_locked(false)
+        end
+    end
+end
+
+ACT_SPECTATOR = allocate_mario_action(ACT_GROUP_AIRBORNE | ACT_FLAG_INVULNERABLE)
+
+hook_event(HOOK_ON_SET_MARIO_ACTION, on_set_mario_action)
+
+---@diagnostic disable-next-line: missing-parameter
+hook_mario_action(ACT_SPECTATOR, act_spectator)
