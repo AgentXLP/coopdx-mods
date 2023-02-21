@@ -1,6 +1,6 @@
 -- name: Flood
 -- incompatible: gamemode
--- description: Flood v2.0\nBy \\#ec7731\\Agent X\\#dcdcdc\\\n\nThis mod adds a flood escape gamemode\nto sm64ex-coop, you must escape the flood and reach the top of the level before everything is flooded.\n\nSpecial thanks to Needlemouse64 with the TTC easter egg
+-- description: Flood v2.0.1\nBy \\#ec7731\\Agent X\\#dcdcdc\\\n\nThis mod adds a flood escape gamemode\nto sm64ex-coop, you must escape the flood and reach the top of the level before everything is flooded.\n\nSpecial thanks to Mr.Needlemouse64 for the TTC easter egg
 
 FLOOD_WATER = 0
 FLOOD_LAVA  = 2
@@ -22,6 +22,7 @@ gGlobalSyncTable.waterLevel = -20000
 gGlobalSyncTable.speedMultiplier = 1
 
 listedSurvivors = false
+savedSpeedMultiplier = 1
 score = tonumber(mod_storage_load("score")) or 0
 if gServerSettings.enableCheats ~= 0 then score = 0 end
 
@@ -36,11 +37,11 @@ gLevels = {
     [LEVEL_WDW] =            { goalPos = { x = 1467, y = 4096, z = 93, a = -0x4000 },    speed = 4.0, area = 1, type = FLOOD_WATER, time = 0, points = 4 },
     [LEVEL_TTM] =            { goalPos = { x = 1053, y = 2309, z = 305, a = 0x0000 },    speed = 3.0, area = 1, type = FLOOD_WATER, time = 0, points = 5 },
     [LEVEL_THI] =            { goalPos = { x = 1037, y = 4060, z = -2091, a = 0x0000 },  speed = 2.0, area = 1, type = FLOOD_WATER, time = 0, points = 5 },
-    [LEVEL_TTC] =            { goalPos = { x = 1200, y = 6190, z = 1400, a = 0x0000 },   speed = 4.0, area = 1, type = FLOOD_WATER, time = 0, points = 7 },
+    [LEVEL_TTC] =            { goalPos = { x = 1354, y = 6190, z = 1340, a = 0x0000 },   speed = 4.0, area = 1, type = FLOOD_WATER, time = 0, points = 7 },
     [LEVEL_BITS] =           { goalPos = { x = 369, y = 6552, z = -6000, a = 0x0000 },   speed = 5.0, area = 1, type = FLOOD_LAVA,  time = 0, points = 6 },
     [LEVEL_BONUS] =          { goalPos = { x = 0, y = 700, z = 0, a = 0x0000 },          speed = 5.0, area = 1, type = FLOOD_LAVA,  time = 0, points = 6 },
     [LEVEL_SL] =             { goalPos = { x = 40, y = 4864, z = 240, a = 0x0000 },      speed = 3.0, area = 1, type = FLOOD_WATER, time = 0, points = 5 },
-    [LEVEL_CASTLE_GROUNDS] = { goalPos = { x = 0, y = 7583, z = -4015, a = 0x0000 },     speed = 7.0, area = 1, type = FLOOD_WATER, time = 0, points = 7 }
+    [LEVEL_CASTLE_GROUNDS] = { goalPos = { x = 0, y = 7583, z = -4015, a = 0x0000 },     speed = 7.0, area = 1, type = FLOOD_WATER, time = 0, points = 9 }
 }
 
 gMapRotation = {
@@ -59,6 +60,24 @@ gMapRotation = {
     LEVEL_BONUS,
     LEVEL_SL,
     LEVEL_CASTLE_GROUNDS
+}
+
+gMapNames = {
+    "bob",
+    "wf",
+    "ccm",
+    "bitdw",
+    "bbh",
+    "lll",
+    "ssl",
+    "wdw",
+    "ttm",
+    "thi",
+    "ttc",
+    "bits",
+    "ctt",
+    "sl",
+    "castle_grounds"
 }
 
 -- runs serverside
@@ -250,7 +269,7 @@ function mario_update(m)
         end
 
         if gServerSettings.enableCheats == 0 then
-            score = score + gLevels[gGlobalSyncTable.level].points
+            score = score + gLevels[gGlobalSyncTable.level].points + math.floor(savedSpeedMultiplier - 1)
             mod_storage_save("score", tostring(score))
             gPlayerSyncTable[0].score = score
         end
@@ -328,9 +347,16 @@ function on_hud_render()
     djui_hud_print_text(text, x, 0, scale)
 
     hud_render_power_meter(gMarioStates[0].health, djui_hud_get_screen_width() - 64, 0, 64, 64)
+
+    if gGlobalSyncTable.speedMultiplier > 1 then
+        djui_hud_set_font(FONT_HUD)
+        djui_hud_print_text(tostring(gGlobalSyncTable.speedMultiplier) .. "x", 2, 2, 1)
+    end
 end
 
 function on_level_init()
+    savedSpeedMultiplier = gGlobalSyncTable.speedMultiplier
+
     if gNetworkPlayers[0].currLevelNum == LEVEL_TTC then
         gLevelValues.fixCollisionBugs = 1
     else
@@ -413,6 +439,12 @@ function on_start_command(msg)
         if override ~= nil then
             override = clamp(math.floor(override), 1, #gMapRotation)
             gGlobalSyncTable.level = gMapRotation[override]
+        else
+            for k, v in pairs(gMapNames) do
+                if msg:lower() == v then
+                    gGlobalSyncTable.level = gMapRotation[k]
+                end
+            end
         end
     end
     round_start()

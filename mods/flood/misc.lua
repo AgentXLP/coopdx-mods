@@ -179,6 +179,23 @@ function on_pause_exit()
     return false
 end
 
+--- @param o Object
+function heal_on_contact(o)
+    local m = gMarioStates[0]
+    if obj_check_hitbox_overlap(o, m.marioObj) then
+        m.healCounter = 31
+        m.hurtCounter = 0
+    end
+end
+
+id_bhv1Up = hook_behavior(id_bhv1Up, OBJ_LIST_LEVEL, false, nil, heal_on_contact)
+id_bhv1upJumpOnApproach = hook_behavior(id_bhv1upJumpOnApproach, OBJ_LIST_LEVEL, false, nil, heal_on_contact)
+id_bhv1upRunningAway = hook_behavior(id_bhv1upRunningAway, OBJ_LIST_LEVEL, false, nil, heal_on_contact)
+id_bhv1upSliding = hook_behavior(id_bhv1upSliding, OBJ_LIST_LEVEL, false, nil, heal_on_contact)
+id_bhv1upWalking = hook_behavior(id_bhv1upWalking, OBJ_LIST_LEVEL, false, nil, heal_on_contact)
+id_bhvHidden1up = hook_behavior(id_bhvHidden1up, OBJ_LIST_LEVEL, false, nil, heal_on_contact)
+id_bhvHidden1upInPole = hook_behavior(id_bhvHidden1upInPole, OBJ_LIST_LEVEL, false, nil, heal_on_contact)
+
 hook_event(HOOK_BEFORE_PHYS_STEP, before_phys_step)
 hook_event(HOOK_ALLOW_INTERACT, allow_interact)
 hook_event(HOOK_ON_DEATH, on_death)
