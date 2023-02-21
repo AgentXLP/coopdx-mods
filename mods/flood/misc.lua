@@ -24,10 +24,14 @@ function bhv_water_loop(o)
         o.oFaceAngleYaw = o.oTimer * 14
     end
 
-    for i = 1, 3 do
-        if get_environment_region(i) < gGlobalSyncTable.waterLevel then
-            set_environment_region(i, -20000)
+    if gNetworkPlayers[0].currLevelNum ~= LEVEL_WDW then
+        for i = 1, 3 do
+            if get_environment_region(i) < gGlobalSyncTable.waterLevel then
+                set_environment_region(i, -20000)
+            end
         end
+    else
+        set_environment_region(1, -20000)
     end
 
     if needlemouse_in_server() and gNetworkPlayers[0].currLevelNum == LEVEL_TTC and o.oAnimState ~= 1 then
@@ -132,6 +136,15 @@ function obj_mark_for_deletion_on_sync(o)
     if gNetworkPlayers[0].currAreaSyncValid then obj_mark_for_deletion(o) end
 end
 
+--- @param o Object
+function heal_on_contact(o)
+    local m = gMarioStates[0]
+    if obj_check_hitbox_overlap(o, m.marioObj) then
+        m.healCounter = 31
+        m.hurtCounter = 0
+    end
+end
+
 hook_behavior(id_bhvHoot, OBJ_LIST_UNIMPORTANT, true, obj_hide, obj_mark_for_deletion_on_sync)
 hook_behavior(id_bhvStar, OBJ_LIST_UNIMPORTANT, true, obj_hide, obj_mark_for_deletion_on_sync)
 hook_behavior(id_bhvUkiki, OBJ_LIST_UNIMPORTANT, true, obj_hide, obj_mark_for_deletion_on_sync)
@@ -143,6 +156,15 @@ hook_behavior(id_bhvEyerokBoss, OBJ_LIST_UNIMPORTANT, true, obj_hide, obj_mark_f
 hook_behavior(id_bhvBalconyBigBoo, OBJ_LIST_UNIMPORTANT, true, obj_hide, obj_mark_for_deletion_on_sync)
 hook_behavior(id_bhvRecoveryHeart, OBJ_LIST_UNIMPORTANT, true, obj_hide, obj_mark_for_deletion_on_sync)
 hook_behavior(id_bhvExclamationBox, OBJ_LIST_UNIMPORTANT, true, obj_hide, obj_mark_for_deletion_on_sync)
+hook_behavior(id_bhvWaterLevelDiamond, OBJ_LIST_UNIMPORTANT, true, obj_hide, obj_mark_for_deletion_on_sync)
+
+hook_behavior(id_bhv1Up, OBJ_LIST_LEVEL, false, nil, heal_on_contact)
+hook_behavior(id_bhv1upJumpOnApproach, OBJ_LIST_LEVEL, false, nil, heal_on_contact)
+hook_behavior(id_bhv1upRunningAway, OBJ_LIST_LEVEL, false, nil, heal_on_contact)
+hook_behavior(id_bhv1upSliding, OBJ_LIST_LEVEL, false, nil, heal_on_contact)
+hook_behavior(id_bhv1upWalking, OBJ_LIST_LEVEL, false, nil, heal_on_contact)
+hook_behavior(id_bhvHidden1up, OBJ_LIST_LEVEL, false, nil, heal_on_contact)
+hook_behavior(id_bhvHidden1upInPole, OBJ_LIST_LEVEL, false, nil, heal_on_contact)
 
 function before_phys_step(m)
     if m.playerIndex ~= 0 then return end
@@ -178,23 +200,6 @@ function on_pause_exit()
     end
     return false
 end
-
---- @param o Object
-function heal_on_contact(o)
-    local m = gMarioStates[0]
-    if obj_check_hitbox_overlap(o, m.marioObj) then
-        m.healCounter = 31
-        m.hurtCounter = 0
-    end
-end
-
-id_bhv1Up = hook_behavior(id_bhv1Up, OBJ_LIST_LEVEL, false, nil, heal_on_contact)
-id_bhv1upJumpOnApproach = hook_behavior(id_bhv1upJumpOnApproach, OBJ_LIST_LEVEL, false, nil, heal_on_contact)
-id_bhv1upRunningAway = hook_behavior(id_bhv1upRunningAway, OBJ_LIST_LEVEL, false, nil, heal_on_contact)
-id_bhv1upSliding = hook_behavior(id_bhv1upSliding, OBJ_LIST_LEVEL, false, nil, heal_on_contact)
-id_bhv1upWalking = hook_behavior(id_bhv1upWalking, OBJ_LIST_LEVEL, false, nil, heal_on_contact)
-id_bhvHidden1up = hook_behavior(id_bhvHidden1up, OBJ_LIST_LEVEL, false, nil, heal_on_contact)
-id_bhvHidden1upInPole = hook_behavior(id_bhvHidden1upInPole, OBJ_LIST_LEVEL, false, nil, heal_on_contact)
 
 hook_event(HOOK_BEFORE_PHYS_STEP, before_phys_step)
 hook_event(HOOK_ALLOW_INTERACT, allow_interact)
