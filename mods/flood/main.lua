@@ -348,7 +348,7 @@ function on_hud_render()
 
     hud_render_power_meter(gMarioStates[0].health, djui_hud_get_screen_width() - 64, 0, 64, 64)
 
-    if gGlobalSyncTable.speedMultiplier > 1 then
+    if gGlobalSyncTable.speedMultiplier ~= 1 then
         djui_hud_set_font(FONT_HUD)
         djui_hud_print_text(tostring(gGlobalSyncTable.speedMultiplier) .. "x", 2, 2, 1)
     end
