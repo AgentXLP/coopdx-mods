@@ -1,5 +1,9 @@
 # Flood
 
-<iframe width="560" height="315" src="https://www.youtube.com/embed/1iPTLlM9Hmg" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>
+<a href="http://www.youtube.com/watch?feature=player_embedded&v=1iPTLlM9Hmg" target="_blank">
+ <img src="http://img.youtube.com/vi/1iPTLlM9Hmg/mqdefault.jpg" alt="Watch the video" width="640" height="360" border="10" />
+</a>
 
 This mod adds a flood escape gamemode to sm64ex-coop, you must escape the flood and reach the top of the level before everything is flooded.
+
+Special thanks to Mr.Needlemouse64 for the TTC easter egg
