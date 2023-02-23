@@ -1,6 +1,6 @@
 -- name: Flood
 -- incompatible: gamemode
--- description: Flood v2.0.1\nBy \\#ec7731\\Agent X\\#dcdcdc\\\n\nThis mod adds a flood escape gamemode\nto sm64ex-coop, you must escape the flood and reach the top of the level before everything is flooded.\n\nSpecial thanks to Mr.Needlemouse64 for the TTC easter egg
+-- description: Flood v2.1\nBy \\#ec7731\\Agent X\\#dcdcdc\\\n\nThis mod adds a flood escape gamemode\nto sm64ex-coop, you must escape the flood and reach the top of the level before everything is flooded.\n\nSpecial thanks to Mr.Needlemouse64 and Blocky for their respective easter eggs.
 
 FLOOD_WATER = 0
 FLOOD_LAVA  = 2
@@ -21,27 +21,29 @@ gGlobalSyncTable.level = LEVEL_BOB
 gGlobalSyncTable.waterLevel = -20000
 gGlobalSyncTable.speedMultiplier = 1
 
+gGlobalTimer = 0
 listedSurvivors = false
+savedStarPoints = 0
 savedSpeedMultiplier = 1
 score = tonumber(mod_storage_load("score")) or 0
 if gServerSettings.enableCheats ~= 0 then score = 0 end
 
 gLevels = {
-    [LEVEL_BOB] =            { goalPos = { x = 3304, y = 4242, z = -4603, a = 0x0000 },  speed = 2.5, area = 1, type = FLOOD_WATER, time = 0, points = 1 },
-    [LEVEL_WF] =             { goalPos = { x = 414, y = 5325, z = -20, a = 0x0000 },     speed = 4.0, area = 1, type = FLOOD_WATER, time = 0, points = 1 },
-    [LEVEL_CCM] =            { goalPos = { x = -478, y = 3471, z = -964, a = 0x0000 },   speed = 5.0, area = 1, type = FLOOD_WATER, time = 0, points = 2, customStartPos = { x = 3336, y = -4200, z = 0, a = 0x0000 }, },
-    [LEVEL_BITDW] =          { goalPos = { x = 6772, y = 2867, z = 0, a = -0x4000 },     speed = 4.0, area = 1, type = FLOOD_WATER, time = 0, points = 3 },
-    [LEVEL_BBH] =            { goalPos = { x = 655, y = 2867, z = 1824, a = 0x8000 },    speed = 3.5, area = 1, type = FLOOD_WATER, time = 0, points = 3 },
-    [LEVEL_LLL] =            { goalPos = { x = 2523, y = 3591, z = -898, a = -0x8000 },  speed = 3.5, area = 2, type = FLOOD_LAVA,  time = 0, points = 3 },
-    [LEVEL_SSL] =            { goalPos = { x = 512, y = 4815, z = -551, a = 0x0000 },    speed = 3.0, area = 2, type = FLOOD_SAND,  time = 0, points = 4 },
-    [LEVEL_WDW] =            { goalPos = { x = 1467, y = 4096, z = 93, a = -0x4000 },    speed = 4.0, area = 1, type = FLOOD_WATER, time = 0, points = 4 },
-    [LEVEL_TTM] =            { goalPos = { x = 1053, y = 2309, z = 305, a = 0x0000 },    speed = 3.0, area = 1, type = FLOOD_WATER, time = 0, points = 5 },
-    [LEVEL_THI] =            { goalPos = { x = 1037, y = 4060, z = -2091, a = 0x0000 },  speed = 2.0, area = 1, type = FLOOD_WATER, time = 0, points = 5 },
-    [LEVEL_TTC] =            { goalPos = { x = 1354, y = 6190, z = 1340, a = 0x0000 },   speed = 4.0, area = 1, type = FLOOD_WATER, time = 0, points = 7 },
-    [LEVEL_BITS] =           { goalPos = { x = 369, y = 6552, z = -6000, a = 0x0000 },   speed = 5.0, area = 1, type = FLOOD_LAVA,  time = 0, points = 6 },
-    [LEVEL_BONUS] =          { goalPos = { x = 0, y = 700, z = 0, a = 0x0000 },          speed = 5.0, area = 1, type = FLOOD_LAVA,  time = 0, points = 6 },
-    [LEVEL_SL] =             { goalPos = { x = 40, y = 4864, z = 240, a = 0x0000 },      speed = 3.0, area = 1, type = FLOOD_WATER, time = 0, points = 5 },
-    [LEVEL_CASTLE_GROUNDS] = { goalPos = { x = 0, y = 7583, z = -4015, a = 0x0000 },     speed = 7.0, area = 1, type = FLOOD_WATER, time = 0, points = 9 }
+    [LEVEL_BOB] =            { goalPos = { x = 3304, y = 4242, z = -4603, a = 0x0000 },  speed = 2.5, area = 1, type = FLOOD_WATER, time = 0, starPoints = 3,  points = 1 },
+    [LEVEL_WF] =             { goalPos = { x = 414, y = 5325, z = -20, a = 0x0000 },     speed = 4.0, area = 1, type = FLOOD_WATER, time = 0, starPoints = 6,  points = 1 },
+    [LEVEL_CCM] =            { goalPos = { x = -478, y = 3471, z = -964, a = 0x0000 },   speed = 5.0, area = 1, type = FLOOD_WATER, time = 0, starPoints = 14, points = 2, customStartPos = { x = 3336, y = -4200, z = 0, a = 0x0000 }, },
+    [LEVEL_BITDW] =          { goalPos = { x = 6772, y = 2867, z = 0, a = -0x4000 },     speed = 4.0, area = 1, type = FLOOD_WATER, time = 0, starPoints = 10, points = 3 },
+    [LEVEL_BBH] =            { goalPos = { x = 655, y = 3277, z = 244, a = 0x8000 },     speed = 3.5, area = 1, type = FLOOD_WATER, time = 0, starPoints = 8,  points = 3 },
+    [LEVEL_LLL] =            { goalPos = { x = 2523, y = 3591, z = -898, a = -0x8000 },  speed = 3.5, area = 2, type = FLOOD_LAVA,  time = 0, starPoints = 3,  points = 3 },
+    [LEVEL_SSL] =            { goalPos = { x = 512, y = 4815, z = -551, a = 0x0000 },    speed = 3.0, area = 2, type = FLOOD_SAND,  time = 0, starPoints = 16, points = 4 },
+    [LEVEL_WDW] =            { goalPos = { x = 1467, y = 4096, z = 93, a = -0x4000 },    speed = 4.0, area = 1, type = FLOOD_WATER, time = 0, starPoints = 14, points = 4 },
+    [LEVEL_TTM] =            { goalPos = { x = 1053, y = 2309, z = 305, a = 0x0000 },    speed = 3.0, area = 1, type = FLOOD_WATER, time = 0, starPoints = 4,  points = 5 },
+    [LEVEL_THI] =            { goalPos = { x = 1037, y = 4060, z = -2091, a = 0x0000 },  speed = 4.0, area = 1, type = FLOOD_WATER, time = 0, starPoints = 8,  points = 5 },
+    [LEVEL_TTC] =            { goalPos = { x = 2208, y = 7051, z = 2217, a = 0x0000 },   speed = 4.0, area = 1, type = FLOOD_WATER, time = 0, starPoints = 3,  points = 7 },
+    [LEVEL_BITS] =           { goalPos = { x = 369, y = 6552, z = -6000, a = 0x0000 },   speed = 5.0, area = 1, type = FLOOD_LAVA,  time = 0, starPoints = 16, points = 6 },
+    [LEVEL_BONUS] =          { goalPos = { x = 0, y = 700, z = 0, a = 0x0000 },          speed = 5.0, area = 1, type = FLOOD_LAVA,  time = 0, starPoints = 0,  points = 6 },
+    [LEVEL_SL] =             { goalPos = { x = 40, y = 4864, z = 240, a = 0x0000 },      speed = 3.0, area = 1, type = FLOOD_WATER, time = 0, starPoints = 10, points = 5 },
+    [LEVEL_CASTLE_GROUNDS] = { goalPos = { x = 0, y = 7583, z = -4015, a = 0x0000 },     speed = 7.0, area = 1, type = FLOOD_WATER, time = 0, starPoints = 0,  points = 9 }
 }
 
 gMapRotation = {
@@ -94,15 +96,16 @@ function round_end()
 end
 
 function level_restart()
+    round_start()
     mario_set_full_health(gMarioStates[0])
     gLevels[gGlobalSyncTable.level].time = 0
-    warp_restart_level()
+    warp_to_level(gGlobalSyncTable.level, gLevels[gGlobalSyncTable.level].area, if_then_else(gNetworkPlayers[0].currLevelNum == LEVEL_CASTLE_GROUNDS, 99, 6))
 end
 
 function server_update()
     if gGlobalSyncTable.roundState == ROUND_STATE_ACTIVE then
         if gNetworkPlayers[0].currLevelNum == gGlobalSyncTable.level then
-            gGlobalSyncTable.waterLevel = math.min(gGlobalSyncTable.waterLevel + gLevels[gGlobalSyncTable.level].speed * gGlobalSyncTable.speedMultiplier, gLevels[gGlobalSyncTable.level].goalPos.y + 200)
+            gGlobalSyncTable.waterLevel = math.min(gGlobalSyncTable.waterLevel + gLevels[gGlobalSyncTable.level].speed * gGlobalSyncTable.speedMultiplier, gLevels[gGlobalSyncTable.level].goalPos.y + 300)
 
             local active = 0
             for i = 0, (MAX_PLAYERS - 1) do
@@ -179,7 +182,7 @@ function update()
         if gNetworkPlayers[0].currLevelNum ~= LEVEL_LOBBY or gNetworkPlayers[0].currActNum ~= 0 then
             warp_to_level(LEVEL_LOBBY, 1, 0)
 
-            if not listedSurvivors then
+            if not listedSurvivors and gGlobalTimer > 5 then
                 listedSurvivors = true
                 local finished = 0
                 djui_chat_message_create("Survivors:")
@@ -204,6 +207,8 @@ function update()
             warp_to_level(gGlobalSyncTable.level, gLevels[gGlobalSyncTable.level].area, act)
         end
     end
+
+    gGlobalTimer = gGlobalTimer + 1
 end
 
 --- @param m MarioState
@@ -219,11 +224,9 @@ function mario_update(m)
 
     if m.playerIndex ~= 0 then return end
 
-    if m.floor.type == SURFACE_WARP or m.floor.type >= SURFACE_PAINTING_WARP_D3 and m.floor.type <= SURFACE_PAINTING_WARP_FC then
+    if m.floor ~= nil and (m.floor.type == SURFACE_WARP or (m.floor.type >= SURFACE_PAINTING_WARP_D3 and m.floor.type <= SURFACE_PAINTING_WARP_FC) or (m.floor.type >= SURFACE_INSTANT_WARP_1B and m.floor.type <= SURFACE_INSTANT_WARP_1E)) then
         m.floor.type = SURFACE_DEFAULT
     end
-
-    romhack_camera(m)
 
     -- dialog boxes
     if (m.action == ACT_SPAWN_NO_SPIN_AIRBORNE or m.action == ACT_SPAWN_NO_SPIN_LANDING or m.action == ACT_SPAWN_SPIN_AIRBORNE or m.action == ACT_SPAWN_SPIN_LANDING) and m.pos.y < m.floorHeight + 10 then
@@ -250,10 +253,9 @@ function mario_update(m)
         end
     end
 
-    if ((gNetworkPlayers[0].currLevelNum ~= LEVEL_BONUS and m.pos.y == m.floorHeight)
+    if gNetworkPlayers[0].currLevelNum == gGlobalSyncTable.level and not gPlayerSyncTable[0].finished and ((gNetworkPlayers[0].currLevelNum ~= LEVEL_BONUS and m.pos.y == m.floorHeight)
     or (gNetworkPlayers[0].currLevelNum == LEVEL_BONUS and m.action == ACT_JUMBO_STAR_CUTSCENE)
-    or (m.action & ACT_FLAG_ON_POLE) ~= 0)
-    and vec3f_dist(m.pos, gLevels[gGlobalSyncTable.level].goalPos) < 500 and not gPlayerSyncTable[0].finished then
+    or (m.action & ACT_FLAG_ON_POLE) ~= 0) and vec3f_dist(m.pos, gLevels[gGlobalSyncTable.level].goalPos) < 600 then
         gPlayerSyncTable[0].finished = true
 
         if gNetworkPlayers[0].currLevelNum ~= LEVEL_BONUS then
@@ -268,13 +270,15 @@ function mario_update(m)
             play_secondary_music(SEQ_EVENT_CUTSCENE_VICTORY, 0, 70, 30)
         end
 
+        local multiplier = math.min(gGlobalSyncTable.speedMultiplier, savedSpeedMultiplier)
+        local starPoints = math.round(savedStarPoints * multiplier)
         if gServerSettings.enableCheats == 0 then
-            score = score + gLevels[gGlobalSyncTable.level].points + math.floor(savedSpeedMultiplier - 1)
+            local oldScore = score
+            score = score + math.round(gLevels[gGlobalSyncTable.level].points * multiplier) + starPoints
             mod_storage_save("score", tostring(score))
             gPlayerSyncTable[0].score = score
+            djui_chat_message_create(string.format("Score: %d -> %d%s", oldScore, gPlayerSyncTable[0].score, if_then_else(starPoints ~= 0, " (" .. starPoints .. " bonus star points)", "")))
         end
-
-        djui_chat_message_create("New score: " .. tostring(gPlayerSyncTable[0].score))
     end
 
     if gPlayerSyncTable[0].finished then
@@ -283,7 +287,7 @@ function mario_update(m)
             set_mario_spectator(m)
         end
     else
-        local damage = if_then_else(gGlobalSyncTable.level ~= LEVEL_CASTLE_GROUNDS, 36, 20) -- (0x880 / (2 * 30)) and (0x880 / (3.5 * 30))
+        local damage = if_then_else(gGlobalSyncTable.level ~= LEVEL_CASTLE_GROUNDS, 36, 20) -- (0x880 / (2 * 30)) and (0x880 / (3.5 * 30)) respectively
         if m.pos.y + 40 < gGlobalSyncTable.waterLevel then
             m.health = m.health - damage
         end
@@ -305,24 +309,29 @@ end
 
 function on_hud_render()
     local water = obj_get_first_with_behavior_id(id_bhvWater)
-    if gNetworkPlayers[0].currLevelNum == gGlobalSyncTable.level and gLakituState.pos.y < gGlobalSyncTable.waterLevel - 10 and water ~= nil then
+    if gNetworkPlayers[0].currLevelNum == gGlobalSyncTable.level and water ~= nil then
         djui_hud_set_resolution(RESOLUTION_DJUI)
-        switch(water.oAnimState, {
-            [FLOOD_WATER] = function()
-                djui_hud_set_adjusted_color(0, 20, 200, 120)
-            end,
-            [1] = function()
-                djui_hud_set_adjusted_color(200, 200, 200, 220)
-            end,
-            [FLOOD_LAVA] = function()
-                djui_hud_set_adjusted_color(200, 0, 0, 220)
-            end,
-            [FLOOD_SAND] = function()
-                djui_hud_set_adjusted_color(254, 193, 121, 220)
-            end
-        })
 
-        djui_hud_render_rect(0, 0, djui_hud_get_screen_width(), djui_hud_get_screen_height())
+        if water.oAction == 1 then
+            djui_hud_set_adjusted_color(150, 0, 0, clamp(water.oTimer, 0, 100))
+            djui_hud_render_rect(0, 0, djui_hud_get_screen_width(), djui_hud_get_screen_height())
+        elseif gLakituState.pos.y < gGlobalSyncTable.waterLevel - 10 then
+            switch(water.oAnimState, {
+                [FLOOD_WATER] = function()
+                    djui_hud_set_adjusted_color(0, 20, 200, 120)
+                end,
+                [1] = function()
+                    djui_hud_set_adjusted_color(200, 200, 200, 220)
+                end,
+                [FLOOD_LAVA] = function()
+                    djui_hud_set_adjusted_color(200, 0, 0, 220)
+                end,
+                [FLOOD_SAND] = function()
+                    djui_hud_set_adjusted_color(254, 193, 121, 220)
+                end
+            })
+            djui_hud_render_rect(0, 0, djui_hud_get_screen_width(), djui_hud_get_screen_height())
+        end
     end
 
     djui_hud_set_resolution(RESOLUTION_N64)
@@ -355,6 +364,7 @@ function on_hud_render()
 end
 
 function on_level_init()
+    savedStarPoints = 0
     savedSpeedMultiplier = gGlobalSyncTable.speedMultiplier
 
     if gNetworkPlayers[0].currLevelNum == LEVEL_TTC then
@@ -364,6 +374,7 @@ function on_level_init()
     end
 
     save_file_erase_current_backup_save()
+    save_file_set_flags(SAVE_FLAG_HAVE_VANISH_CAP)
     save_file_set_using_backup_slot(true)
 
     if gGlobalSyncTable.roundState == ROUND_STATE_ACTIVE then
@@ -464,6 +475,8 @@ function on_speed_command(msg)
     end
     return false
 end
+
+gServerSettings.stayInLevelAfterStar = 2
 
 gLevelValues.entryLevel = LEVEL_LOBBY
 gLevelValues.floorLowerLimit = -20000

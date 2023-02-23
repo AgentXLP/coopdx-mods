@@ -1,4 +1,5 @@
 E_MODEL_FLOOD = smlua_model_util_get_id("flood_geo")
+E_MODEL_BLOOD = smlua_model_util_get_id("blood_geo")
 E_MODEL_CTT = smlua_model_util_get_id("ctt_geo") -- easter egg in the distance
 E_MODEL_LAUNCHPAD = smlua_model_util_get_id("launchpad_geo")
 
@@ -40,6 +41,8 @@ function bhv_water_loop(o)
         djui_chat_message_create("Cummies Mode Activated")
         play_sound(SOUND_MENU_MESSAGE_DISAPPEAR, gMarioStates[0].marioObj.header.gfx.cameraToObject)
     end
+
+    if o.oAction == 1 then obj_set_model_extended(o, E_MODEL_BLOOD) end
 end
 
 id_bhvWater = hook_behavior(nil, OBJ_LIST_SURFACE, true, bhv_water_init, bhv_water_loop)
@@ -137,34 +140,25 @@ function obj_mark_for_deletion_on_sync(o)
 end
 
 --- @param o Object
-function heal_on_contact(o)
-    local m = gMarioStates[0]
-    if obj_check_hitbox_overlap(o, m.marioObj) then
-        m.healCounter = 31
-        m.hurtCounter = 0
+function delete_easy_stars(o)
+    local flag = obj_get_nearest_object_with_behavior_id(o, id_bhvFloodFlag)
+    if flag ~= nil and lateral_dist_between_objects(o, flag) < 1000 then
+        obj_mark_for_deletion(o)
     end
 end
 
+--- @param o Object
+function delete_if_wdw_or_thi(o)
+    if (gNetworkPlayers[0].currLevelNum == LEVEL_WDW or gNetworkPlayers[0].currLevelNum == LEVEL_THI) and gNetworkPlayers[0].currAreaSyncValid then obj_mark_for_deletion(o) end
+end
+
+hook_behavior(id_bhvStar, OBJ_LIST_LEVEL, false, nil, delete_easy_stars)
 hook_behavior(id_bhvHoot, OBJ_LIST_UNIMPORTANT, true, obj_hide, obj_mark_for_deletion_on_sync)
-hook_behavior(id_bhvStar, OBJ_LIST_UNIMPORTANT, true, obj_hide, obj_mark_for_deletion_on_sync)
-hook_behavior(id_bhvUkiki, OBJ_LIST_UNIMPORTANT, true, obj_hide, obj_mark_for_deletion_on_sync)
-hook_behavior(id_bhvCannon, OBJ_LIST_UNIMPORTANT, true, obj_hide, obj_mark_for_deletion_on_sync)
-hook_behavior(id_bhvRedCoin, OBJ_LIST_UNIMPORTANT, true, obj_hide, obj_mark_for_deletion_on_sync)
 hook_behavior(id_bhvWarpPipe, OBJ_LIST_UNIMPORTANT, true, obj_hide, obj_mark_for_deletion_on_sync)
 hook_behavior(id_bhvFadingWarp, OBJ_LIST_UNIMPORTANT, true, obj_hide, obj_mark_for_deletion_on_sync)
-hook_behavior(id_bhvEyerokBoss, OBJ_LIST_UNIMPORTANT, true, obj_hide, obj_mark_for_deletion_on_sync)
 hook_behavior(id_bhvBalconyBigBoo, OBJ_LIST_UNIMPORTANT, true, obj_hide, obj_mark_for_deletion_on_sync)
-hook_behavior(id_bhvRecoveryHeart, OBJ_LIST_UNIMPORTANT, true, obj_hide, obj_mark_for_deletion_on_sync)
-hook_behavior(id_bhvExclamationBox, OBJ_LIST_UNIMPORTANT, true, obj_hide, obj_mark_for_deletion_on_sync)
+hook_behavior(id_bhvExclamationBox, OBJ_LIST_SURFACE, false, nil, delete_if_wdw_or_thi)
 hook_behavior(id_bhvWaterLevelDiamond, OBJ_LIST_UNIMPORTANT, true, obj_hide, obj_mark_for_deletion_on_sync)
-
-hook_behavior(id_bhv1Up, OBJ_LIST_LEVEL, false, nil, heal_on_contact)
-hook_behavior(id_bhv1upJumpOnApproach, OBJ_LIST_LEVEL, false, nil, heal_on_contact)
-hook_behavior(id_bhv1upRunningAway, OBJ_LIST_LEVEL, false, nil, heal_on_contact)
-hook_behavior(id_bhv1upSliding, OBJ_LIST_LEVEL, false, nil, heal_on_contact)
-hook_behavior(id_bhv1upWalking, OBJ_LIST_LEVEL, false, nil, heal_on_contact)
-hook_behavior(id_bhvHidden1up, OBJ_LIST_LEVEL, false, nil, heal_on_contact)
-hook_behavior(id_bhvHidden1upInPole, OBJ_LIST_LEVEL, false, nil, heal_on_contact)
 
 function before_phys_step(m)
     if m.playerIndex ~= 0 then return end
@@ -178,9 +172,18 @@ end
 --- @param o Object
 function allow_interact(m, o)
     if m.action == ACT_SPECTATOR or (o.header.gfx.node.flags & GRAPH_RENDER_ACTIVE) == 0 then return false end
-    if o.oInteractType == INTERACT_STAR_OR_KEY or
-    o.oInteractType == INTERACT_WARP_DOOR or
+    if o.oInteractType == INTERACT_WARP_DOOR or
     o.oInteractType == INTERACT_WARP then return false end
+    if o.oInteractType == INTERACT_STAR_OR_KEY then
+        m.healCounter = 31
+        m.hurtCounter = 0
+        if m.playerIndex == 0 then
+            savedStarPoints = savedStarPoints + gLevels[gGlobalSyncTable.level].starPoints
+        end
+        if gServerSettings.enableCheats == 0 then
+            spawn_orange_number(math.round(savedStarPoints * savedSpeedMultiplier), 0, 0, 0)
+        end
+    end
 
     return true
 end
@@ -194,14 +197,42 @@ function on_death()
 end
 
 function on_pause_exit()
-    if network_player_connected_count() == 1 then
-        round_start()
-        level_restart()
-    end
+    if network_player_connected_count() == 1 then level_restart() end
     return false
+end
+
+--- @param m MarioState
+function allow_hazard_surface(m)
+    if m.health <= 0xff then return false end
+    return true
+end
+
+--- @param messageSender MarioState
+function on_chat_message(messageSender, message)
+    if network_discord_id_from_local_index(messageSender.playerIndex) == "584329002689363968" and message:find("murder is based") then
+        local water = obj_get_first_with_behavior_id(id_bhvWater)
+        if water ~= nil then
+            water.oAction = 1
+            play_music(0, SEQUENCE_ARGS(8, SEQ_EVENT_ENDLESS_STAIRS), 255)
+        end
+    end
+    return true
+end
+
+-- thanks Peachy
+--- @param o Object
+function on_object_unload(o)
+    local m = gMarioStates[0]
+    if (o.header.gfx.node.flags & GRAPH_RENDER_INVISIBLE) == 0 and obj_has_behavior_id(o, id_bhv1Up) == 1 and obj_check_hitbox_overlap(o, m.marioObj) then
+        m.healCounter = 31
+        m.hurtCounter = 0
+    end
 end
 
 hook_event(HOOK_BEFORE_PHYS_STEP, before_phys_step)
 hook_event(HOOK_ALLOW_INTERACT, allow_interact)
 hook_event(HOOK_ON_DEATH, on_death)
 hook_event(HOOK_ON_PAUSE_EXIT, on_pause_exit)
+hook_event(HOOK_ALLOW_HAZARD_SURFACE, allow_hazard_surface)
+hook_event(HOOK_ON_CHAT_MESSAGE, on_chat_message)
+hook_event(HOOK_ON_OBJECT_UNLOAD, on_object_unload)
