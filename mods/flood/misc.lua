@@ -157,14 +157,15 @@ hook_behavior(id_bhvHoot, OBJ_LIST_UNIMPORTANT, true, obj_hide, obj_mark_for_del
 hook_behavior(id_bhvWarpPipe, OBJ_LIST_UNIMPORTANT, true, obj_hide, obj_mark_for_deletion_on_sync)
 hook_behavior(id_bhvFadingWarp, OBJ_LIST_UNIMPORTANT, true, obj_hide, obj_mark_for_deletion_on_sync)
 hook_behavior(id_bhvBalconyBigBoo, OBJ_LIST_UNIMPORTANT, true, obj_hide, obj_mark_for_deletion_on_sync)
-hook_behavior(id_bhvExclamationBox, OBJ_LIST_SURFACE, false, nil, delete_if_wdw_or_thi)
 hook_behavior(id_bhvWaterLevelDiamond, OBJ_LIST_UNIMPORTANT, true, obj_hide, obj_mark_for_deletion_on_sync)
 
+--- @param m MarioState
 function before_phys_step(m)
     if m.playerIndex ~= 0 then return end
 
     if m.pos.y + 40 < gGlobalSyncTable.waterLevel and gNetworkPlayers[m.playerIndex].currLevelNum == gGlobalSyncTable.level then
         m.vel.y = m.vel.y + 2
+        m.peakHeight = m.pos.y
     end
 end
 
@@ -184,6 +185,7 @@ function allow_interact(m, o)
             spawn_orange_number(math.round(savedStarPoints * savedSpeedMultiplier), 0, 0, 0)
         end
     end
+    m.numCoins = 76
 
     return true
 end
@@ -197,7 +199,10 @@ function on_death()
 end
 
 function on_pause_exit()
-    if network_player_connected_count() == 1 then level_restart() end
+    if network_is_server() then
+        network_send(true, { restart = true })
+        level_restart()
+    end
     return false
 end
 
@@ -229,6 +234,14 @@ function on_object_unload(o)
     end
 end
 
+function on_packet_receive(dataTable)
+    if dataTable.restart then
+        level_restart()
+    elseif dataTable.score then
+        set_score()
+    end
+end
+
 hook_event(HOOK_BEFORE_PHYS_STEP, before_phys_step)
 hook_event(HOOK_ALLOW_INTERACT, allow_interact)
 hook_event(HOOK_ON_DEATH, on_death)
@@ -236,3 +249,4 @@ hook_event(HOOK_ON_PAUSE_EXIT, on_pause_exit)
 hook_event(HOOK_ALLOW_HAZARD_SURFACE, allow_hazard_surface)
 hook_event(HOOK_ON_CHAT_MESSAGE, on_chat_message)
 hook_event(HOOK_ON_OBJECT_UNLOAD, on_object_unload)
+hook_event(HOOK_ON_PACKET_RECEIVE, on_packet_receive)
