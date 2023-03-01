@@ -197,6 +197,15 @@ end
 
 ACT_HUGGING = allocate_mario_action(ACT_GROUP_STATIONARY | ACT_FLAG_IDLE | ACT_FLAG_INVULNERABLE | ACT_FLAG_INTANGIBLE | ACT_FLAG_STATIONARY)
 
+--- @param m MarioState
+function mario_update(m)
+    if m.playerIndex ~= 0 then return end
+
+    if (m.action & ACT_FLAG_IDLE) ~= 0 and (m.controller.buttonPressed & D_JPAD) ~= 0 then
+        drop_and_set_mario_action(m, ACT_START_SLEEPING, 0)
+    end
+end
+
 function on_hud_render()
     djui_hud_set_resolution(RESOLUTION_N64)
     djui_hud_set_font(FONT_NORMAL)
@@ -245,6 +254,7 @@ function on_hug_hint_command()
     djui_chat_message_create("Hug hint toggled " .. on_or_off(hint))
 end
 
+hook_event(HOOK_MARIO_UPDATE, mario_update)
 hook_event(HOOK_ON_HUD_RENDER, on_hud_render)
 hook_event(HOOK_ON_PACKET_RECEIVE, on_packet_receive)
 
