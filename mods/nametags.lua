@@ -21,12 +21,6 @@ function on_or_off(value)
     return "\\#ff0000\\OFF"
 end
 
-function clamp(x, a, b)
-    if x < a then return a end
-    if x > b then return b end
-    return x
-end
-
 --- @param m MarioState
 function active_player(m)
     local np = gNetworkPlayers[m.playerIndex]
@@ -106,7 +100,7 @@ function on_hud_render()
             if m.playerIndex ~= 0 and vec3f_dist(gMarioStates[0].pos, m.pos) > 1000 then
                 scale = 0.5
                 scale = scale + vec3f_dist(gMarioStates[0].pos, m.pos) / gGlobalSyncTable.dist
-                scale = clamp(1 - scale, 0, MAX_SCALE)
+                scale = clampf(1 - scale, 0, MAX_SCALE)
             end
             local name = name_without_hex(gNetworkPlayers[i].name)
             local color = { r = 162, g = 202, b = 234 }
