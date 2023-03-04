@@ -5,11 +5,9 @@ To download single file mods click on the link and then press the "Raw" button t
 
 ## Mod Downloads
 
-[Gun Mod (Soon to be depreciated)](./mods/gun-mod/gun-mod.zip)
+[Gun Mod (Depreciated, no longer receiving updates)](./mods/gun-mod/gun-mod.zip)
 
 [Climb the Tower](./mods/climb-the-tower/climb-the-tower.zip)
-
-[Islands](./mods/islands/islands.zip)
 
 [Downing (Cross compatible with Left 4 Dead 2 HUD)](./mods/downing.lua)
 
@@ -21,24 +19,10 @@ To download single file mods click on the link and then press the "Raw" button t
 
 [Mario Style](./mods/mario-style/mario-style.zip)
 
-[Tree Billboard Fix](./mods/tree-billboard-fix.lua)
-
 [Easy Ceiling Cling](./mods/easy-ceiling-cling.lua)
-
-[Everyone Wins](./mods/everyone-wins.lua)
-
-[Pong](./mods/pong.lua)
-
-[LEGO HUD](./mods/lego-hud/lego-hud.zip)
-
-[LGBT Goombas](./mods/lgbt-goombas/lgbt-goombas.zip)
 
 [Hugging](./mods/hugging.lua)
 
-[Completion Percentage](./mods/completion-percentage.lua)
-
 [Flood](./mods/flood/flood.zip)
-
-[Achievements](./mods/achievements.lua)
 
 [Galaxy Star Select](./mods/galaxy-star-select/galaxy-star-select.zip)
