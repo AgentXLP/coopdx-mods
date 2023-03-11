@@ -68,6 +68,8 @@ end
 
 --- @param m MarioState
 function act_spectator(m)
+    mario_drop_held_object(m)
+
     set_mario_animation(m, MARIO_ANIM_DYING_ON_STOMACH)
     m.marioBodyState.eyeState = MARIO_EYES_DEAD
     m.faceAngle.x = 0

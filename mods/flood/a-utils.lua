@@ -1,3 +1,24 @@
+sOverrideCameraModes = {
+    [CAMERA_MODE_RADIAL]            = true,
+    [CAMERA_MODE_OUTWARD_RADIAL]    = true,
+    [CAMERA_MODE_CLOSE]             = true,
+    [CAMERA_MODE_SLIDE_HOOT]        = true,
+    [CAMERA_MODE_PARALLEL_TRACKING] = true,
+    [CAMERA_MODE_FIXED]             = true,
+    [CAMERA_MODE_8_DIRECTIONS]      = true,
+    [CAMERA_MODE_FREE_ROAM]         = true,
+    [CAMERA_MODE_SPIRAL_STAIRS]     = true,
+}
+
+--- @param m MarioState
+function romhack_camera(m)
+    if sOverrideCameraModes[m.area.camera.mode] == nil then return end
+
+    if (m.controller.buttonPressed & L_TRIG) ~= 0 then center_rom_hack_camera() end
+
+    set_camera_mode(m.area.camera, CAMERA_MODE_ROM_HACK, 0)
+end
+
 function name_without_hex(name)
     local s = ''
     local inSlash = false
@@ -10,12 +31,6 @@ function name_without_hex(name)
         end
     end
     return s
-end
-
-function clamp(x, a, b)
-    if x < a then return a end
-    if x > b then return b end
-    return x
 end
 
 function needlemouse_in_server()
@@ -45,6 +60,9 @@ function switch(param, case_table)
     return def and def() or nil
 end
 
+-- Rounds up or down depending on the decimal position of `x`.
+--- @param x number
+--- @return integer
 math.round = function(x)
     return if_then_else(x - math.floor(x) >= 0.5, math.ceil(x), math.floor(x))
 end

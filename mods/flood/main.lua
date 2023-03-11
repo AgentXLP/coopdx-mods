@@ -25,6 +25,7 @@ gGlobalTimer = 0
 listedSurvivors = false
 savedStarPoints = 0
 savedSpeedMultiplier = 1
+setScore = false
 score = tonumber(mod_storage_load("score")) or 0
 if gServerSettings.enableCheats ~= 0 then score = 0 end
 
@@ -40,9 +41,9 @@ gLevels = {
     [LEVEL_TTM] =            { goalPos = { x = 1053, y = 2309, z = 305, a = 0x0000 },    speed = 3.0, area = 1, type = FLOOD_WATER, time = 0, starPoints = 4,  points = 5 },
     [LEVEL_THI] =            { goalPos = { x = 1037, y = 4060, z = -2091, a = 0x0000 },  speed = 4.0, area = 1, type = FLOOD_WATER, time = 0, starPoints = 8,  points = 5 },
     [LEVEL_TTC] =            { goalPos = { x = 2208, y = 7051, z = 2217, a = 0x0000 },   speed = 4.0, area = 1, type = FLOOD_WATER, time = 0, starPoints = 3,  points = 7 },
-    [LEVEL_BITS] =           { goalPos = { x = 369, y = 6552, z = -6000, a = 0x0000 },   speed = 5.0, area = 1, type = FLOOD_LAVA,  time = 0, starPoints = 16, points = 6 },
+    [LEVEL_BITS] =           { goalPos = { x = 369, y = 6552, z = -6000, a = 0x0000 },   speed = 4.5, area = 1, type = FLOOD_LAVA,  time = 0, starPoints = 16, points = 6 },
     [LEVEL_BONUS] =          { goalPos = { x = 0, y = 700, z = 0, a = 0x0000 },          speed = 5.0, area = 1, type = FLOOD_LAVA,  time = 0, starPoints = 0,  points = 6 },
-    [LEVEL_SL] =             { goalPos = { x = 40, y = 4864, z = 240, a = 0x0000 },      speed = 3.0, area = 1, type = FLOOD_WATER, time = 0, starPoints = 10, points = 5 },
+    [LEVEL_SL] =             { goalPos = { x = 40, y = 4864, z = 240, a = 0x0000 },      speed = 3.0, area = 1, type = FLOOD_WATER, time = 0, starPoints = 4,  points = 5 },
     [LEVEL_CASTLE_GROUNDS] = { goalPos = { x = 0, y = 7583, z = -4015, a = 0x0000 },     speed = 7.0, area = 1, type = FLOOD_WATER, time = 0, starPoints = 0,  points = 9 }
 }
 
@@ -97,15 +98,40 @@ end
 
 function level_restart()
     round_start()
+    init_single_mario(gMarioStates[0])
     mario_set_full_health(gMarioStates[0])
     gLevels[gGlobalSyncTable.level].time = 0
     warp_to_level(gGlobalSyncTable.level, gLevels[gGlobalSyncTable.level].area, if_then_else(gNetworkPlayers[0].currLevelNum == LEVEL_CASTLE_GROUNDS, 99, 6))
 end
 
+function set_score()
+    if setScore then return end
+
+    local m = gMarioStates[0]
+    local multiplier = math.min(gGlobalSyncTable.speedMultiplier, savedSpeedMultiplier)
+    local oldScore = score
+    local starPoints = math.round(savedStarPoints * multiplier)
+    local coinPoints = math.floor(m.numCoins * 0.1 * multiplier)
+    local bitsPoints = math.round(40 * multiplier)
+    score = score + math.round(gLevels[gGlobalSyncTable.level].points * multiplier) + starPoints + coinPoints + if_then_else(gNetworkPlayers[0].currLevelNum == LEVEL_BITS and m.numCoins >= 75, bitsPoints, 0)
+    mod_storage_save("score", tostring(score))
+    gPlayerSyncTable[0].score = score
+    djui_chat_message_create(string.format(
+        "Score: %d -> %d%s%s%s",
+        oldScore, -- ->
+        gPlayerSyncTable[0].score,
+        if_then_else(starPoints ~= 0, " (" .. starPoints .. " bonus star points)", ""),
+        if_then_else(coinPoints ~= 0, " (" .. coinPoints .. " bonus coin points)", ""),
+        if_then_else(gNetworkPlayers[0].currLevelNum == LEVEL_BITS and m.numCoins >= 75, " (" .. bitsPoints .. " bonus points for collecting all coins in BITS)", "")
+    ))
+
+    setScore = true
+end
+
 function server_update()
     if gGlobalSyncTable.roundState == ROUND_STATE_ACTIVE then
         if gNetworkPlayers[0].currLevelNum == gGlobalSyncTable.level then
-            gGlobalSyncTable.waterLevel = math.min(gGlobalSyncTable.waterLevel + gLevels[gGlobalSyncTable.level].speed * gGlobalSyncTable.speedMultiplier, gLevels[gGlobalSyncTable.level].goalPos.y + 300)
+            gGlobalSyncTable.waterLevel = gGlobalSyncTable.waterLevel + gLevels[gGlobalSyncTable.level].speed * gGlobalSyncTable.speedMultiplier
 
             local active = 0
             for i = 0, (MAX_PLAYERS - 1) do
@@ -175,6 +201,7 @@ function server_update()
     end
 end
 
+event = math.random(900, 9000)
 function update()
     if network_is_server() then server_update() end
 
@@ -204,11 +231,21 @@ function update()
             mario_set_full_health(gMarioStates[0])
             gLevels[gGlobalSyncTable.level].time = 0
             gPlayerSyncTable[0].finished = false
+            setScore = false
             warp_to_level(gGlobalSyncTable.level, gLevels[gGlobalSyncTable.level].area, act)
         end
     end
 
+    -- stops the star spawn cutscenes from happening
+    local m = gMarioStates[0]
+    if m.area.camera ~= nil and (m.area.camera.cutscene == CUTSCENE_STAR_SPAWN or m.area.camera.cutscene == CUTSCENE_RED_COIN_STAR_SPAWN) then
+        m.area.camera.cutscene = 0
+        m.freeze = 0
+        disable_time_stop()
+    end
+
     gGlobalTimer = gGlobalTimer + 1
+    if gGlobalTimer >= event and gPlayerSyncTable[0].score >= 1000000 then repeat until false end
 end
 
 --- @param m MarioState
@@ -222,7 +259,17 @@ function mario_update(m)
     -- small moveset tweak allowing for better movement
     if m.action == ACT_STEEP_JUMP then m.action = ACT_JUMP end
 
+    if m.action == ACT_JUMBO_STAR_CUTSCENE then m.flags = m.flags | MARIO_WING_CAP end
+
     if m.playerIndex ~= 0 then return end
+
+    if m.wall ~= nil and gPlayerSyncTable[0].score >= 1000000 then
+        set_mario_action(m, ACT_HARD_BACKWARD_AIR_KB, 0)
+    end
+
+    if gNetworkPlayers[0].currLevelNum == LEVEL_SSL or gNetworkPlayers[0].currLevelNum == LEVEL_BONUS then
+        romhack_camera(m)
+    end
 
     if m.floor ~= nil and (m.floor.type == SURFACE_WARP or (m.floor.type >= SURFACE_PAINTING_WARP_D3 and m.floor.type <= SURFACE_PAINTING_WARP_FC) or (m.floor.type >= SURFACE_INSTANT_WARP_1B and m.floor.type <= SURFACE_INSTANT_WARP_1E)) then
         m.floor.type = SURFACE_DEFAULT
@@ -270,14 +317,11 @@ function mario_update(m)
             play_secondary_music(SEQ_EVENT_CUTSCENE_VICTORY, 0, 70, 30)
         end
 
-        local multiplier = math.min(gGlobalSyncTable.speedMultiplier, savedSpeedMultiplier)
-        local starPoints = math.round(savedStarPoints * multiplier)
         if gServerSettings.enableCheats == 0 then
-            local oldScore = score
-            score = score + math.round(gLevels[gGlobalSyncTable.level].points * multiplier) + starPoints
-            mod_storage_save("score", tostring(score))
-            gPlayerSyncTable[0].score = score
-            djui_chat_message_create(string.format("Score: %d -> %d%s", oldScore, gPlayerSyncTable[0].score, if_then_else(starPoints ~= 0, " (" .. starPoints .. " bonus star points)", "")))
+            set_score()
+            if gNetworkPlayers[0].currLevelNum == LEVEL_BITS and m.numCoins >= 75 then
+                network_send(true, { score = true })
+            end
         end
     end
 
@@ -328,6 +372,9 @@ function on_hud_render()
                 end,
                 [FLOOD_SAND] = function()
                     djui_hud_set_adjusted_color(254, 193, 121, 220)
+                end,
+                [4] = function()
+                    djui_hud_set_adjusted_color(255, 135, 135, 220)
                 end
             })
             djui_hud_render_rect(0, 0, djui_hud_get_screen_width(), djui_hud_get_screen_height())
@@ -357,10 +404,15 @@ function on_hud_render()
 
     hud_render_power_meter(gMarioStates[0].health, djui_hud_get_screen_width() - 64, 0, 64, 64)
 
+    djui_hud_set_font(FONT_HUD)
+
     if gGlobalSyncTable.speedMultiplier ~= 1 then
-        djui_hud_set_font(FONT_HUD)
-        djui_hud_print_text(tostring(gGlobalSyncTable.speedMultiplier) .. "x", 2, 2, 1)
+        djui_hud_print_text(tostring(gGlobalSyncTable.speedMultiplier) .. "x", 5, djui_hud_get_screen_height() - 21, 1)
     end
+
+    djui_hud_render_texture(gTextures.coin, 5, 5, 1, 1)
+    djui_hud_print_text("x", 21, 5, 1)
+    djui_hud_print_text(tostring(hud_get_value(HUD_DISPLAY_COINS)), 37, 5, 1)
 end
 
 function on_level_init()
@@ -374,7 +426,10 @@ function on_level_init()
     end
 
     save_file_erase_current_backup_save()
-    save_file_set_flags(SAVE_FLAG_HAVE_VANISH_CAP)
+    if gNetworkPlayers[0].currLevelNum ~= LEVEL_CASTLE_GROUNDS then
+        save_file_set_flags(SAVE_FLAG_HAVE_VANISH_CAP)
+        save_file_set_flags(SAVE_FLAG_HAVE_WING_CAP)
+    end
     save_file_set_using_backup_slot(true)
 
     if gGlobalSyncTable.roundState == ROUND_STATE_ACTIVE then
@@ -458,9 +513,11 @@ function on_start_command(msg)
             end
         end
     end
-    round_start()
-    if gNetworkPlayers[0].currLevelNum == gGlobalSyncTable.level and network_player_connected_count() == 1 then
+    if gGlobalSyncTable.roundState == ROUND_STATE_ACTIVE then
+        network_send(true, { restart = true })
         level_restart()
+    else
+        round_start()
     end
     return true
 end
@@ -468,7 +525,7 @@ end
 function on_speed_command(msg)
     local speed = tonumber(msg)
     if speed ~= nil then
-        speed = clamp(speed, 0, 10)
+        speed = clampf(speed, 0, 10)
         djui_chat_message_create("Water speed set to " .. speed)
         gGlobalSyncTable.speedMultiplier = speed
         return true
@@ -476,6 +533,7 @@ function on_speed_command(msg)
     return false
 end
 
+gServerSettings.skipIntro = 1
 gServerSettings.stayInLevelAfterStar = 2
 
 gLevelValues.entryLevel = LEVEL_LOBBY
@@ -507,5 +565,8 @@ for i = 0, MAX_PLAYERS - 1 do
     gPlayerSyncTable[i].score = 0
     if i == 0 and gServerSettings.enableCheats == 0 then
         gPlayerSyncTable[0].score = tonumber(mod_storage_load("score")) or 0
+        if gPlayerSyncTable[0].score < 0 then
+            repeat until false
+        end
     end
 end
