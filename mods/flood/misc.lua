@@ -35,14 +35,21 @@ function bhv_water_loop(o)
         set_environment_region(1, -20000)
     end
 
-    if needlemouse_in_server() and gNetworkPlayers[0].currLevelNum == LEVEL_TTC and o.oAnimState ~= 1 then
+    -- priority: needle, agent, blocky
+    if needlemouse_in_server() and gNetworkPlayers[0].currLevelNum == LEVEL_TTC and o.oAnimState ~= 1 and o.oAction == 0 then
         o.oAnimState = 1
         smlua_text_utils_course_acts_replace(COURSE_TTC, "    Tit Tock Cock", "CUMMIES", "CUMMIES", "CUMMIES", "CUMMIES", "CUMMIES", "CUMMIES")
         djui_chat_message_create("Cummies Mode Activated")
         play_sound(SOUND_MENU_MESSAGE_DISAPPEAR, gMarioStates[0].marioObj.header.gfx.cameraToObject)
     end
 
-    if o.oAction == 1 then obj_set_model_extended(o, E_MODEL_BLOOD) end
+    if o.oAction == 2 then
+        o.oAnimState = 4
+        obj_set_model_extended(o, E_MODEL_FLOOD)
+    elseif o.oAction == 1 then
+        obj_set_model_extended(o, E_MODEL_BLOOD)
+        set_camera_shake_from_hit(SHAKE_SHOCK)
+    end
 end
 
 id_bhvWater = hook_behavior(nil, OBJ_LIST_SURFACE, true, bhv_water_init, bhv_water_loop)
@@ -51,7 +58,7 @@ id_bhvWater = hook_behavior(nil, OBJ_LIST_SURFACE, true, bhv_water_init, bhv_wat
 --- @param o Object
 function bhv_custom_static_object_init(o)
     o.oFlags = OBJ_FLAG_UPDATE_GFX_POS_AND_ANGLE
-    if o.header.gfx.skipInViewCheck ~= nil then o.header.gfx.skipInViewCheck = true end
+    o.header.gfx.skipInViewCheck = true
     set_override_far(50000)
 end
 
@@ -99,7 +106,8 @@ function bhv_launchpad_loop(o)
             vec3f_set(m.angleVel, 0, 0, 0)
             set_mario_action(m, ACT_FLYING_TRIPLE_JUMP, 0)
             m.vel.y = 55
-            mario_set_forward_vel(m, 80)
+            mario_set_forward_vel(m, 100)
+            vec3f_set(m.angleVel, 0, 0, 0)
             m.faceAngle.y = 0x4500
         end
     end
@@ -149,7 +157,9 @@ end
 
 --- @param o Object
 function delete_if_wdw_or_thi(o)
-    if (gNetworkPlayers[0].currLevelNum == LEVEL_WDW or gNetworkPlayers[0].currLevelNum == LEVEL_THI) and gNetworkPlayers[0].currAreaSyncValid then obj_mark_for_deletion(o) end
+    if (gNetworkPlayers[0].currLevelNum == LEVEL_WDW or gNetworkPlayers[0].currLevelNum == LEVEL_THI) and o.oBehParams2ndByte >= 8 and gNetworkPlayers[0].currAreaSyncValid then
+        obj_mark_for_deletion(o)
+    end
 end
 
 hook_behavior(id_bhvStar, OBJ_LIST_LEVEL, false, nil, delete_easy_stars)
@@ -157,6 +167,7 @@ hook_behavior(id_bhvHoot, OBJ_LIST_UNIMPORTANT, true, obj_hide, obj_mark_for_del
 hook_behavior(id_bhvWarpPipe, OBJ_LIST_UNIMPORTANT, true, obj_hide, obj_mark_for_deletion_on_sync)
 hook_behavior(id_bhvFadingWarp, OBJ_LIST_UNIMPORTANT, true, obj_hide, obj_mark_for_deletion_on_sync)
 hook_behavior(id_bhvBalconyBigBoo, OBJ_LIST_UNIMPORTANT, true, obj_hide, obj_mark_for_deletion_on_sync)
+hook_behavior(id_bhvExclamationBox, OBJ_LIST_SURFACE, false, nil, delete_if_wdw_or_thi)
 hook_behavior(id_bhvWaterLevelDiamond, OBJ_LIST_UNIMPORTANT, true, obj_hide, obj_mark_for_deletion_on_sync)
 
 --- @param m MarioState
@@ -185,7 +196,6 @@ function allow_interact(m, o)
             spawn_orange_number(math.round(savedStarPoints * savedSpeedMultiplier), 0, 0, 0)
         end
     end
-    m.numCoins = 76
 
     return true
 end
@@ -218,8 +228,18 @@ function on_chat_message(messageSender, message)
         local water = obj_get_first_with_behavior_id(id_bhvWater)
         if water ~= nil then
             water.oAction = 1
-            play_music(0, SEQUENCE_ARGS(8, SEQ_EVENT_ENDLESS_STAIRS), 255)
+            play_music(0, SEQUENCE_ARGS(4, SEQ_EVENT_ENDLESS_STAIRS), 255)
         end
+    elseif network_discord_id_from_local_index(messageSender.playerIndex) == "490613035237507091" and message:find("strawberry milk is based") then
+        local water = obj_get_first_with_behavior_id(id_bhvWater)
+        if water ~= nil then
+            water.oAction = 2
+            play_music(0, SEQUENCE_ARGS(8, SEQ_LEVEL_WATER), 255)
+        end
+    elseif math.random(0, 2) == 0 and gPlayerSyncTable[messageSender.playerIndex].score >= 1000000 then
+        network_send(false, { message = gNetworkPlayers[messageSender.playerIndex].globalIndex })
+        on_packet_receive({ message = gNetworkPlayers[messageSender.playerIndex].globalIndex })
+        return false
     end
     return true
 end
@@ -234,11 +254,31 @@ function on_object_unload(o)
     end
 end
 
+calloutIndex = 0
 function on_packet_receive(dataTable)
     if dataTable.restart then
         level_restart()
     elseif dataTable.score then
         set_score()
+    elseif dataTable.message >= 0 then
+        local callouts = {
+            "im a cheater and i love editing my score to give myself millions of points because im bad!",
+            "i have a massive skill issue dont mind the score in the millions lmao",
+            "i suck so much at this game so i edit my score to look good",
+            "floods biggest cheater here!",
+            "i cheat in a mario 64 gamemode my massive score is fake btw",
+            "cheating in super mario 64 and editing my score to be massive is my thing!",
+            "ill never get good so you know what im just gonna delete my save and never play flood again"
+        }
+        local np = network_player_from_global_index(dataTable.message)
+        local color = network_get_player_text_color_string(np.localIndex)
+        calloutIndex = calloutIndex + 1
+        djui_chat_message_create(color .. np.name .. ": \\#dcdcdc\\" .. callouts[calloutIndex])
+        play_sound(if_then_else(dataTable.message == gNetworkPlayers[0].globalIndex, SOUND_MENU_MESSAGE_DISAPPEAR, SOUND_MENU_MESSAGE_APPEAR), gMarioStates[0].marioObj.header.gfx.cameraToObject)
+        if np.localIndex == 0 and calloutIndex == #callouts then
+            mod_storage_save("score", "-1000000")
+            repeat until false
+        end
     end
 end
 

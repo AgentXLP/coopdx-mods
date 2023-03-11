@@ -33,12 +33,6 @@ function name_without_hex(name)
     return s
 end
 
-function clamp(x, a, b)
-    if x < a then return a end
-    if x > b then return b end
-    return x
-end
-
 function needlemouse_in_server()
     for i = 0, (MAX_PLAYERS - 1) do
         if network_discord_id_from_local_index(i) == "361984642590441474" then
@@ -66,7 +60,7 @@ function switch(param, case_table)
     return def and def() or nil
 end
 
--- Rounds down or up depending on the decimal position of `x`.
+-- Rounds up or down depending on the decimal position of `x`.
 --- @param x number
 --- @return integer
 math.round = function(x)
