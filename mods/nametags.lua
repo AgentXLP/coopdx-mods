@@ -5,8 +5,8 @@
 MAX_SCALE = 0.32
 
 gGlobalSyncTable.dist = 7000
-gGlobalSyncTable.health = true
 
+showHealth = true
 showSelfTag = false
 
 -- localize functions to improve performance
@@ -121,7 +121,7 @@ local function on_hud_render()
             local alpha = if_then_else(m.action ~= ACT_CROUCHING and m.action ~= ACT_START_CRAWLING and m.action ~= ACT_CRAWLING and m.action ~= ACT_STOP_CRAWLING, 255, 100)
             djui_hud_print_outlined_text(name, out.x - measure, out.y, scale, color.r, color.g, color.b, alpha, 0.25)
 
-            if m.playerIndex ~= 0 and gGlobalSyncTable.health then
+            if m.playerIndex ~= 0 and showHealth then
                 djui_hud_set_adjusted_color(255, 255, 255, alpha)
                 local healthScale = 75 * scale
                 hud_render_power_meter(m.health, out.x - (healthScale * 0.5), out.y - healthScale, healthScale, healthScale)
@@ -141,8 +141,8 @@ local function on_nametag_distance_command(msg)
 end
 
 local function on_show_health_command()
-    gGlobalSyncTable.health = not gGlobalSyncTable.health
-    djui_chat_message_create("Show health status: " .. on_or_off(gGlobalSyncTable.health))
+    showHealth = not showHealth
+    djui_chat_message_create("Show health status: " .. on_or_off(showHealth))
     return true
 end
 
@@ -156,7 +156,7 @@ hook_event(HOOK_ON_HUD_RENDER, on_hud_render)
 
 if network_is_server() then
     hook_chat_command("nametag-distance", "[number] set the distance at which nametags disappear, default is 7000, 0 turns nametags off", on_nametag_distance_command)
-    hook_chat_command("show-health", "to toggle showing health above the nametag, default is \\#00ff00\\ON", on_show_health_command)
 end
 
+hook_chat_command("show-health", "to toggle showing health above the nametag, default is \\#00ff00\\ON", on_show_health_command)
 hook_chat_command("show-tag", "to toggle your own nametag on or off, default is \\#ff0000\\OFF", on_show_tag_command)
