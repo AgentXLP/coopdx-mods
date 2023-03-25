@@ -9,20 +9,32 @@ gGlobalSyncTable.health = true
 
 showSelfTag = false
 
-for k, v in pairs(gActiveMods) do
-    local name = v.name:lower()
-    if v.enabled and (name:find("hide") or name:find("hns") or name:find("hunt")) then
+-- localize functions to improve performance
+local djui_hud_set_resolution = djui_hud_set_resolution
+local djui_hud_set_font = djui_hud_set_font
+local is_player_active = is_player_active
+local djui_hud_world_pos_to_screen_pos = djui_hud_world_pos_to_screen_pos
+local vec3f_dist = vec3f_dist
+local network_player_palette_to_color = network_player_palette_to_color
+local djui_hud_measure_text = djui_hud_measure_text
+local djui_hud_print_text = djui_hud_print_text
+local djui_hud_set_color = djui_hud_set_color
+local hud_render_power_meter = hud_render_power_meter
+
+for i in pairs(gActiveMods) do
+    local name = gActiveMods[i].name:lower()
+    if gActiveMods[i].enabled and (name:find("hide") or name:find("hns") or name:find("hunt")) then
         gGlobalSyncTable.dist = 0
     end
 end
 
-function on_or_off(value)
+local function on_or_off(value)
     if value then return "\\#00ff00\\ON" end
     return "\\#ff0000\\OFF"
 end
 
 --- @param m MarioState
-function active_player(m)
+local function active_player(m)
     local np = gNetworkPlayers[m.playerIndex]
     if m.playerIndex == 0 then
         return 1
@@ -45,18 +57,18 @@ function active_player(m)
     return is_player_active(m)
 end
 
-function if_then_else(cond, if_true, if_false)
+local function if_then_else(cond, if_true, if_false)
     if cond then return if_true end
     return if_false
 end
 
-function djui_hud_set_adjusted_color(r, g, b, a)
+local function djui_hud_set_adjusted_color(r, g, b, a)
     local multiplier = 1
     if is_game_paused() then multiplier = 0.5 end
     djui_hud_set_color(r * multiplier, g * multiplier, b * multiplier, a)
 end
 
-function djui_hud_print_outlined_text(text, x, y, scale, r, g, b, a, outlineDarkness)
+local function djui_hud_print_outlined_text(text, x, y, scale, r, g, b, a, outlineDarkness)
     -- render outline
     djui_hud_set_adjusted_color(r * outlineDarkness, g * outlineDarkness, b * outlineDarkness, a)
     djui_hud_print_text(text, x - (1*(scale*2)), y, scale)
@@ -69,7 +81,7 @@ function djui_hud_print_outlined_text(text, x, y, scale, r, g, b, a, outlineDark
     djui_hud_set_color(255, 255, 255, 255)
 end
 
-function name_without_hex(name)
+local function name_without_hex(name)
     local s = ''
     local inSlash = false
     for i = 1, #name do
@@ -83,7 +95,7 @@ function name_without_hex(name)
     return s
 end
 
-function on_hud_render()
+local function on_hud_render()
     if gGlobalSyncTable.dist == 0 or not gNetworkPlayers[0].currAreaSyncValid or obj_get_first_with_behavior_id(id_bhvActSelector) ~= nil then return end
 
     djui_hud_set_resolution(RESOLUTION_N64)
@@ -118,7 +130,7 @@ function on_hud_render()
     end
 end
 
-function on_nametag_distance_command(msg)
+local function on_nametag_distance_command(msg)
     local dist = tonumber(msg)
     if dist ~= nil then
         djui_chat_message_create("Set nametag distance to " .. msg)
@@ -128,13 +140,13 @@ function on_nametag_distance_command(msg)
     return false
 end
 
-function on_show_health_command()
+local function on_show_health_command()
     gGlobalSyncTable.health = not gGlobalSyncTable.health
     djui_chat_message_create("Show health status: " .. on_or_off(gGlobalSyncTable.health))
     return true
 end
 
-function on_show_tag_command()
+local function on_show_tag_command()
     showSelfTag = not showSelfTag
     djui_chat_message_create("Show my tag status: " .. on_or_off(showSelfTag))
     return true
