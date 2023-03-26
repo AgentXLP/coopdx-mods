@@ -96,22 +96,23 @@ local function name_without_hex(name)
 end
 
 local function on_hud_render()
-    if gGlobalSyncTable.dist == 0 or not gNetworkPlayers[0].currAreaSyncValid or obj_get_first_with_behavior_id(id_bhvActSelector) ~= nil then return end
+    if gGlobalSyncTable.dist == 0 or (not showSelfTag and network_player_connected_count() == 1) or not gNetworkPlayers[0].currAreaSyncValid or obj_get_first_with_behavior_id(id_bhvActSelector) ~= nil then return end
 
     djui_hud_set_resolution(RESOLUTION_N64)
     djui_hud_set_font(FONT_NORMAL)
 
     for i = if_then_else(showSelfTag, 0, 1), (MAX_PLAYERS - 1) do
         local m = gMarioStates[i]
-        if active_player(m) ~= 0 and m.action ~= ACT_IN_CANNON and (m.playerIndex ~= 0 or (m.playerIndex == 0 and m.action ~= ACT_FIRST_PERSON)) then
+        if m.marioBodyState.updateTorsoTime == gMarioStates[0].marioBodyState.updateTorsoTime and active_player(m) ~= 0 and m.action ~= ACT_IN_CANNON and (m.playerIndex ~= 0 or (m.playerIndex == 0 and m.action ~= ACT_FIRST_PERSON)) then
             local out = { x = 0, y = 0, z = 0 }
             local pos = { x = m.marioObj.header.gfx.pos.x, y = m.pos.y + 210, z = m.marioObj.header.gfx.pos.z }
             djui_hud_world_pos_to_screen_pos(pos, out)
 
             local scale = MAX_SCALE
-            if m.playerIndex ~= 0 and vec3f_dist(gMarioStates[0].pos, m.pos) > 1000 then
+            local dist = vec3f_dist(gMarioStates[0].pos, m.pos)
+            if m.playerIndex ~= 0 and dist > 1000 then
                 scale = 0.5
-                scale = scale + vec3f_dist(gMarioStates[0].pos, m.pos) / gGlobalSyncTable.dist
+                scale = scale + dist / gGlobalSyncTable.dist
                 scale = clampf(1 - scale, 0, MAX_SCALE)
             end
             local name = name_without_hex(gNetworkPlayers[i].name)
