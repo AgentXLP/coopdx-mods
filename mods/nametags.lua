@@ -10,16 +10,22 @@ showHealth = true
 showSelfTag = false
 
 -- localize functions to improve performance
-local djui_hud_set_resolution = djui_hud_set_resolution
-local djui_hud_set_font = djui_hud_set_font
-local is_player_active = is_player_active
-local djui_hud_world_pos_to_screen_pos = djui_hud_world_pos_to_screen_pos
-local vec3f_dist = vec3f_dist
-local network_player_palette_to_color = network_player_palette_to_color
+local djui_chat_message_create = djui_chat_message_create
 local djui_hud_measure_text = djui_hud_measure_text
 local djui_hud_print_text = djui_hud_print_text
 local djui_hud_set_color = djui_hud_set_color
+local djui_hud_set_font = djui_hud_set_font
+local djui_hud_set_resolution = djui_hud_set_resolution
+local djui_hud_world_pos_to_screen_pos = djui_hud_world_pos_to_screen_pos
+local vec3f_dist = vec3f_dist
+local network_player_connected_count = network_player_connected_count
+local network_player_palette_to_color = network_player_palette_to_color
+local network_is_server = network_is_server
+local is_player_active = is_player_active
+local clampf = clampf
 local hud_render_power_meter = hud_render_power_meter
+local is_game_paused = is_game_paused
+local obj_get_first_with_behavior_id = obj_get_first_with_behavior_id
 
 for i in pairs(gActiveMods) do
     local name = gActiveMods[i].name:lower()
