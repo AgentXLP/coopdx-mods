@@ -28,3 +28,5 @@ To download single file mods click on the link and then press the "Raw" button t
 [Galaxy Star Select](./mods/galaxy-star-select/galaxy-star-select.zip)
 
 [Flying Gorilla](./mods/flying-gorilla/flying-gorilla.zip)
+
+[Day Night Cycle](./mods/day-night-cycle/day-night-cycle.zip)
