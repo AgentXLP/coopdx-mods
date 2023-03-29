@@ -1,11 +1,5 @@
 # Single File Mods
 
-## Downing
-
-<img width="1532" alt="downing" src="https://user-images.githubusercontent.com/44549182/185983238-4a1acfe2-7954-4bc4-bad4-ffd8f3b8731d.png">
-
-This mod adds a Left 4 Dead like incapacitation system where instead of dying you will be incapacitated and someone has to come and revive you before you die, they can also continously bash you while incapacitated until you actually die. Incapacitation doesn't work over death planes, vertical wind, quicksand or lava for obvious reasons.
-
 ## Nametags
 
 <img width="600" alt="nametags2" src="https://user-images.githubusercontent.com/44549182/187086960-135affa8-bfe0-48d4-8bd8-4cf77b3dbec4.png">

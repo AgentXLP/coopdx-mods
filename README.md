@@ -9,8 +9,6 @@ To download single file mods click on the link and then press the "Raw" button t
 
 [Climb the Tower](./mods/climb-the-tower/climb-the-tower.zip)
 
-[Downing (Cross compatible with Left 4 Dead 2 HUD)](./mods/downing.lua)
-
 [Pos Display](./mods/pos-display.lua)
 
 [Nametags](./mods/nametags.lua)
