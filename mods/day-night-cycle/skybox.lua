@@ -1,3 +1,5 @@
+if VERSION_NUMBER < 32 then return end
+
 local SKYBOX_DAY = 0
 local SKYBOX_SUNSET = 1
 local SKYBOX_NIGHT = 2
@@ -16,7 +18,8 @@ local gVanillaSkyboxModels = {
     [BACKGROUND_HAUNTED] = smlua_model_util_get_id("skybox_haunted_geo"),
     [BACKGROUND_GREEN_SKY] = smlua_model_util_get_id("skybox_green_sky_geo"),
     [BACKGROUND_ABOVE_CLOUDS] = smlua_model_util_get_id("skybox_above_clouds_geo"),
-    [BACKGROUND_PURPLE_SKY] = smlua_model_util_get_id("skybox_purple_sky_geo")
+    [BACKGROUND_PURPLE_SKY] = smlua_model_util_get_id("skybox_purple_sky_geo"),
+    [BACKGROUND_CUSTOM] = smlua_model_util_get_id("skybox_ocean_sky_geo")
 }
 
 -- localize functions to improve performance

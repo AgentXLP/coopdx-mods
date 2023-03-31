@@ -1,3 +1,8 @@
+if VERSION_NUMBER < 32 then
+    djui_popup_create("\\#ffff00\\This sm64ex-coop version is not compatible with Day Night Cycle!\n\nPlease update to the latest version.", 4)
+    return
+end
+
 -- localize functions to improve performance
 local math_floor = math.floor
 local table_insert = table.insert
