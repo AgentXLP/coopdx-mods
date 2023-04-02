@@ -135,7 +135,7 @@ local function on_hud_render()
 
     local actSelector = obj_get_first_with_behavior_id(id_bhvActSelector)
 
-    djui_hud_set_render_behind_hud(true)
+    djui_hud_set_render_behind_hud(not hud_is_hidden())
 
     set_lighting_dir(1, -(1 - light))
     set_lighting_dir(2, -(1 - light))

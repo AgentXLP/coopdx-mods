@@ -88,7 +88,7 @@ end
 function load_time()
     local time = tonumber(mod_storage_load("time"))
     if time == nil then
-        time = MINUTE * 6
+        time = MINUTE * 5
         mod_storage_save("time", tostring(time))
     end
     return time
