@@ -7,10 +7,6 @@ To download single file mods click on the link and then press the "Raw" button t
 
 [Gun Mod (Depreciated, no longer receiving updates)](./mods/gun-mod/gun-mod.zip)
 
-[Climb the Tower](./mods/climb-the-tower/climb-the-tower.zip)
-
-[Pos Display](./mods/pos-display.lua)
-
 [Nametags](./mods/nametags.lua)
 
 [Left 4 Dead 2 HUD (Cross compatible with Downing)](./mods/l4d2-hud/l4d2-hud.zip)
@@ -19,12 +15,10 @@ To download single file mods click on the link and then press the "Raw" button t
 
 [Easy Ceiling Cling](./mods/easy-ceiling-cling.lua)
 
-[Hugging](./mods/hugging.lua)
+[Door Bust](./mods/door-bust.lua)
 
 [Flood](./mods/flood/flood.zip)
 
 [Galaxy Star Select](./mods/galaxy-star-select/galaxy-star-select.zip)
-
-[Flying Gorilla](./mods/flying-gorilla/flying-gorilla.zip)
 
 [Day Night Cycle](./mods/day-night-cycle/day-night-cycle.zip)
