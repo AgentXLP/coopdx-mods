@@ -2,12 +2,12 @@
 -- incompatible: nametags
 -- description: Nametags\nBy \\#ec7731\\Agent X\\#dcdcdc\\\n\nThis mod adds nametags to sm64ex-coop, this helps to easily identify other players without the player list, nametags can toggled on and off with \\#ffff00\\/nametag-distance 7000\\#dcdcdc\\ and \\#ffff00\\/nametag-distance 0\\#dcdcdc\\ respectively.
 
-MAX_SCALE = 0.32
+local MAX_SCALE = 0.32
 
 gGlobalSyncTable.dist = 7000
 
-showHealth = true
-showSelfTag = false
+local showHealth = true
+local showSelfTag = false
 
 -- localize functions to improve performance
 local djui_chat_message_create = djui_chat_message_create
