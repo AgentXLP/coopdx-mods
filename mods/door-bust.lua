@@ -1,5 +1,5 @@
 -- name: Door Bust
--- description: Door Bust v1.1.1\nBy \\#ec7731\\Agent X\\#dcdcdc\\\n\nThis mod adds busting down doors by slide kicking into them, flying doors can deal damage to other players and normal doors will respawn after 10 seconds.
+-- description: Door Bust v1.2\nBy \\#ec7731\\Agent X\\#dcdcdc\\\n\nThis mod adds busting down doors by slide kicking into them, flying doors can deal damage to other players and normal doors will respawn after 10 seconds.
 
 gGlobalSyncTable.excludeLevels = false
 
@@ -60,13 +60,24 @@ local function lateral_dist_between_object_and_point(obj, pointX, pointZ)
     return math.sqrt(dx * dx + dz * dz)
 end
 
+local function if_then_else(cond, if_true, if_false)
+    if cond then return if_true end
+    return if_false
+end
+
+local function s16(num)
+    num = math.floor(num) & 0xFFFF
+    if num >= 32768 then return num - 65536 end
+    return num
+end
+
 --- @param o Object
 local function bhv_broken_door_init(o)
     o.oFlags = OBJ_FLAG_UPDATE_GFX_POS_AND_ANGLE
     o.oInteractType = INTERACT_DAMAGE
     o.oIntangibleTimer = 0
     o.oGraphYOffset = -5
-    o.oDamageOrCoinValue = 3
+    o.oDamageOrCoinValue = 2
     obj_scale(o, 0.85)
 
     o.hitboxRadius = 80
@@ -98,6 +109,17 @@ end
 local id_bhvBrokenDoor = hook_behavior(nil, OBJ_LIST_GENACTOR, true, bhv_broken_door_init, bhv_broken_door_loop)
 
 --- @param m MarioState
+--- @param o Object
+local function should_push_or_pull_door(m, o)
+    local dx = o.oPosX - m.pos.x
+    local dz = o.oPosZ - m.pos.z
+
+    local dYaw = s16(o.oMoveAngleYaw - atan2s(dz, dx))
+
+    return if_then_else(dYaw >= -0x4000 and dYaw <= 0x4000, 0x00000001, 0x00000002)
+end
+
+--- @param m MarioState
 local function mario_update(m)
     if active_player(m) == 0 or (gGlobalSyncTable.excludeLevels and (gNetworkPlayers[0].currLevelNum == LEVEL_BBH or gNetworkPlayers[0].currLevelNum == LEVEL_HMC)) then return end
 
@@ -105,7 +127,7 @@ local function mario_update(m)
     if m.playerIndex == 0 then
         door = obj_get_first(OBJ_LIST_SURFACE)
         while door ~= nil do
-            if get_id_from_behavior(door.behavior) == id_bhvDoor or get_id_from_behavior(door.behavior) == id_bhvStarDoor then
+            if get_id_from_behavior(door.behavior) == id_bhvDoor or get_id_from_behavior(door.behavior) == id_bhvStarDoor or get_id_from_behavior(door.behavior) == id_bhvDoorWarp then
                 if door.oDoorDespawnedTimer > 0 then
                     door.oDoorDespawnedTimer = door.oDoorDespawnedTimer - 1
                 else
@@ -118,11 +140,14 @@ local function mario_update(m)
     end
 
     door = obj_get_nearest_object_with_behavior_id(m.marioObj, id_bhvDoor)
-    local targetDoor = door
     local starDoor = obj_get_nearest_object_with_behavior_id(m.marioObj, id_bhvStarDoor)
-    if starDoor ~= nil then
+    local warpDoor = obj_get_nearest_object_with_behavior_id(m.marioObj, id_bhvDoorWarp)
+    local targetDoor = door
+    if warpDoor ~= nil or starDoor ~= nil then
         if dist_between_objects(m.marioObj, starDoor) < dist_between_objects(m.marioObj, door) then
             targetDoor = starDoor
+        elseif dist_between_objects(m.marioObj, warpDoor) < dist_between_objects(m.marioObj, door) or door == nil then
+            targetDoor = warpDoor
         else
             targetDoor = door
         end
@@ -135,7 +160,7 @@ local function mario_update(m)
         if (m.action == ACT_SLIDE_KICK or m.action == ACT_SLIDE_KICK_SLIDE or m.action == ACT_JUMP_KICK or (m.action == ACT_LONG_JUMP and m.forwardVel <= -80)) and dist_between_objects(m.marioObj, targetDoor) < dist then
             local model = E_MODEL_CASTLE_CASTLE_DOOR
 
-            if get_id_from_behavior(targetDoor.behavior) == id_bhvDoor then
+            if get_id_from_behavior(targetDoor.behavior) ~= id_bhvStarDoor then
                 -- just make obj_get_model_extended dammit
                 if obj_has_model_extended(targetDoor, E_MODEL_CASTLE_DOOR_1_STAR) ~= 0 then
                     model = E_MODEL_CASTLE_DOOR_1_STAR
@@ -157,6 +182,8 @@ local function mario_update(m)
                     model = E_MODEL_HMC_HAZY_MAZE_DOOR
                 elseif obj_has_model_extended(targetDoor, E_MODEL_CASTLE_GROUNDS_METAL_DOOR) ~= 0 then
                     model = E_MODEL_CASTLE_GROUNDS_METAL_DOOR
+                elseif obj_has_model_extended(targetDoor, E_MODEL_CASTLE_KEY_DOOR) ~= 0 then
+                    model = E_MODEL_CASTLE_KEY_DOOR
                 end
             else
                 model = E_MODEL_CASTLE_STAR_DOOR_8_STARS
@@ -179,16 +206,24 @@ local function mario_update(m)
                         play_sound(SOUND_ACTION_HIT_2, m.marioObj.header.gfx.cameraToObject)
                     end
                 )
-                if targetDoor.oBehParams >> 24 == 50 and m.action == ACT_LONG_JUMP and m.forwardVel <= -80 then
-                    set_mario_action(m, ACT_THROWN_BACKWARD, 0)
-                    m.forwardVel = -300
-                    m.faceAngle.y = -0x8000
-                    m.vel.y = 20
-                    m.pos.x = -200
-                    m.pos.y = 2350
-                    m.pos.z = 4900
-                elseif m.playerIndex == 0 then
-                    set_camera_shake_from_hit(SHAKE_SMALL_DAMAGE)
+                if get_id_from_behavior(targetDoor.behavior) == id_bhvDoorWarp then
+                    m.interactObj = targetDoor
+                    m.usedObj = targetDoor
+                    m.actionArg = should_push_or_pull_door(m, targetDoor)
+
+                    level_trigger_warp(m, WARP_OP_WARP_DOOR)
+                else
+                    if targetDoor.oBehParams >> 24 == 50 and m.action == ACT_LONG_JUMP and m.forwardVel <= -80 then
+                        set_mario_action(m, ACT_THROWN_BACKWARD, 0)
+                        m.forwardVel = -300
+                        m.faceAngle.y = -0x8000
+                        m.vel.y = 20
+                        m.pos.x = -200
+                        m.pos.y = 2350
+                        m.pos.z = 4900
+                    elseif m.playerIndex == 0 then
+                        set_camera_shake_from_hit(SHAKE_SMALL_DAMAGE)
+                    end
                 end
             end
         end
