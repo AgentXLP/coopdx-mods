@@ -22,3 +22,5 @@ To download single file mods click on the link and then press the "Raw" button t
 [Galaxy Star Select](./mods/galaxy-star-select/galaxy-star-select.zip)
 
 [Day Night Cycle](./mods/day-night-cycle/day-night-cycle.zip)
+
+[Hats](./mods/hats/hats.zip)
