@@ -1,5 +1,5 @@
 -- name: Hats
--- description: Hats\nBy \\#dd7032\\CosmicMan08\\#dcdcdc\\ and \\#ec7731\\Agent X\n\n\\#dcdcdc\\This mod adds 15 hats to sm64ex-coop being a top hat, crown, halo, cape, sonic hair, dr headband, raccoon ears and tail, chain chomp, artisan, bone brim, slumber, sign, pipe and water bomb.\n\nUse /hat [0-15] to select your hat, 0\nbeing none.
+-- description: Hats v1.0.1\nBy \\#dd7032\\CosmicMan08\\#dcdcdc\\ and \\#ec7731\\Agent X\n\n\\#dcdcdc\\This mod adds 15 hats to sm64ex-coop being a top hat, crown, halo, cape, sonic hair, dr headband, raccoon ears and tail, chain chomp, artisan, bone brim, slumber, sign, pipe and water bomb.\n\nUse /hat [0-15] to select your hat, 0\nbeing none.
 
 define_custom_obj_fields({
     oHatOwner = 'u32',
@@ -95,7 +95,7 @@ local function bhv_hat_loop(o)
     end
 
     if m.marioBodyState.updateTorsoTime == gMarioStates[0].marioBodyState.updateTorsoTime and m.action ~= ACT_DISAPPEARED and m.action ~= ACT_IN_CANNON then
-        if (m.action & ACT_FLAG_ON_POLE) == 0 then
+        if (m.action & ACT_FLAG_ON_POLE) == 0 and m.action ~= ACT_JUMBO_STAR_CUTSCENE then
             if gPlayerSyncTable[m.playerIndex].hat ~= HAT_PIPE then
                 o.oPosX = m.marioBodyState.headPos.x + m.vel.x
                 o.oPosY = m.marioBodyState.headPos.y + m.vel.y
