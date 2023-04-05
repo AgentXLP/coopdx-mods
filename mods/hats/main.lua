@@ -30,7 +30,7 @@ local HAT_WATER_BOMB = 15
 local gHatList = {
     [HAT_TOP_HAT] =     { model = smlua_model_util_get_id("tophat_geo"),     cap = false },
     [HAT_CROWN] =       { model = smlua_model_util_get_id("crown_geo"),      cap = false },
-    [HAT_HALO] =        { model = smlua_model_util_get_id("halo_geo"),       cap = false },
+    [HAT_HALO] =        { model = smlua_model_util_get_id("halo_geo"),       cap = true  },
     [HAT_CAPE] =        { model = smlua_model_util_get_id("cape_geo"),       cap = true  },
     [HAT_SONIC_HAIR] =  { model = smlua_model_util_get_id("sonichair_geo"),  cap = false },
     [HAT_DR_HEADBAND] = { model = smlua_model_util_get_id("drheadband_geo"), cap = false },
