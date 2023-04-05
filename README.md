@@ -7,6 +7,8 @@ To download single file mods click on the link and then press the "Raw" button t
 
 [Gun Mod (Depreciated, no longer receiving updates)](./mods/gun-mod/gun-mod.zip)
 
+[Pos Display](./mods/pos-display.lua)
+
 [Nametags](./mods/nametags.lua)
 
 [Left 4 Dead 2 HUD (Cross compatible with Downing)](./mods/l4d2-hud/l4d2-hud.zip)
