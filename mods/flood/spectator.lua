@@ -1,6 +1,8 @@
-marioHeadPos = 120
+if unsupported then return end
 
-sPlayerFirstPerson = {
+local MARIO_HEAD_POS = 120
+
+local sPlayerFirstPerson = {
     pos = { x = 0, y = 0, z = 0 },
     freecam = camera_config_is_free_cam_enabled(),
     pitch = 0,
@@ -8,8 +10,31 @@ sPlayerFirstPerson = {
     fov = 70
 }
 
+-- localize functions to improve performance
+local djui_hud_get_raw_mouse_x = djui_hud_get_raw_mouse_x
+local djui_hud_get_raw_mouse_y = djui_hud_get_raw_mouse_y
+local djui_hud_set_mouse_locked = djui_hud_set_mouse_locked
+local mario_drop_held_object = mario_drop_held_object
+local set_mario_animation = set_mario_animation
+local vec3f_copy = vec3f_copy
+local vec3f_mul = vec3f_mul
+local vec3f_set = vec3f_set
+local clamp = clamp
+local allocate_mario_action = allocate_mario_action
+local camera_config_get_x_sensitivity = camera_config_get_x_sensitivity
+local camera_config_get_y_sensitivity = camera_config_get_y_sensitivity
+local camera_config_is_free_cam_enabled = camera_config_is_free_cam_enabled
+local camera_config_is_mouse_look_enabled = camera_config_is_mouse_look_enabled
+local camera_config_is_x_inverted = camera_config_is_x_inverted
+local camera_config_is_y_inverted = camera_config_is_y_inverted
+local camera_freeze = camera_freeze
+local camera_unfreeze = camera_unfreeze
+local is_game_paused = is_game_paused
+local set_override_fov = set_override_fov
+local set_override_near = set_override_near
+
 --- @param m MarioState
-function update_fp_camera(m)
+local function update_fp_camera(m)
     gLakituState.mode = CAMERA_MODE_FREE_ROAM
     gLakituState.defMode = CAMERA_MODE_FREE_ROAM
 
@@ -37,7 +62,7 @@ function update_fp_camera(m)
 
     -- update pos
     gLakituState.pos.x = sPlayerFirstPerson.pos.x + coss(sPlayerFirstPerson.pitch) * sins(sPlayerFirstPerson.yaw)
-    gLakituState.pos.y = sPlayerFirstPerson.pos.y + sins(sPlayerFirstPerson.pitch) + marioHeadPos
+    gLakituState.pos.y = sPlayerFirstPerson.pos.y + sins(sPlayerFirstPerson.pitch) + MARIO_HEAD_POS
     gLakituState.pos.z = sPlayerFirstPerson.pos.z + coss(sPlayerFirstPerson.pitch) * coss(sPlayerFirstPerson.yaw)
     vec3f_copy(m.area.camera.pos, gLakituState.pos)
     vec3f_copy(gLakituState.curPos, gLakituState.pos)
@@ -45,7 +70,7 @@ function update_fp_camera(m)
 
     -- update focus
     gLakituState.focus.x = sPlayerFirstPerson.pos.x - 100 * coss(sPlayerFirstPerson.pitch) * sins(sPlayerFirstPerson.yaw)
-    gLakituState.focus.y = sPlayerFirstPerson.pos.y - 100 * sins(sPlayerFirstPerson.pitch) + marioHeadPos
+    gLakituState.focus.y = sPlayerFirstPerson.pos.y - 100 * sins(sPlayerFirstPerson.pitch) + MARIO_HEAD_POS
     gLakituState.focus.z = sPlayerFirstPerson.pos.z - 100 * coss(sPlayerFirstPerson.pitch) * coss(sPlayerFirstPerson.yaw)
     vec3f_copy(m.area.camera.focus, gLakituState.focus)
     vec3f_copy(gLakituState.curFocus, gLakituState.focus)
@@ -67,8 +92,9 @@ function set_mario_spectator(m)
 end
 
 --- @param m MarioState
-function act_spectator(m)
+local function act_spectator(m)
     mario_drop_held_object(m)
+    m.squishTimer = 0
 
     set_mario_animation(m, MARIO_ANIM_DYING_ON_STOMACH)
     m.marioBodyState.eyeState = MARIO_EYES_DEAD
@@ -119,7 +145,7 @@ function act_spectator(m)
 end
 
 --- @param m MarioState
-function on_set_mario_action(m)
+local function on_set_mario_action(m)
     if m.playerIndex ~= 0 then return end
 
     if m.action == ACT_SPECTATOR then

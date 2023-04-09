@@ -1,19 +1,18 @@
 -- name: Flood
 -- incompatible: gamemode
--- description: Flood v2.2\nBy \\#ec7731\\Agent X\\#dcdcdc\\\n\nThis mod adds a flood escape gamemode\nto sm64ex-coop, you must escape the flood and reach the top of the level before everything is flooded.\n\nSpecial thanks to Mr.Needlemouse64 and Blocky for their respective easter eggs.
+-- description: Flood v2.3\nBy \\#ec7731\\Agent X\\#dcdcdc\\\n\nThis mod adds a flood escape gamemode\nto sm64ex-coop, you must escape the flood and reach the top of the level before everything is flooded.\n\nSpecial thanks to Mr.Needlemouse64 and Blocky for their respective easter eggs.
 
-FLOOD_WATER = 0
-FLOOD_LAVA  = 2
-FLOOD_SAND  = 3
+if unsupported then return end
 
-LEVEL_LOBBY = LEVEL_CASTLE_GROUNDS
-LEVEL_BONUS = LEVEL_PSS
+FLOOD_VERSION = "2.3"
 
-BONUS_LEVELS = 2
+local ROUND_STATE_INACTIVE = 0
+ROUND_STATE_ACTIVE         = 1
+local ROUND_COOLDOWN       = 600
 
-ROUND_STATE_INACTIVE = 0
-ROUND_STATE_ACTIVE   = 1
-ROUND_COOLDOWN       = 600
+local SPEEDRUN_MODE_OFF = 0
+local SPEEDRUN_MODE_PROGRESS = 1
+local SPEEDRUN_MODE_RESTART = 2
 
 gGlobalSyncTable.roundState = ROUND_STATE_INACTIVE
 gGlobalSyncTable.timer = ROUND_COOLDOWN
@@ -21,76 +20,78 @@ gGlobalSyncTable.level = LEVEL_BOB
 gGlobalSyncTable.waterLevel = -20000
 gGlobalSyncTable.speedMultiplier = 1
 
-gGlobalTimer = 0
-listedSurvivors = false
+local gGlobalTimer = 0
+local listedSurvivors = false
 savedStarPoints = 0
 savedSpeedMultiplier = 1
-setScore = false
-score = tonumber(mod_storage_load("score")) or 0
-if gServerSettings.enableCheats ~= 0 then score = 0 end
+local setScore = false
+score = if_then_else(cheats, 0, tonumber(mod_storage_load("score")) or 0)
+local speedrunner = 0
 
-gLevels = {
-    [LEVEL_BOB] =            { goalPos = { x = 3304, y = 4242, z = -4603, a = 0x0000 },  speed = 2.5, area = 1, type = FLOOD_WATER, time = 0, starPoints = 3,  points = 1 },
-    [LEVEL_WF] =             { goalPos = { x = 414, y = 5325, z = -20, a = 0x0000 },     speed = 4.0, area = 1, type = FLOOD_WATER, time = 0, starPoints = 6,  points = 1 },
-    [LEVEL_CCM] =            { goalPos = { x = -478, y = 3471, z = -964, a = 0x0000 },   speed = 5.0, area = 1, type = FLOOD_WATER, time = 0, starPoints = 14, points = 2, customStartPos = { x = 3336, y = -4200, z = 0, a = 0x0000 }, },
-    [LEVEL_BITDW] =          { goalPos = { x = 6772, y = 2867, z = 0, a = -0x4000 },     speed = 4.0, area = 1, type = FLOOD_WATER, time = 0, starPoints = 10, points = 3 },
-    [LEVEL_BBH] =            { goalPos = { x = 655, y = 3277, z = 244, a = 0x8000 },     speed = 3.5, area = 1, type = FLOOD_WATER, time = 0, starPoints = 8,  points = 3 },
-    [LEVEL_LLL] =            { goalPos = { x = 2523, y = 3591, z = -898, a = -0x8000 },  speed = 3.5, area = 2, type = FLOOD_LAVA,  time = 0, starPoints = 3,  points = 3 },
-    [LEVEL_SSL] =            { goalPos = { x = 512, y = 4815, z = -551, a = 0x0000 },    speed = 3.0, area = 2, type = FLOOD_SAND,  time = 0, starPoints = 16, points = 4 },
-    [LEVEL_WDW] =            { goalPos = { x = 1467, y = 4096, z = 93, a = -0x4000 },    speed = 4.0, area = 1, type = FLOOD_WATER, time = 0, starPoints = 14, points = 4 },
-    [LEVEL_TTM] =            { goalPos = { x = 1053, y = 2309, z = 305, a = 0x0000 },    speed = 3.0, area = 1, type = FLOOD_WATER, time = 0, starPoints = 4,  points = 5 },
-    [LEVEL_THI] =            { goalPos = { x = 1037, y = 4060, z = -2091, a = 0x0000 },  speed = 4.0, area = 1, type = FLOOD_WATER, time = 0, starPoints = 8,  points = 5 },
-    [LEVEL_TTC] =            { goalPos = { x = 2208, y = 7051, z = 2217, a = 0x0000 },   speed = 4.0, area = 1, type = FLOOD_WATER, time = 0, starPoints = 3,  points = 7 },
-    [LEVEL_BITS] =           { goalPos = { x = 369, y = 6552, z = -6000, a = 0x0000 },   speed = 4.5, area = 1, type = FLOOD_LAVA,  time = 0, starPoints = 16, points = 6 },
-    [LEVEL_BONUS] =          { goalPos = { x = 0, y = 700, z = 0, a = 0x0000 },          speed = 5.0, area = 1, type = FLOOD_LAVA,  time = 0, starPoints = 0,  points = 6 },
-    [LEVEL_SL] =             { goalPos = { x = 40, y = 4864, z = 240, a = 0x0000 },      speed = 3.0, area = 1, type = FLOOD_WATER, time = 0, starPoints = 4,  points = 5 },
-    [LEVEL_CASTLE_GROUNDS] = { goalPos = { x = 0, y = 7583, z = -4015, a = 0x0000 },     speed = 7.0, area = 1, type = FLOOD_WATER, time = 0, starPoints = 0,  points = 9 }
-}
+-- localize functions to improve performance
+local math_min = math.min
+local math_floor = math.floor
+local math_random = math.random
+local math_max = math.max
+local camera_set_use_course_specific_settings = camera_set_use_course_specific_settings
+local djui_chat_message_create = djui_chat_message_create
+local djui_hud_get_screen_height = djui_hud_get_screen_height
+local djui_hud_get_screen_width = djui_hud_get_screen_width
+local djui_hud_measure_text = djui_hud_measure_text
+local djui_hud_print_text = djui_hud_print_text
+local djui_hud_render_rect = djui_hud_render_rect
+local djui_hud_set_font = djui_hud_set_font
+local djui_hud_set_resolution = djui_hud_set_resolution
+local play_music = play_music
+local play_race_fanfare = play_race_fanfare
+local play_secondary_music = play_secondary_music
+local play_sound = play_sound
+local init_single_mario = init_single_mario
+local set_mario_action = set_mario_action
+local vec3f_copy = vec3f_copy
+local vec3f_dist = vec3f_dist
+local mod_storage_load = mod_storage_load
+local mod_storage_save = mod_storage_save
+local network_player_connected_count = network_player_connected_count
+local network_player_set_description = network_player_set_description
+local network_is_server = network_is_server
+local disable_time_stop = disable_time_stop
+local obj_scale = obj_scale
+local spawn_mist_particles = spawn_mist_particles
+local save_file_erase_current_backup_save = save_file_erase_current_backup_save
+local save_file_set_flags = save_file_set_flags
+local smlua_audio_utils_replace_sequence = smlua_audio_utils_replace_sequence
+local warp_to_level = warp_to_level
+local clamp = clamp
+local clampf = clampf
+local max = max
+local hud_get_value = hud_get_value
+local hud_hide = hud_hide
+local hud_render_power_meter = hud_render_power_meter
+local save_file_set_using_backup_slot = save_file_set_using_backup_slot
+local set_environment_region = set_environment_region
+local obj_check_hitbox_overlap = obj_check_hitbox_overlap
+local obj_get_first_with_behavior_id = obj_get_first_with_behavior_id
+local spawn_non_sync_object = spawn_non_sync_object
+local smlua_text_utils_secret_star_replace = smlua_text_utils_secret_star_replace
+local find_floor_height = find_floor_height
 
-gMapRotation = {
-    LEVEL_BOB,
-    LEVEL_WF,
-    LEVEL_CCM,
-    LEVEL_BITDW,
-    LEVEL_BBH,
-    LEVEL_LLL,
-    LEVEL_SSL,
-    LEVEL_WDW,
-    LEVEL_TTM,
-    LEVEL_THI,
-    LEVEL_TTC,
-    LEVEL_BITS,
-    LEVEL_BONUS,
-    LEVEL_SL,
-    LEVEL_CASTLE_GROUNDS
-}
-
-gMapNames = {
-    "bob",
-    "wf",
-    "ccm",
-    "bitdw",
-    "bbh",
-    "lll",
-    "ssl",
-    "wdw",
-    "ttm",
-    "thi",
-    "ttc",
-    "bits",
-    "ctt",
-    "sl",
-    "castle_grounds"
-}
+function speedrun_mode(mode)
+    if mode == nil then
+        return speedrunner > 0 and network_player_connected_count() == 1
+    else
+        return speedrunner == mode and network_player_connected_count() == 1
+    end
+end
 
 -- runs serverside
-function round_start()
+local function round_start()
     gGlobalSyncTable.roundState = ROUND_STATE_ACTIVE
     gGlobalSyncTable.timer = if_then_else(gGlobalSyncTable.level == LEVEL_BONUS, 730, 100)
 end
 
 -- runs serverside
-function round_end()
+local function round_end()
     gGlobalSyncTable.roundState = ROUND_STATE_INACTIVE
     gGlobalSyncTable.timer = ROUND_COOLDOWN
     gGlobalSyncTable.waterLevel = -20000
@@ -108,12 +109,18 @@ function set_score()
     if setScore then return end
 
     local m = gMarioStates[0]
-    local multiplier = math.min(gGlobalSyncTable.speedMultiplier, savedSpeedMultiplier)
+    local multiplier = math_min(gGlobalSyncTable.speedMultiplier, savedSpeedMultiplier)
+    if moveset then
+        multiplier = math_min(1, multiplier)
+    end
     local oldScore = score
-    local starPoints = math.round(savedStarPoints * multiplier)
-    local coinPoints = math.floor(m.numCoins * 0.1 * multiplier)
-    local bitsPoints = math.round(40 * multiplier)
-    score = score + math.round(gLevels[gGlobalSyncTable.level].points * multiplier) + starPoints + coinPoints + if_then_else(gNetworkPlayers[0].currLevelNum == LEVEL_BITS and m.numCoins >= 75, bitsPoints, 0)
+    local starPoints = math_round(savedStarPoints * multiplier)
+    local coinPoints = math_floor(m.numCoins * 0.1 * multiplier)
+    local bitsPoints = math_round(40 * multiplier)
+    score = score + math_round(gLevels[gGlobalSyncTable.level].points * multiplier)
+    if not moveset then
+        score = score + starPoints + coinPoints + if_then_else(gNetworkPlayers[0].currLevelNum == LEVEL_BITS and m.numCoins >= 75, bitsPoints, 0)
+    end
     mod_storage_save("score", tostring(score))
     gPlayerSyncTable[0].score = score
     djui_chat_message_create(string.format(
@@ -128,7 +135,7 @@ function set_score()
     setScore = true
 end
 
-function server_update()
+local function server_update()
     if gGlobalSyncTable.roundState == ROUND_STATE_ACTIVE then
         if gNetworkPlayers[0].currLevelNum == gGlobalSyncTable.level then
             gGlobalSyncTable.waterLevel = gGlobalSyncTable.waterLevel + gLevels[gGlobalSyncTable.level].speed * gGlobalSyncTable.speedMultiplier
@@ -148,7 +155,7 @@ function server_update()
                         dead = dead + 1
                     end
                 end
-                if dead == network_player_connected_count() then
+                if dead == network_player_connected_count() or speedrun_mode() then
                     gGlobalSyncTable.timer = 0
                 end
 
@@ -157,29 +164,31 @@ function server_update()
                 else
                     round_end()
 
-                    -- move to the next level
-                    local finished = 0
-                    for i = 0, (MAX_PLAYERS - 1) do
-                        if gNetworkPlayers[i].connected and gPlayerSyncTable[i].finished then
-                            finished = finished + 1
-                        end
-                    end
-
-                    if finished ~= 0 then
-                        -- calculate position
-                        local position = 1
-                        for k, v in pairs(gMapRotation) do
-                            if gGlobalSyncTable.level == v then
-                                position = k
+                    if not speedrun_mode() or speedrun_mode(SPEEDRUN_MODE_PROGRESS) then
+                        -- move to the next level
+                        local finished = 0
+                        for i = 0, (MAX_PLAYERS - 1) do
+                            if gNetworkPlayers[i].connected and gPlayerSyncTable[i].finished then
+                                finished = finished + 1
                             end
                         end
 
-                        position = position + 1
-                        if position > #gMapRotation - BONUS_LEVELS then
-                            position = 1
-                        end
+                        if finished ~= 0 then
+                            -- calculate position
+                            local position = 1
+                            for k, v in pairs(gMapRotation) do
+                                if gGlobalSyncTable.level == v then
+                                    position = k
+                                end
+                            end
 
-                        gGlobalSyncTable.level = gMapRotation[position]
+                            position = position + 1
+                            if position > FLOOD_LEVEL_COUNT - FLOOD_BONUS_LEVELS then
+                                position = 1
+                            end
+
+                            gGlobalSyncTable.level = gMapRotation[position]
+                        end
                     end
                 end
             end
@@ -201,12 +210,15 @@ function server_update()
     end
 end
 
-event = math.random(900, 9000)
-function update()
+local function update()
     if network_is_server() then server_update() end
 
     if gGlobalSyncTable.roundState == ROUND_STATE_INACTIVE then
         if gNetworkPlayers[0].currLevelNum ~= LEVEL_LOBBY or gNetworkPlayers[0].currActNum ~= 0 then
+            if speedrun_mode() then
+                level_restart()
+            end
+
             warp_to_level(LEVEL_LOBBY, 1, 0)
 
             if not listedSurvivors and gGlobalTimer > 5 then
@@ -215,7 +227,7 @@ function update()
                 djui_chat_message_create("Survivors:")
                 for i = 0, (MAX_PLAYERS - 1) do
                     if gNetworkPlayers[i].connected and gPlayerSyncTable[i].finished then
-                        djui_chat_message_create(gNetworkPlayers[i].name)
+                        djui_chat_message_create(network_get_player_text_color_string(i) .. gNetworkPlayers[i].name)
                         finished = finished + 1
                     end
                 end
@@ -238,41 +250,54 @@ function update()
 
     -- stops the star spawn cutscenes from happening
     local m = gMarioStates[0]
-    if m.area.camera ~= nil and (m.area.camera.cutscene == CUTSCENE_STAR_SPAWN or m.area.camera.cutscene == CUTSCENE_RED_COIN_STAR_SPAWN) then
+    if m.area ~= nil and m.area.camera ~= nil and (m.area.camera.cutscene == CUTSCENE_STAR_SPAWN or m.area.camera.cutscene == CUTSCENE_RED_COIN_STAR_SPAWN) then
         m.area.camera.cutscene = 0
         m.freeze = 0
         disable_time_stop()
     end
 
     gGlobalTimer = gGlobalTimer + 1
-    if gGlobalTimer >= event and gPlayerSyncTable[0].score >= 1000000 then repeat until false end
 end
 
 --- @param m MarioState
-function mario_update(m)
-    local color = { r = 0, g = 255, b = 0 }
-    if m.health <= 0xff then color = { r = 255, g = 0, b = 0 } end
-    network_player_set_description(gNetworkPlayers[m.playerIndex], tostring(gPlayerSyncTable[m.playerIndex].score), color.r, color.g, color.b, 255)
+local function mario_update(m)
+    if not gNetworkPlayers[m.playerIndex].connected then return end
 
-    if m.action == ACT_TWIRLING and gNetworkPlayers[0].currLevelNum == LEVEL_BONUS then m.particleFlags = m.particleFlags | PARTICLE_SPARKLES end
-
-    -- small moveset tweak allowing for better movement
-    if m.action == ACT_STEEP_JUMP then m.action = ACT_JUMP end
-
-    if m.action == ACT_JUMBO_STAR_CUTSCENE then m.flags = m.flags | MARIO_WING_CAP end
+    if m.health <= 0xff then
+        network_player_set_description(gNetworkPlayers[m.playerIndex], tostring(gPlayerSyncTable[m.playerIndex].score), 255, 0, 0, 255)
+    else
+        network_player_set_description(gNetworkPlayers[m.playerIndex], tostring(gPlayerSyncTable[m.playerIndex].score), 0, 255, 0, 255)
+    end
 
     if m.playerIndex ~= 0 then return end
 
-    if m.wall ~= nil and gPlayerSyncTable[0].score >= 1000000 then
-        set_mario_action(m, ACT_HARD_BACKWARD_AIR_KB, 0)
+    if screen then
+        mario_set_full_health(m)
+        set_mario_action(m, ACT_PAUSE, 0)
+        return
     end
 
-    if gNetworkPlayers[0].currLevelNum == LEVEL_SSL or gNetworkPlayers[0].currLevelNum == LEVEL_BONUS then
-        romhack_camera(m)
+    -- action specific modifications
+    if m.action == ACT_STEEP_JUMP then
+        m.action = ACT_JUMP
+    elseif m.action == ACT_JUMBO_STAR_CUTSCENE then
+        m.flags = m.flags | MARIO_WING_CAP
     end
 
+    -- disable instant warps
     if m.floor ~= nil and (m.floor.type == SURFACE_WARP or (m.floor.type >= SURFACE_PAINTING_WARP_D3 and m.floor.type <= SURFACE_PAINTING_WARP_FC) or (m.floor.type >= SURFACE_INSTANT_WARP_1B and m.floor.type <= SURFACE_INSTANT_WARP_1E)) then
         m.floor.type = SURFACE_DEFAULT
+    end
+
+    -- disable damage in lobby
+    if gGlobalSyncTable.roundState == ROUND_STATE_INACTIVE then
+        mario_set_full_health(m)
+        m.peakHeight = m.pos.y
+        return
+    end
+
+    if (gNetworkPlayers[0].currLevelNum == LEVEL_SSL or gNetworkPlayers[0].currLevelNum == LEVEL_BONUS or gNetworkPlayers[0].currLevelNum == LEVEL_HMC) and not _G.ommEnabled then
+        romhack_camera(m)
     end
 
     -- dialog boxes
@@ -280,13 +305,8 @@ function mario_update(m)
         set_mario_action(m, ACT_FREEFALL, 0)
     end
 
-    if gGlobalSyncTable.roundState == ROUND_STATE_INACTIVE then
-        mario_set_full_health(m)
-        m.peakHeight = m.pos.y
-        return
-    end
-
-    if gNetworkPlayers[0].currLevelNum == LEVEL_BONUS then
+    -- manage CTT
+    if gNetworkPlayers[0].currLevelNum == LEVEL_BONUS and game == GAME_VANILLA then
         m.peakHeight = m.pos.y
 
         local star = obj_get_first_with_behavior_id(id_bhvFinalStar)
@@ -295,14 +315,15 @@ function mario_update(m)
             set_mario_action(m, ACT_JUMBO_STAR_CUTSCENE, 0)
         end
 
-        if m.action == ACT_JUMBO_STAR_CUTSCENE and m.actionTimer == 499 then
+        if m.action == ACT_JUMBO_STAR_CUTSCENE and m.actionTimer >= 499 then
             set_mario_spectator(m)
         end
     end
 
+    -- check if the player has reached the end of the level 
     if gNetworkPlayers[0].currLevelNum == gGlobalSyncTable.level and not gPlayerSyncTable[0].finished and ((gNetworkPlayers[0].currLevelNum ~= LEVEL_BONUS and m.pos.y == m.floorHeight)
-    or (gNetworkPlayers[0].currLevelNum == LEVEL_BONUS and m.action == ACT_JUMBO_STAR_CUTSCENE)
-    or (m.action & ACT_FLAG_ON_POLE) ~= 0) and vec3f_dist(m.pos, gLevels[gGlobalSyncTable.level].goalPos) < 600 then
+    or (gNetworkPlayers[0].currLevelNum == LEVEL_BONUS and m.action == ACT_JUMBO_STAR_CUTSCENE) or (m.action & ACT_FLAG_ON_POLE) ~= 0)
+    and vec3f_dist(m.pos, gLevels[gGlobalSyncTable.level].goalPos) < 600 then
         gPlayerSyncTable[0].finished = true
 
         if gNetworkPlayers[0].currLevelNum ~= LEVEL_BONUS then
@@ -312,12 +333,14 @@ function mario_update(m)
             else
                 play_secondary_music(SEQ_EVENT_CUTSCENE_COLLECT_STAR, 10, 110, 10)
             end
-        else
+        elseif game == GAME_VANILLA then
             djui_chat_message_create("\\#00ff00\\You escaped the \\#ffff00\\final\\#00ff00\\ flood! Congratulations!")
             play_secondary_music(SEQ_EVENT_CUTSCENE_VICTORY, 0, 70, 30)
         end
 
-        if gServerSettings.enableCheats == 0 then
+        djui_chat_message_create("Your time: " .. string.format("%.3f", gLevels[gGlobalSyncTable.level].time / 30))
+
+        if not cheats then
             set_score()
             if gNetworkPlayers[0].currLevelNum == LEVEL_BITS and m.numCoins >= 75 then
                 network_send(true, { score = true })
@@ -325,15 +348,15 @@ function mario_update(m)
         end
     end
 
+    -- update spectator if finished, manage other things if not
     if gPlayerSyncTable[0].finished then
         mario_set_full_health(m)
         if network_player_connected_count() > 1 and m.action ~= ACT_JUMBO_STAR_CUTSCENE then
             set_mario_spectator(m)
         end
     else
-        local damage = if_then_else(gGlobalSyncTable.level ~= LEVEL_CASTLE_GROUNDS, 36, 20) -- (0x880 / (2 * 30)) and (0x880 / (3.5 * 30)) respectively
         if m.pos.y + 40 < gGlobalSyncTable.waterLevel then
-            m.health = m.health - damage
+            m.health = m.health - 30
         end
 
         if m.action == ACT_QUICKSAND_DEATH then
@@ -351,11 +374,21 @@ function mario_update(m)
     end
 end
 
-function on_hud_render()
+--- @param m MarioState
+local function on_set_mario_action(m)
+    if m.action == ACT_VERTICAL_WIND then
+        m.vel.y = math.max(m.vel.y, 0)
+    end
+end
+
+local function on_hud_render()
+    if screen then return end
+
     local water = obj_get_first_with_behavior_id(id_bhvWater)
     if gNetworkPlayers[0].currLevelNum == gGlobalSyncTable.level and water ~= nil then
         djui_hud_set_resolution(RESOLUTION_DJUI)
 
+        -- tint the screen if Blocky's easter egg is active or the camera is under the water
         if water.oAction == 1 then
             djui_hud_set_adjusted_color(150, 0, 0, clamp(water.oTimer, 0, 100))
             djui_hud_render_rect(0, 0, djui_hud_get_screen_width(), djui_hud_get_screen_height())
@@ -387,7 +420,7 @@ function on_hud_render()
     local text = if_then_else(gGlobalSyncTable.roundState == ROUND_STATE_INACTIVE, "Type /start to start a round", "0.000 seconds")
     if gNetworkPlayers[0].currAreaSyncValid then
         if gGlobalSyncTable.roundState == ROUND_STATE_INACTIVE then
-            text = if_then_else(network_player_connected_count() > 1, "Round starts in " .. tostring(math.floor(gGlobalSyncTable.timer / 30)), "Type /start to start a round")
+            text = if_then_else(network_player_connected_count() > 1, "Round starts in " .. tostring(math_floor(gGlobalSyncTable.timer / 30)), "Type /start to start a round")
         elseif gNetworkPlayers[0].currLevelNum == gGlobalSyncTable.level then
             text = tostring(string.format("%.3f", gLevels[gGlobalSyncTable.level].time / 30)) .. " seconds"
         end
@@ -406,25 +439,20 @@ function on_hud_render()
 
     djui_hud_set_font(FONT_HUD)
 
-    if gGlobalSyncTable.speedMultiplier ~= 1 then
-        djui_hud_print_text(tostring(gGlobalSyncTable.speedMultiplier) .. "x", 5, djui_hud_get_screen_height() - 21, 1)
-    end
-
     djui_hud_render_texture(gTextures.coin, 5, 5, 1, 1)
     djui_hud_print_text("x", 21, 5, 1)
     djui_hud_print_text(tostring(hud_get_value(HUD_DISPLAY_COINS)), 37, 5, 1)
+
+    if gGlobalSyncTable.speedMultiplier ~= 1 then
+        djui_hud_print_text(string.format("%.2fx", gGlobalSyncTable.speedMultiplier), 5, 24, 1)
+    end
 end
 
-function on_level_init()
+local function on_level_init()
     savedStarPoints = 0
     savedSpeedMultiplier = gGlobalSyncTable.speedMultiplier
 
-    if gNetworkPlayers[0].currLevelNum == LEVEL_TTC then
-        gLevelValues.fixCollisionBugs = 1
-    else
-        gLevelValues.fixCollisionBugs = 0
-    end
-
+    -- reset save
     save_file_erase_current_backup_save()
     if gNetworkPlayers[0].currLevelNum ~= LEVEL_CASTLE_GROUNDS then
         save_file_set_flags(SAVE_FLAG_HAVE_VANISH_CAP)
@@ -434,18 +462,26 @@ function on_level_init()
 
     if gGlobalSyncTable.roundState == ROUND_STATE_ACTIVE then
         if network_is_server() then
-            gGlobalSyncTable.waterLevel = flood_get_start_water_level()
+            local start = gLevels[gGlobalSyncTable.level].customStartPos
+            if start ~= nil then
+                gGlobalSyncTable.waterLevel = find_floor_height(start.x, start.y, start.z) - 1200
+            else
+                -- only sub areas have a weird issue where this function appears to always return the floor lower limit on level init
+                gGlobalSyncTable.waterLevel = if_then_else(gLevels[gGlobalSyncTable.level].area == 1, find_floor_height(gMarioStates[0].pos.x, gMarioStates[0].pos.y, gMarioStates[0].pos.z), gMarioStates[0].pos.y) - 1200
+            end
         end
 
-        if gNetworkPlayers[0].currLevelNum == LEVEL_BITS then
-            spawn_non_sync_object(
-                id_bhvCustomStaticObject,
-                E_MODEL_CTT,
-                10000, -2000, -40000,
-                function(o) obj_scale(o, 0.5) end
-            )
-        elseif gNetworkPlayers[0].currLevelNum == LEVEL_WDW then
-            set_environment_region(1, -20000)
+        if game == GAME_VANILLA then
+            if gNetworkPlayers[0].currLevelNum == LEVEL_BITS then
+                spawn_non_sync_object(
+                    id_bhvCustomStaticObject,
+                    E_MODEL_CTT,
+                    10000, -2000, -40000,
+                    function(o) obj_scale(o, 0.5) end
+                )
+            elseif gNetworkPlayers[0].currLevelNum == LEVEL_WDW then
+                set_environment_region(1, -20000)
+            end
         end
 
         local pos = gLevels[gGlobalSyncTable.level].goalPos
@@ -459,7 +495,7 @@ function on_level_init()
                     o.oFaceAngleYaw = pos.a
                 end
             )
-        else
+        elseif game == GAME_VANILLA then
             spawn_non_sync_object(
                 id_bhvFinalStar,
                 E_MODEL_STAR,
@@ -478,7 +514,7 @@ function on_level_init()
 end
 
 -- dynos warps mario back to castle grounds facing the wrong way, likely something from the title screen
-function on_warp()
+local function on_warp()
     local m = gMarioStates[0]
     if gNetworkPlayers[0].currLevelNum == LEVEL_CASTLE_GROUNDS then
         m.faceAngle.y = m.faceAngle.y + 0x8000
@@ -493,22 +529,22 @@ function on_warp()
     end
 end
 
-function on_player_connected()
+local function on_player_connected()
     if network_is_server() and gGlobalSyncTable.roundState == ROUND_STATE_INACTIVE then gGlobalSyncTable.timer = ROUND_COOLDOWN end
 end
 
-function on_start_command(msg)
+local function on_start_command(msg)
     if msg == "random" then
-        gGlobalSyncTable.level = gLevels[math.random(1, #gMapRotation)]
+        gGlobalSyncTable.level = gLevels[math_random(1, FLOOD_LEVEL_COUNT)]
     else
         local override = tonumber(msg)
         if override ~= nil then
-            override = clamp(math.floor(override), 1, #gMapRotation)
+            override = clamp(math_floor(override), 1, FLOOD_LEVEL_COUNT)
             gGlobalSyncTable.level = gMapRotation[override]
         else
-            for k, v in pairs(gMapNames) do
-                if msg:lower() == v then
-                    gGlobalSyncTable.level = gMapRotation[k]
+            for k, v in pairs(gLevels) do
+                if msg:lower() == v.name then
+                    gGlobalSyncTable.level = k
                 end
             end
         end
@@ -522,12 +558,30 @@ function on_start_command(msg)
     return true
 end
 
-function on_speed_command(msg)
+local function on_speed_command(msg)
     local speed = tonumber(msg)
     if speed ~= nil then
         speed = clampf(speed, 0, 10)
         djui_chat_message_create("Water speed set to " .. speed)
         gGlobalSyncTable.speedMultiplier = speed
+        return true
+    end
+    return false
+end
+
+local function on_speedrun_command(msg)
+    msg = msg:lower()
+    if msg == "off" then
+        djui_chat_message_create("Speedrun mode status: \\#ff0000\\OFF")
+        speedrunner = SPEEDRUN_MODE_OFF
+        return true
+    elseif msg == "progress" then
+        djui_chat_message_create("Speedrun mode status: \\#00ff00\\Progress Level")
+        speedrunner = SPEEDRUN_MODE_PROGRESS
+        return true
+    elseif msg == "restart" then
+        djui_chat_message_create("Speedrun mode status: \\#00ff00\\Restart Level")
+        speedrunner = SPEEDRUN_MODE_RESTART
         return true
     end
     return false
@@ -540,6 +594,8 @@ gLevelValues.entryLevel = LEVEL_LOBBY
 gLevelValues.floorLowerLimit = -20000
 gLevelValues.floorLowerLimitMisc = -20000 + 1000
 gLevelValues.floorLowerLimitShadow = -20000 + 1000.0
+gLevelValues.fixCollisionBugs = 1
+gLevelValues.fixCollisionBugsRoundedCorners = 0
 
 hud_hide()
 camera_set_use_course_specific_settings(false)
@@ -550,23 +606,26 @@ smlua_audio_utils_replace_sequence(SEQ_LEVEL_BOSS_KOOPA_FINAL, 37, 60, "00_pinba
 
 hook_event(HOOK_UPDATE, update)
 hook_event(HOOK_MARIO_UPDATE, mario_update)
+hook_event(HOOK_ON_SET_MARIO_ACTION, on_set_mario_action)
 hook_event(HOOK_ON_HUD_RENDER, on_hud_render)
 hook_event(HOOK_ON_LEVEL_INIT, on_level_init)
 hook_event(HOOK_ON_WARP, on_warp)
 hook_event(HOOK_ON_PLAYER_CONNECTED, on_player_connected)
 
 if network_is_server() then
-    hook_chat_command("start", "[random|1-" .. #gMapRotation .. "] to set the level to a random one or a specific one, you can also leave it empty for normal progression.", on_start_command)
+    hook_chat_command("start", "[random|1-" .. FLOOD_LEVEL_COUNT .. "] to set the level to a random one or a specific one, you can also leave it empty for normal progression.", on_start_command)
     hook_chat_command("speed", "[number] to set the water speed multiplier", on_speed_command)
+    hook_chat_command("speedrun", "[off|progress|restart] to change adjustments to singleplayer Flood helpful for speedrunners", on_speedrun_command)
 end
 
 for i = 0, MAX_PLAYERS - 1 do
     gPlayerSyncTable[i].finished = false
     gPlayerSyncTable[i].score = 0
-    if i == 0 and gServerSettings.enableCheats == 0 then
+    if i == 0 and not cheats then
         gPlayerSyncTable[0].score = tonumber(mod_storage_load("score")) or 0
-        if gPlayerSyncTable[0].score < 0 then
-            repeat until false
-        end
     end
+end
+
+if _G.ommEnabled then
+    _G.OmmApi.omm_hud_change_setting(true)
 end
