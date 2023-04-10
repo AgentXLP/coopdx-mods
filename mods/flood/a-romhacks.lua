@@ -54,7 +54,7 @@ for mod in pairs(gActiveMods) do
         flood_define_level(false, LEVEL_CCM,            "ccm",            { x = -478,  y = 3471, z = -964,  a =  0x0000 }, 5.0,  1,   FLOOD_WATER, 14,         2,     { x = 3336, y = -4200, z = 0, a = 0x0000 })
         flood_define_level(false, LEVEL_BITDW,          "bitdw",          { x = 6772,  y = 2867, z = 0,     a = -0x4000 }, 4.0,  1,   FLOOD_WATER, 10,         3,     nil)
         flood_define_level(false, LEVEL_BBH,            "bbh",            { x = 655,   y = 3277, z = 244,   a =  0x8000 }, 3.5,  1,   FLOOD_WATER, 8,          3,     nil)
-        flood_define_level(false, LEVEL_HMC,            "hmc",            { x = -4163, y = 2355, z = -2544, a =  0x0000 }, 3.0,  1,   FLOOD_WATER, 2,          5,     { x = 2546, y = -4279, z = 5579, a = 0x0000 })
+        flood_define_level(false, LEVEL_HMC,            "hmc",            { x = -4163, y = 2355, z = -2544, a =  0x0000 }, 3.0,  1,   FLOOD_WATER, 1,          5,     { x = 2546, y = -4279, z = 5579, a = 0x0000 })
         flood_define_level(false, LEVEL_LLL,            "lll",            { x = 2523,  y = 3591, z = -898,  a = -0x8000 }, 3.5,  2,   FLOOD_LAVA,  3,          3,     nil)
         flood_define_level(false, LEVEL_SSL,            "ssl",            { x = 512,   y = 4815, z = -551,  a =  0x0000 }, 3.0,  2,   FLOOD_SAND,  16,         4,     nil)
         flood_define_level(false, LEVEL_WDW,            "wdw",            { x = 1467,  y = 4096, z = 93,    a = -0x4000 }, 4.0,  1,   FLOOD_WATER, 14,         4,     nil)
