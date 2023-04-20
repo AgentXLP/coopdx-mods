@@ -26,3 +26,5 @@ To download single file mods click on the link and then press the "Raw" button t
 [Day Night Cycle](./mods/day-night-cycle/day-night-cycle.zip)
 
 [Hats](./mods/hats/hats.zip)
+
+[Personal Models (Blocky and Agent X)](./mods/personal-models/personal-models.zip)
