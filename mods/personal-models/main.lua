@@ -86,7 +86,7 @@ end
 
 --- @param m MarioState
 local function on_player_connected(m)
-    gPlayerSyncTable[m.playerIndex].modelId = idTable[network_discord_id_from_local_index(0)]
+    gPlayerSyncTable[m.playerIndex].modelId = idTable[network_discord_id_from_local_index(m.playerIndex)]
 end
 
 hook_event(HOOK_MARIO_UPDATE, mario_update)
