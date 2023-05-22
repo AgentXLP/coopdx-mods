@@ -29,7 +29,6 @@ local load_object_collision_model = load_object_collision_model
 local function bhv_water_init(o)
     o.oFlags = OBJ_FLAG_UPDATE_GFX_POS_AND_ANGLE
     o.oAnimState = gLevels[gGlobalSyncTable.level].type
-    print(o.oAnimState)
 
     o.header.gfx.skipInViewCheck = true
 
