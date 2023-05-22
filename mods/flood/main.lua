@@ -420,7 +420,7 @@ local function on_hud_render()
 
     djui_hud_render_texture(gTextures.coin, 5, 5, 1, 1)
     djui_hud_print_text("x", 21, 5, 1)
-    djui_hud_print_text(tostring(gMarioStates[0].numCoins), 37, 5, 1)
+    djui_hud_print_text(tostring(hud_get_value(HUD_DISPLAY_COINS)), 37, 5, 1)
 
     if gGlobalSyncTable.speedMultiplier ~= 1 then
         djui_hud_print_text(string.format("%.2fx", gGlobalSyncTable.speedMultiplier), 5, 24, 1)
