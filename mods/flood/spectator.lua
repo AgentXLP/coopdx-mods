@@ -96,7 +96,7 @@ local function act_spectator(m)
     mario_drop_held_object(m)
     m.squishTimer = 0
 
-    set_mario_animation(m, MARIO_ANIM_DYING_ON_STOMACH)
+    set_mario_animation(m, MARIO_ANIM_DROWNING_PART2)
     m.marioBodyState.eyeState = MARIO_EYES_DEAD
     m.faceAngle.x = 0
     m.faceAngle.z = 0
@@ -107,7 +107,7 @@ local function act_spectator(m)
         vec3f_set(m.pos, goalPos.x, goalPos.y + 600, goalPos.z)
         mario_set_full_health(m)
     else
-        m.pos.y = gGlobalSyncTable.waterLevel - 25
+        m.pos.y = gGlobalSyncTable.waterLevel - 70
         vec3f_copy(m.marioObj.header.gfx.pos, m.pos)
         vec3f_copy(m.marioObj.header.gfx.angle, m.faceAngle)
         m.marioObj.header.gfx.angle.y = 0
@@ -146,6 +146,10 @@ end
 
 --- @param m MarioState
 local function on_set_mario_action(m)
+    if m.action == ACT_VERTICAL_WIND then
+        m.vel.y = maxf(m.vel.y, 0)
+    end
+
     if m.playerIndex ~= 0 then return end
 
     if m.action == ACT_SPECTATOR then

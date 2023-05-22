@@ -12,18 +12,14 @@ if gServerSettings.enableCheats ~= 0 then
 end
 
 for i in pairs(gActiveMods) do
-    if (gActiveMods[i].incompatible ~= nil and gActiveMods[i].incompatible:find("moveset")) or gActiveMods[i].name:find("Squishy's Server") then
+    if (gActiveMods[i].incompatible ~= nil and gActiveMods[i].incompatible:find("moveset")) or gActiveMods[i].name:find("Squishy's Server") or (gActiveMods[i].name:find("Pasta") and gActiveMods[i].name:find("Castle")) then
         moveset = true
     end
 end
 
 -- localize functions to improve performance
-local math_floor = math.floor
-local math_ceil = math.ceil
-local center_rom_hack_camera = center_rom_hack_camera
 local set_camera_mode = set_camera_mode
 local djui_hud_set_color = djui_hud_set_color
-local network_discord_id_from_local_index = network_discord_id_from_local_index
 local is_game_paused = is_game_paused
 
 local sOverrideCameraModes = {
@@ -53,7 +49,7 @@ rom_hack_cam_set_collisions(false)
 --- @param x number
 --- @return integer
 function math_round(x)
-    return if_then_else(x - math_floor(x) >= 0.5, math_ceil(x), math_floor(x))
+    return if_then_else(x - math.floor(x) >= 0.5, math.ceil(x), math.floor(x))
 end
 
 -- Recieves a value of any type and converts it into a boolean.
@@ -76,6 +72,30 @@ function switch(param, case_table)
     if case then return case() end
     local def = case_table['default']
     return def and def() or nil
+end
+
+--- @param m MarioState
+function active_player(m)
+    local np = gNetworkPlayers[m.playerIndex]
+    if m.playerIndex == 0 then
+        return 1
+    end
+    if not np.connected then
+        return 0
+    end
+    if np.currCourseNum ~= gNetworkPlayers[0].currCourseNum then
+        return 0
+    end
+    if np.currActNum ~= gNetworkPlayers[0].currActNum then
+        return 0
+    end
+    if np.currLevelNum ~= gNetworkPlayers[0].currLevelNum then
+        return 0
+    end
+    if np.currAreaIndex ~= gNetworkPlayers[0].currAreaIndex then
+        return 0
+    end
+    return is_player_active(m)
 end
 
 function if_then_else(cond, if_true, if_false)
@@ -102,13 +122,12 @@ function on_or_off(value)
     return "\\#ff0000\\OFF"
 end
 
-function needlemouse_in_server()
-    for i = 0, (MAX_PLAYERS - 1) do
-        if network_discord_id_from_local_index(i) == "361984642590441474" then
-            return true
-        end
+function split(s)
+    local result = {}
+    for match in (s):gmatch(string.format("[^%s]+", " ")) do
+        table.insert(result, match)
     end
-    return false
+    return result
 end
 
 function djui_hud_set_adjusted_color(r, g, b, a)
@@ -126,4 +145,45 @@ function mario_set_full_health(m)
     m.health = 0x880
     m.healCounter = 0
     m.hurtCounter = 0
+end
+
+local levelToCourse = {
+    [LEVEL_NONE] = COURSE_NONE,
+    [LEVEL_BOB] = COURSE_BOB,
+    [LEVEL_WF] = COURSE_WF,
+    [LEVEL_JRB] = COURSE_JRB,
+    [LEVEL_CCM] = COURSE_CCM,
+    [LEVEL_BBH] = COURSE_BBH,
+    [LEVEL_HMC] = COURSE_HMC,
+    [LEVEL_LLL] = COURSE_LLL,
+    [LEVEL_SSL] = COURSE_SSL,
+    [LEVEL_DDD] = COURSE_DDD,
+    [LEVEL_SL] = COURSE_SL,
+    [LEVEL_WDW] = COURSE_WDW,
+    [LEVEL_TTM] = COURSE_TTM,
+    [LEVEL_THI] = COURSE_THI,
+    [LEVEL_TTC] = COURSE_TTC,
+    [LEVEL_RR] = COURSE_RR,
+    [LEVEL_BITDW] = COURSE_BITDW,
+    [LEVEL_BITFS] = COURSE_BITFS,
+    [LEVEL_BITS] = COURSE_BITS,
+    [LEVEL_PSS] = COURSE_PSS,
+    [LEVEL_COTMC] = COURSE_COTMC,
+    [LEVEL_TOTWC] = COURSE_TOTWC,
+    [LEVEL_VCUTM] = COURSE_VCUTM,
+    [LEVEL_WMOTR] = COURSE_WMOTR,
+    [LEVEL_SA] = COURSE_SA,
+    [LEVEL_ENDING] = COURSE_CAKE_END,
+}
+
+function level_to_course(level)
+    return levelToCourse[level] or COURSE_NONE
+end
+
+function timestamp(seconds)
+    seconds = seconds / 30
+    local minutes = math.floor(seconds / 60)
+    local milliseconds = math.floor((seconds - math.floor(seconds)) * 1000)
+    seconds = math.floor(seconds) % 60
+    return string.format("%d:%02d:%03d", minutes, seconds, milliseconds)
 end
