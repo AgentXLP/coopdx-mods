@@ -1,10 +1,8 @@
 -- name: Flood
 -- incompatible: gamemode
--- description: Flood v2.4\nBy \\#ec7731\\Agent X\\#dcdcdc\\\n\nThis mod adds a flood escape gamemode\nto sm64ex-coop, you must escape the flood and reach the top of the level before everything is flooded.\n\nSpecial thanks to Mr.Needlemouse64 and Blocky for their respective easter eggs.
+-- description: Flood v2.4.1\nBy \\#ec7731\\Agent X\\#dcdcdc\\\n\nThis mod adds a flood escape gamemode\nto sm64ex-coop, you must escape the flood and reach the top of the level before everything is flooded.
 
 if unsupported then return end
-
-FLOOD_VERSION = "2.4"
 
 local ROUND_STATE_INACTIVE = 0
 ROUND_STATE_ACTIVE         = 1
@@ -204,6 +202,8 @@ end
 local function update()
     if network_is_server() then server_update() end
 
+    gServerSettings.playerInteractions = PLAYER_INTERACTIONS_NONE
+
     if gGlobalSyncTable.roundState == ROUND_STATE_INACTIVE then
         if gNetworkPlayers[0].currLevelNum ~= LEVEL_LOBBY or gNetworkPlayers[0].currActNum ~= 0 then
             if speedrun_mode() then
@@ -272,6 +272,11 @@ local function mario_update(m)
     -- disable instant warps
     if m.floor ~= nil and (m.floor.type == SURFACE_WARP or (m.floor.type >= SURFACE_PAINTING_WARP_D3 and m.floor.type <= SURFACE_PAINTING_WARP_FC) or (m.floor.type >= SURFACE_INSTANT_WARP_1B and m.floor.type <= SURFACE_INSTANT_WARP_1E)) then
         m.floor.type = SURFACE_DEFAULT
+    end
+
+    -- disable insta kills
+    if m.floor ~= nil and (m.floor.type == SURFACE_INSTANT_QUICKSAND or m.floor.type == SURFACE_INSTANT_MOVING_QUICKSAND) then
+        m.floor.type = SURFACE_BURNING
     end
 
     -- disable damage in lobby
