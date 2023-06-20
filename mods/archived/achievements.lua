@@ -135,7 +135,6 @@ function update()
     -- is mario on cap switch for achievement
     if m.marioObj.platform ~= nil and get_id_from_behavior(m.marioObj.platform.behavior) == id_bhvCapSwitch and m.marioObj.platform.oAction == 1 then
         local capAchievements = { [0] = ACHIEVEMENT_WING_CAP, [1] = ACHIEVEMENT_METAL_CAP, [2] = ACHIEVEMENT_VANISH_CAP }
-        print(capAchievements[m.marioObj.platform.oBehParams2ndByte ])
         achievement_unlock(capAchievements[m.marioObj.platform.oBehParams2ndByte])
     end
 
