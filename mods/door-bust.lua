@@ -1,7 +1,5 @@
 -- name: Door Bust
--- description: Door Bust v1.2\nBy \\#ec7731\\Agent X\\#dcdcdc\\\n\nThis mod adds busting down doors by slide kicking into them, flying doors can deal damage to other players and normal doors will respawn after 10 seconds.
-
-gGlobalSyncTable.excludeLevels = false
+-- description: Door Bust v1.2.1\nBy \\#ec7731\\Agent X\\#dcdcdc\\\n\nThis mod adds busting down doors by slide kicking into them, flying doors can deal damage to other players and normal doors will respawn after 10 seconds.
 
 define_custom_obj_fields({
     oDoorDespawnedTimer = 'u32',
@@ -121,7 +119,7 @@ end
 
 --- @param m MarioState
 local function mario_update(m)
-    if active_player(m) == 0 or (gGlobalSyncTable.excludeLevels and (gNetworkPlayers[0].currLevelNum == LEVEL_BBH or gNetworkPlayers[0].currLevelNum == LEVEL_HMC)) then return end
+    if active_player(m) == 0 then return end
 
     local door = nil
     if m.playerIndex == 0 then
@@ -161,7 +159,6 @@ local function mario_update(m)
             local model = E_MODEL_CASTLE_CASTLE_DOOR
 
             if get_id_from_behavior(targetDoor.behavior) ~= id_bhvStarDoor then
-                -- just make obj_get_model_extended dammit
                 if obj_has_model_extended(targetDoor, E_MODEL_CASTLE_DOOR_1_STAR) ~= 0 then
                     model = E_MODEL_CASTLE_DOOR_1_STAR
                 elseif obj_has_model_extended(targetDoor, E_MODEL_CASTLE_DOOR_3_STARS) ~= 0 then
@@ -255,16 +252,5 @@ local function allow_interact(m, o)
     return true
 end
 
-
-local function on_exclude_levels_command(msg)
-    gGlobalSyncTable.excludeLevels = not gGlobalSyncTable.excludeLevels
-    djui_chat_message_create("Exclude Levels status: " .. on_or_off(gGlobalSyncTable.excludeLevels))
-    return true
-end
-
 hook_event(HOOK_MARIO_UPDATE, mario_update)
 hook_event(HOOK_ALLOW_INTERACT, allow_interact)
-
-if network_is_server() then
-    hook_chat_command("exclude-levels", "to toggle excluding problematic levels in Door Bust or not", on_exclude_levels_command)
-end
