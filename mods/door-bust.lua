@@ -1,5 +1,5 @@
 -- name: Door Bust
--- description: Door Bust v1.2.1\nBy \\#ec7731\\Agent X\\#dcdcdc\\\n\nThis mod adds busting down doors by slide kicking into them, flying doors can deal damage to other players and normal doors will respawn after 10 seconds.
+-- description: Door Bust v1.2.1\nBy \\#ec7731\\Agent X\\#dcdcdc\\\n\nThis mod adds busting down doors by slide kicking or jump kicking into them, flying doors can deal damage to other players and normal doors will respawn after 10 seconds.
 
 define_custom_obj_fields({
     oDoorDespawnedTimer = 'u32',
