@@ -21,11 +21,6 @@ local function approach_number(current, target, inc, dec)
     return current
 end
 
-local function on_or_off(value)
-    if value then return "\\#00ff00\\ON" end
-    return "\\#ff0000\\OFF"
-end
-
 --- @param m MarioState
 local function active_player(m)
     local np = gNetworkPlayers[m.playerIndex]
