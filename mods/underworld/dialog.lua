@@ -88,6 +88,7 @@ gDialogs = {
             "Now if you'll excuse me I have to   just step into the massive laser.",
             "It will bring me to the Overworld.",
             "I'm sure that fling broke your back and rendered you useless.",
+            "Heh.",
             "See you never."
         },
         speed = 1

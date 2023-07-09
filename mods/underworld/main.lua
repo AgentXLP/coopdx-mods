@@ -1,6 +1,6 @@
 -- name: Super Mario 64: The Underworld
 -- incompatible: romhack
--- description: Super Mario 64: The Underworld v1.0\nBy \\#ec7731\\Agent X\\#dcdcdc\\\n\nMario is pulled into another land some call The Underworld...\nHe must make his way through this condemned land and help in both the escape of\nhimself and someone he thinks he can trust\nfrom the Underworld.\nThis is a 30 star romhack with a fully custom cutscene system, dialog system and boss fight entirely in Lua created for the sm64ex-coop level competition.\n\nSpecial thanks to \\#005500\\Squishy\\#dcdcdc\\ for the compass textures
+-- description: Super Mario 64: The Underworld v1.0.1\nBy \\#ec7731\\Agent X\\#dcdcdc\\\n\nMario is pulled into another land some call The Underworld...\nHe must make his way through this condemned land and help in both the escape of\nhimself and someone he thinks he can trust\nfrom the Underworld.\nThis is a 30 star romhack with a fully custom cutscene system, dialog system and boss fight entirely in Lua created for the sm64ex-coop level competition.\n\nSpecial thanks to \\#005500\\Squishy\\#dcdcdc\\ for the compass textures
 
 STREAM_EARTHQUAKE = audio_stream_load("earthquake.mp3")
 STREAM_SRIATS_SSELDNE = audio_stream_load("sriats_sseldne.mp3")
@@ -26,14 +26,15 @@ E_MODEL_NORMAL_STAR = smlua_model_util_get_id("normal_star_geo")
 local E_MODEL_LASER = smlua_model_util_get_id("laser_geo")
 
 PACKET_STAR = 0
+PACKET_LASER = 1
 
 local TITLE = "Super Mario 64: The Underworld"
-local VERSION = "v1.0"
+local VERSION = "v1.0.1"
 STARS = 30
 
 gGlobalSyncTable.castleRisingTimer = 0
 gGlobalSyncTable.stars = if_then_else(network_is_server(), mod_storage_get_total_star_count() or 0, 0)
-gGlobalSyncTable.betrayalCutscene = if_then_else(gGlobalSyncTable.stars >= STARS, 2, 0)
+gGlobalSyncTable.laser = gGlobalSyncTable.stars >= STARS
 gGlobalSyncTable.level = LEVEL_CASTLE_GROUNDS
 
 gIntroEvent = {
@@ -46,6 +47,7 @@ apparition = false
 local starSpawned = false
 local teleportTimer = -1
 local endingTimer = 0
+betrayalCutscene = 0
 
 -- localize functions to improve performance
 local set_mario_animation,allocate_mario_action,stop_background_music,obj_get_first_with_behavior_id,audio_stream_play,audio_stream_set_looping,audio_stream_set_volume,play_character_sound,spawn_non_sync_object,vec3f_set,vec3f_copy,min,clamp,play_sound,minf,adjust_sound_for_speed,maxf,set_camera_shake_from_hit,check_common_airborne_cancels,obj_set_model_extended,warp_to_level,set_lighting_color,hud_hide,mario_set_forward_vel,find_floor_height,set_mario_action,get_network_area_timer,audio_stream_stop,play_music,obj_mark_for_deletion,play_transition,network_is_server,is_transition_playing,level_trigger_warp,fade_volume_scale,djui_hud_set_resolution,djui_hud_set_render_behind_hud,djui_hud_get_screen_width,djui_hud_get_screen_height,djui_hud_set_color,djui_hud_render_rect,djui_hud_set_font,djui_hud_measure_text,djui_hud_print_text,hud_show,hud_render_power_meter,djui_hud_set_rotation,obj_get_nearest_object_with_behavior_id,audio_sample_play,camera_unfreeze,set_override_envfx,network_player_connected_count,spawn_mist_particles,mod_storage_load,mod_storage_save,smlua_text_utils_course_acts_replace = set_mario_animation,allocate_mario_action,stop_background_music,obj_get_first_with_behavior_id,audio_stream_play,audio_stream_set_looping,audio_stream_set_volume,play_character_sound,spawn_non_sync_object,vec3f_set,vec3f_copy,min,clamp,play_sound,minf,adjust_sound_for_speed,maxf,set_camera_shake_from_hit,check_common_airborne_cancels,obj_set_model_extended,warp_to_level,set_lighting_color,hud_hide,mario_set_forward_vel,find_floor_height,set_mario_action,get_network_area_timer,audio_stream_stop,play_music,obj_mark_for_deletion,play_transition,network_is_server,is_transition_playing,level_trigger_warp,fade_volume_scale,djui_hud_set_resolution,djui_hud_set_render_behind_hud,djui_hud_get_screen_width,djui_hud_get_screen_height,djui_hud_set_color,djui_hud_render_rect,djui_hud_set_font,djui_hud_measure_text,djui_hud_print_text,hud_show,hud_render_power_meter,djui_hud_set_rotation,obj_get_nearest_object_with_behavior_id,audio_sample_play,camera_unfreeze,set_override_envfx,network_player_connected_count,spawn_mist_particles,mod_storage_load,mod_storage_save,smlua_text_utils_course_acts_replace
@@ -97,8 +99,12 @@ local function act_cutscene_betrayal(m)
         vec3f_set(m.pos, 0, -3627, -5295)
         vec3f_copy(m.marioObj.header.gfx.pos, m.pos)
         m.peakHeight = m.pos.y
+
+        m.faceAngle.x = 0
         m.faceAngle.y = 0x8000
-        m.marioObj.header.gfx.angle.y = m.faceAngle.y
+        m.faceAngle.z = 0
+
+        vec3f_copy(m.marioObj.header.gfx.angle, m.faceAngle)
     elseif m.actionState == 1 then
         if m.actionTimer == 200 then
             play_character_sound(m, CHAR_SOUND_WAAAOOOW)
@@ -118,7 +124,13 @@ local function act_cutscene_betrayal(m)
         vec3f_set(m.pos, 0, -3627 + m.actionTimer, -5295)
         vec3f_copy(m.marioObj.header.gfx.pos, m.pos)
         m.peakHeight = m.pos.y
+
+        m.faceAngle.x = 0
         m.faceAngle.y = 0x8000
+        m.faceAngle.z = 0
+
+        vec3f_copy(m.marioObj.header.gfx.angle, m.faceAngle)
+
         m.marioObj.header.gfx.angle.y = m.faceAngle.y
         m.actionTimer = min(m.actionTimer + 1, 200)
     elseif m.actionState == 2 then
@@ -305,13 +317,15 @@ local function mario_update(m)
             end
         end
 
-        if gGlobalSyncTable.stars >= STARS and gGlobalSyncTable.betrayalCutscene == 0 then
-            gGlobalSyncTable.betrayalCutscene = 1
+        if gGlobalSyncTable.stars >= STARS and not gGlobalSyncTable.laser then
+            betrayalCutscene = 1
         end
 
         local apparition = get_npc_with_id(1)
-        if gGlobalSyncTable.betrayalCutscene == 1 then
-            gMarioStates[0].freeze = 1
+        if betrayalCutscene == 1 then
+            if gCustomCutsceneBetrayal.fadeTimer <= 100 then
+                gMarioStates[0].freeze = 1
+            end
 
             if gCustomCutsceneBetrayal.fadeTimer == 0 then
                 obj_mark_for_deletion(obj_get_first_with_behavior_id(id_bhvDialogTrigger))
@@ -332,19 +346,19 @@ local function mario_update(m)
                     apparition.oPosZ = -5500
                 end
                 play_transition(WARP_TRANSITION_FADE_FROM_COLOR, 40, 0, 0, 0)
-            elseif gCustomCutsceneBetrayal.fadeTimer >= 50 then
+            elseif gCustomCutsceneBetrayal.fadeTimer == 50 then
                 start_dialog(3, nil, false, true, 0)
                 start_custom_cutscene_betrayal(apparition, true)
                 set_mario_action(m, ACT_CUTSCENE_BETRAYAL, 0)
-                if network_is_server() then
-                    gGlobalSyncTable.betrayalCutscene = 2
-                end
+                gGlobalSyncTable.laser = true
             end
             gCustomCutsceneBetrayal.fadeTimer = gCustomCutsceneBetrayal.fadeTimer + 1
+        else
+            gCustomCutsceneBetrayal.fadeTimer = 0
         end
 
         local spawned = obj_get_first_with_behavior_id(id_bhvStaticObject) ~= nil
-        if gGlobalSyncTable.betrayalCutscene >= 2 then
+        if gGlobalSyncTable.laser then
             if spawned then
                 if m.floor ~= nil and m.floor.type == SURFACE_ICE then
                     if teleportTimer < 0 then
@@ -384,9 +398,14 @@ local function mario_update(m)
         if gNetworkPlayers[0].currAreaIndex == 1 then
             tint_lighting_color()
         else
+            if gDialogState.currentDialog ~= nil then
+                end_dialog()
+                end_custom_cutscene()
+            end
             reset_lighting_color()
             stop_background_music(SEQ_LEVEL_BOSS_KOOPA_FINAL)
-            gGlobalSyncTable.betrayalCutscene = 0
+            gGlobalSyncTable.laser = false
+            betrayalCutscene = 0
 
             if not starSpawned and m.action ~= ACT_JUMBO_STAR_CUTSCENE then
                 starSpawned = true
@@ -703,10 +722,12 @@ end
 
 function on_packet_receive(dataTable)
     if dataTable.id == PACKET_STAR then
-        if mod_storage_load(dataTable.starId .. "_collected") ~= "true" then
-            gGlobalSyncTable.stars = gGlobalSyncTable.stars + 1
+        if network_is_server() then
+            mod_storage_save(dataTable.starId .. "_collected", "true")
+            gGlobalSyncTable.stars = mod_storage_get_total_star_count()
         end
-        mod_storage_save(dataTable.starId .. "_collected", "true")
+
+        obj_mark_for_deletion(obj_get_star_by_id(dataTable.starId))
     end
 end
 

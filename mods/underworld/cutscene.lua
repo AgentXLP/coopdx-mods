@@ -52,7 +52,6 @@ function end_custom_cutscene()
     sCustomCutsceneGeneric.time = 0
     sCustomCutsceneGeneric.shake = false
     sCustomCutsceneApparitionBattle.apparition = nil
-    gCustomCutsceneBetrayal.fadeTimer = 0
     gCustomCutsceneBetrayal.apparition = nil
 
     gCustomCutscene.playing = false

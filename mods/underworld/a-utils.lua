@@ -259,6 +259,17 @@ function warp_to_level_global(aLevel, aArea, aAct)
     warp_to_level(aLevel, aArea, aAct)
 end
 
+function obj_get_star_by_id(id)
+    local star = obj_get_first_with_behavior_id(id_bhvStar)
+    while star ~= nil do
+        if (star.oBehParams >> 24) + 1 == id then
+            return star
+        end
+        star = obj_get_next_with_same_behavior_id(star)
+    end
+    return nil
+end
+
 local courseToLevel = {
     [COURSE_NONE] = LEVEL_NONE,
     [COURSE_BOB] = LEVEL_BOB,

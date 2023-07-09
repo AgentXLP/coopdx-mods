@@ -310,7 +310,7 @@ local function apparition_battle(o, m)
                 o.oAction = 3
             end
 
-            if (o.oInteractStatus & INT_STATUS_INTERACTED) ~= 0 and (m.action & ACT_FLAG_ATTACKING) ~= 0 then
+            if (o.oInteractStatus & INT_STATUS_INTERACTED) ~= 0 and (m.action & ACT_FLAG_ATTACKING) ~= 0 and m.action ~= ACT_GROUND_POUND and m.action ~= ACT_GROUND_POUND_LAND then
                 m.forwardVel = 48
                 o.oHealth = o.oHealth - 50
                 o.oInteractStatus = 0

@@ -19,15 +19,6 @@ end
 
 --- @param o Object
 local function bhv_npc_init(o)
-    if gGlobalSyncTable.stars >= STARS then
-        gGlobalSyncTable.betrayalCutscene = 2
-    end
-
-    if gGlobalSyncTable.betrayalCutscene >= 2 then
-        obj_mark_for_deletion(o)
-        return
-    end
-
     o.oFlags = OBJ_FLAG_UPDATE_GFX_POS_AND_ANGLE
     o.globalPlayerIndex = 0
     o.oNpcTalkingTo = -1
@@ -56,13 +47,18 @@ end
 
 --- @param o Object
 local function bhv_npc_loop(o)
+    if betrayalCutscene >= 2 then
+        obj_mark_for_deletion(o)
+        return
+    end
+
     if o.oAction == 0 then
         smlua_anim_util_set_animation(o, "apparition_idle")
+        o.oGraphYOffset = 65
     elseif o.oAction == 1 then
         smlua_anim_util_set_animation(o, "apparition_raise_arm")
-        o.oGraphYOffset = 65
+        o.oGraphYOffset = 75
     end
-    o.oGraphYOffset = 65
 
     if o.oNpcTalkingTo < 0 then
         if dist_between_objects(o, gMarioStates[0].marioObj) < NPC_INTERACT_RANGE and (gMarioStates[0].input & INPUT_B_PRESSED) ~= 0 then
