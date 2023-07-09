@@ -24,3 +24,5 @@ To download single file mods click on the link and then press the "Raw" button t
 [Day Night Cycle](./mods/day-night-cycle/day-night-cycle.zip)
 
 [Hats](./mods/hats/hats.zip)
+
+[Super Mario 64: The Underworld](./mods/underworld/underworld.zip)
