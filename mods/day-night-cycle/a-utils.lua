@@ -1,22 +1,59 @@
-if VERSION_NUMBER < 32 then
-    djui_popup_create("\\#ffff00\\This sm64ex-coop version is not compatible with Day Night Cycle!\n\nPlease update to the latest version.", 4)
+if VERSION_NUMBER < 35 then
+    local version = VERSION_TEXT .. " " .. VERSION_NUMBER
+    djui_popup_create("\\#ffff00\\sm64ex-coop " .. version .. " is outdated and not supported with Day Night Cycle!\n\nPlease update to the latest version.", 4)
     return
 end
 
 -- localize functions to improve performance
-local math_floor = math.floor
-local table_insert = table.insert
-local djui_hud_set_color = djui_hud_set_color
-local mod_storage_load = mod_storage_load
-local mod_storage_save = mod_storage_save
-local obj_mark_for_deletion = obj_mark_for_deletion
-local get_skybox = get_skybox
-local hud_is_hidden = hud_is_hidden
-local is_game_paused = is_game_paused
+local is_player_active,djui_hud_measure_text,djui_hud_print_text,table_insert,is_game_paused,djui_hud_set_color,get_skybox,math_floor,mod_storage_save,mod_storage_load,obj_mark_for_deletion = is_player_active,djui_hud_measure_text,djui_hud_print_text,table.insert,is_game_paused,djui_hud_set_color,get_skybox,math.floor,mod_storage_save,mod_storage_load,obj_mark_for_deletion
+
+romhack = false
+for mod in pairs(gActiveMods) do
+    if gActiveMods[mod].incompatible == "romhack" then
+        romhack = true
+        break
+    end
+end
 
 function if_then_else(cond, if_true, if_false)
     if cond then return if_true end
     return if_false
+end
+
+function switch(param, case_table)
+    local case = case_table[param]
+    if case then return case() end
+    local def = case_table['default']
+    return def and def() or nil
+end
+
+--- @param m MarioState
+function active_player(m)
+    local np = gNetworkPlayers[m.playerIndex]
+    if m.playerIndex == 0 then
+        return 1
+    end
+    if not np.connected then
+        return 0
+    end
+    if np.currCourseNum ~= gNetworkPlayers[0].currCourseNum then
+        return 0
+    end
+    if np.currActNum ~= gNetworkPlayers[0].currActNum then
+        return 0
+    end
+    if np.currLevelNum ~= gNetworkPlayers[0].currLevelNum then
+        return 0
+    end
+    if np.currAreaIndex ~= gNetworkPlayers[0].currAreaIndex then
+        return 0
+    end
+    return is_player_active(m)
+end
+
+function djui_hud_print_text_centered(message, x, y, scale)
+    local measure = djui_hud_measure_text(message)
+    djui_hud_print_text(message, x - (measure * 0.5) * scale, y, scale)
 end
 
 function approach_number(current, target, inc, dec)
@@ -37,20 +74,32 @@ end
 function split(s)
     local result = {}
     for match in (s):gmatch(string.format("[^%s]+", " ")) do
-        table_insert(result, match)
+        table.insert(result, match)
     end
     return result
 end
 
-function lerp(a,b,t) return a * (1-t) + b * t end
+function lerp(a, b, t) return a * (1 - t) + b * t end
 
 --- @param a Color
 --- @param b Color
+--- @return Color
 function color_lerp(a, b, t)
     return {
         r = lerp(a.r, b.r, t),
         g = lerp(a.g, b.g, t),
-        b = lerp(a.b, b.b, t),
+        b = lerp(a.b, b.b, t)
+    }
+end
+
+--- @param a Vec3f
+--- @param b Vec3f
+--- @return Vec3f
+function vec3f_lerp(a, b, t)
+    return {
+        x = lerp(a.x, b.x, t),
+        y = lerp(a.y, b.y, t),
+        z = lerp(a.z, b.z, t)
     }
 end
 
@@ -73,14 +122,15 @@ function format_number(number)
 end
 
 function show_day_night_cycle()
-    return not gExcludedDayNightLevels[gNetworkPlayers[0].currLevelNum] and get_skybox() ~= -1
+    return (not gExcludedDayNightLevels[gNetworkPlayers[0].currLevelNum] and get_skybox() ~= -1) or (romhack and get_skybox() ~= -1)
 end
 
 function get_day_count()
-    return math_floor(gGlobalSyncTable.time / (MINUTE * 24))
+    return math.floor(gGlobalSyncTable.time / (MINUTE * 24))
 end
 
 function save_time()
+    gGlobalSyncTable.time = math.floor(gGlobalSyncTable.time)
     mod_storage_save("time", tostring(gGlobalSyncTable.time))
     print("Saving time to 'day-night-cycle.sav'")
 end
@@ -94,15 +144,27 @@ function load_time()
     return time
 end
 
-function common_hud_hide_requirements()
-    return gNetworkPlayers[0].currActNum == 99 or hud_is_hidden()
+function get_time_string()
+    local minutes = (gGlobalSyncTable.time / MINUTE) % 24
+    local formattedMinutes = math.floor(minutes)
+    local seconds = math.floor(gGlobalSyncTable.time / SECOND) % 60
+
+    if useAMPM then
+        if formattedMinutes == 0 then
+            formattedMinutes = 12
+        elseif formattedMinutes > 12 then
+            formattedMinutes = formattedMinutes - 12
+        end
+    end
+
+    return math.floor(formattedMinutes) .. ":" .. format_number(seconds) .. if_then_else(useAMPM, if_then_else(minutes < 12, " AM", " PM"), "")
 end
 
 --- @param o Object
 local function delete_at_dark(o)
     local minutes = gGlobalSyncTable.time / MINUTE % 24
 
-    if minutes < 5 or minutes > 7 then
+    if minutes < HOUR_SUNRISE_START or minutes > HOUR_SUNSET_END then
        obj_mark_for_deletion(o)
     end
 end
