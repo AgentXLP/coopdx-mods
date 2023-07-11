@@ -1,6 +1,6 @@
 -- name: Day Night Cycle
 -- incompatible: light
--- description: Day Night Cycle v1.1\nBy \\#ec7731\\Agent X\n\n\\#dcdcdc\\This mod adds a fully featured day night cycle system with night, sunrise, day and sunset to sm64ex-coop. Days last 24 minutes and you can switch to and from 24 hour time with /ampm\nSpecial thanks to \\#00ffff\\AngelicMiracles \\#dcdcdc\\for the sunset, sunrise and night time skyboxes
+-- description: Day Night Cycle v1.1.1\nBy \\#ec7731\\Agent X\n\n\\#dcdcdc\\This mod adds a fully featured day night cycle system with night, sunrise, day and sunset to sm64ex-coop. Days last 24 minutes and you can switch to and from 24 hour time with /ampm\nSpecial thanks to \\#00ffff\\AngelicMiracles \\#dcdcdc\\for the sunset, sunrise and night time skyboxes
 
 _G.DayNightCycle = {}
 
@@ -248,9 +248,7 @@ local function on_time_command(msg)
             save_time()
         end
         return true
-    elseif args[1] == "curse" and network_is_server() and gGlobalSyncTable.fought then
-        mod_storage_save("fought", "false")
-        gGlobalSyncTable.fought = false
+    elseif args[1] == "curse" then
         play_sound(SOUND_MENU_BOWSER_LAUGH, gMarioStates[0].marioObj.header.gfx.cameraToObject)
         return true
     end
