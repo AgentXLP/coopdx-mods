@@ -1,12 +1,13 @@
 -- name: Super Mario 64: The Underworld
 -- incompatible: romhack
--- description: Super Mario 64: The Underworld v1.0.1\nBy \\#ec7731\\Agent X\\#dcdcdc\\\n\nMario is pulled into another land some call The Underworld...\nHe must make his way through this condemned land and help in both the escape of\nhimself and someone he thinks he can trust\nfrom the Underworld.\nThis is a 30 star romhack with a fully custom cutscene system, dialog system and boss fight entirely in Lua created for the sm64ex-coop level competition.\n\nSpecial thanks to \\#005500\\Squishy\\#dcdcdc\\ for the compass textures
+-- description: Super Mario 64: The Underworld v1.1\nBy \\#ec7731\\Agent X\\#dcdcdc\\\n\nMario is pulled into another land some call The Underworld...\nHe must make his way through this condemned land and help in both the escape of\nhimself and someone he thinks he can trust\nfrom the Underworld.\nThis is a 30 star romhack with a fully custom cutscene system, dialog system and boss fight entirely in Lua created for the sm64ex-coop level competition.\n\nSpecial thanks to \\#005500\\Squishy\\#dcdcdc\\ for the compass textures
 
 STREAM_EARTHQUAKE = audio_stream_load("earthquake.mp3")
 STREAM_SRIATS_SSELDNE = audio_stream_load("sriats_sseldne.mp3")
 
-local SOUND_CUSTOM_APPARITION_DIALOG = audio_sample_load("apparition_dialog.mp3")
+SOUND_CUSTOM_APPARITION_DIALOG = audio_sample_load("apparition_dialog.mp3")
 
+TEX_UNDERWORLD_BACKGROUND = get_texture_info("underworld_background")
 local TEX_COMPASS_BACK = get_texture_info("compass_back")
 local TEX_COMPASS_CAMERA_DIAL = get_texture_info("compass_camera_dial")
 local TEX_COMPASS_PLAYER_DIAL = get_texture_info("compass_player_dial")
@@ -22,14 +23,17 @@ E_MODEL_SOUL_FLAME = smlua_model_util_get_id("soul_flame_geo")
 E_MODEL_SOUL_STAR_NOISE = smlua_model_util_get_id("soul_star_noise_geo")
 E_MODEL_NOISE = smlua_model_util_get_id("noise_geo")
 E_MODEL_ORB = smlua_model_util_get_id("orb_geo")
-E_MODEL_NORMAL_STAR = smlua_model_util_get_id("normal_star_geo")
 local E_MODEL_LASER = smlua_model_util_get_id("laser_geo")
 
 PACKET_STAR = 0
 PACKET_LASER = 1
 
-local TITLE = "Super Mario 64: The Underworld"
-local VERSION = "v1.0.1"
+TEXT_SHITILIZER = "TEXT_SHITILIZER"
+TEXT_STAR = "TEXT_STAR"
+local TEXT_TIP = "TEXT_TIP"
+
+TITLE = "Super Mario 64: The Underworld"
+VERSION = "v1.1"
 STARS = 30
 
 gGlobalSyncTable.castleRisingTimer = 0
@@ -42,15 +46,39 @@ gIntroEvent = {
     fallTimer = 0
 }
 
+gLanguages = {
+    ["English"] = true,
+    ["Spanish"] = true,
+    ["French"]  = true
+}
+
+gLocalizedText = {
+    [TEXT_SHITILIZER] = {
+        ["English"] = "The Shitilizer",
+        ["Spanish"] = "El Shitilizer",
+        ["French"]  = "Le Shitilizer"
+    },
+    [TEXT_STAR] = {
+        ["English"] = "star",
+        ["Spanish"] = "estrella",
+        ["French"]  = "étoile"
+    },
+    [TEXT_TIP] = {
+        ["English"] = "Tip: Press B to go through dialog quickly.",
+        ["Spanish"] = "Consejo: Presiona el botón B para avanzar los diálogos más rápido.",
+        ["French"]  = "Appuie sur B pour augmenter la vitesse du dialogue"
+    },
+}
+
 flashAlpha = 0
 apparition = false
+betrayalCutscene = 0
 local starSpawned = false
 local teleportTimer = -1
 local endingTimer = 0
-betrayalCutscene = 0
 
 -- localize functions to improve performance
-local set_mario_animation,allocate_mario_action,stop_background_music,obj_get_first_with_behavior_id,audio_stream_play,audio_stream_set_looping,audio_stream_set_volume,play_character_sound,spawn_non_sync_object,vec3f_set,vec3f_copy,min,clamp,play_sound,minf,adjust_sound_for_speed,maxf,set_camera_shake_from_hit,check_common_airborne_cancels,obj_set_model_extended,warp_to_level,set_lighting_color,hud_hide,mario_set_forward_vel,find_floor_height,set_mario_action,get_network_area_timer,audio_stream_stop,play_music,obj_mark_for_deletion,play_transition,network_is_server,is_transition_playing,level_trigger_warp,fade_volume_scale,djui_hud_set_resolution,djui_hud_set_render_behind_hud,djui_hud_get_screen_width,djui_hud_get_screen_height,djui_hud_set_color,djui_hud_render_rect,djui_hud_set_font,djui_hud_measure_text,djui_hud_print_text,hud_show,hud_render_power_meter,djui_hud_set_rotation,obj_get_nearest_object_with_behavior_id,audio_sample_play,camera_unfreeze,set_override_envfx,network_player_connected_count,spawn_mist_particles,mod_storage_load,mod_storage_save,smlua_text_utils_course_acts_replace = set_mario_animation,allocate_mario_action,stop_background_music,obj_get_first_with_behavior_id,audio_stream_play,audio_stream_set_looping,audio_stream_set_volume,play_character_sound,spawn_non_sync_object,vec3f_set,vec3f_copy,min,clamp,play_sound,minf,adjust_sound_for_speed,maxf,set_camera_shake_from_hit,check_common_airborne_cancels,obj_set_model_extended,warp_to_level,set_lighting_color,hud_hide,mario_set_forward_vel,find_floor_height,set_mario_action,get_network_area_timer,audio_stream_stop,play_music,obj_mark_for_deletion,play_transition,network_is_server,is_transition_playing,level_trigger_warp,fade_volume_scale,djui_hud_set_resolution,djui_hud_set_render_behind_hud,djui_hud_get_screen_width,djui_hud_get_screen_height,djui_hud_set_color,djui_hud_render_rect,djui_hud_set_font,djui_hud_measure_text,djui_hud_print_text,hud_show,hud_render_power_meter,djui_hud_set_rotation,obj_get_nearest_object_with_behavior_id,audio_sample_play,camera_unfreeze,set_override_envfx,network_player_connected_count,spawn_mist_particles,mod_storage_load,mod_storage_save,smlua_text_utils_course_acts_replace
+local set_mario_animation,allocate_mario_action,stop_background_music,obj_get_first_with_behavior_id,audio_stream_play,audio_stream_set_looping,audio_stream_set_volume,play_character_sound,spawn_non_sync_object,vec3f_set,vec3f_copy,min,clamp,play_sound,minf,adjust_sound_for_speed,maxf,set_camera_shake_from_hit,check_common_airborne_cancels,obj_set_model_extended,warp_to_level,set_lighting_color,hud_hide,mario_set_forward_vel,find_floor_height,set_mario_action,play_transition,get_network_area_timer,audio_stream_stop,play_music,obj_mark_for_deletion,is_transition_playing,level_trigger_warp,fade_volume_scale,djui_hud_set_resolution,djui_hud_set_render_behind_hud,djui_hud_get_screen_width,djui_hud_get_screen_height,djui_hud_set_color,djui_hud_render_rect,djui_hud_set_font,sound_banks_disable,sound_banks_enable,djui_hud_measure_text,djui_hud_print_text,hud_show,hud_render_power_meter,djui_hud_set_rotation,obj_get_nearest_object_with_behavior_id,save_file_set_using_backup_slot,camera_unfreeze,set_override_envfx,network_player_connected_count,spawn_mist_particles,network_is_server,mod_storage_save,smlua_text_utils_course_acts_replace = set_mario_animation,allocate_mario_action,stop_background_music,obj_get_first_with_behavior_id,audio_stream_play,audio_stream_set_looping,audio_stream_set_volume,play_character_sound,spawn_non_sync_object,vec3f_set,vec3f_copy,min,clamp,play_sound,minf,adjust_sound_for_speed,maxf,set_camera_shake_from_hit,check_common_airborne_cancels,obj_set_model_extended,warp_to_level,set_lighting_color,hud_hide,mario_set_forward_vel,find_floor_height,set_mario_action,play_transition,get_network_area_timer,audio_stream_stop,play_music,obj_mark_for_deletion,is_transition_playing,level_trigger_warp,fade_volume_scale,djui_hud_set_resolution,djui_hud_set_render_behind_hud,djui_hud_get_screen_width,djui_hud_get_screen_height,djui_hud_set_color,djui_hud_render_rect,djui_hud_set_font,sound_banks_disable,sound_banks_enable,djui_hud_measure_text,djui_hud_print_text,hud_show,hud_render_power_meter,djui_hud_set_rotation,obj_get_nearest_object_with_behavior_id,save_file_set_using_backup_slot,camera_unfreeze,set_override_envfx,network_player_connected_count,spawn_mist_particles,network_is_server,mod_storage_save,smlua_text_utils_course_acts_replace
 
 --- @param m MarioState
 local function act_cutscene(m)
@@ -58,6 +86,10 @@ local function act_cutscene(m)
     m.marioBodyState.headAngle.x = approach_number(m.marioBodyState.headAngle.x, -3840, 384, 384)
     m.pos.y = m.floorHeight
     m.marioObj.header.gfx.pos.y = m.pos.y
+    m.faceAngle.x = 0
+    m.faceAngle.z = 0
+    m.marioObj.header.gfx.angle.x = 0
+    m.marioObj.header.gfx.angle.z = 0
 end
 
 ACT_CUTSCENE = allocate_mario_action(ACT_GROUP_CUTSCENE | ACT_FLAG_STATIONARY | ACT_FLAG_INTANGIBLE | ACT_FLAG_INVULNERABLE | ACT_FLAG_WATER_OR_TEXT)
@@ -69,7 +101,7 @@ local function act_cutscene_betrayal(m)
     if m.actionState == 0 then
         if gDialogState.currentLine == 1 then
             stop_background_music(SEQ_LEVEL_UNDERGROUND)
-        elseif gDialogState.currentLine == 6 then
+        elseif gDialogState.currentLine == (gDialogState.currentDialog["specialLine" .. get_language()] or 6) then
             if obj_get_first_with_behavior_id(id_bhvOrb) ~= nil then
                 m.actionState = 1
                 return
@@ -293,13 +325,21 @@ local function mario_update(m)
             end
         elseif gGlobalSyncTable.castleRisingTimer >= 300 and m.action ~= ACT_GETTING_SUCKED_IN then
             end_custom_cutscene()
-            local x = 300 * gNetworkPlayers[0].globalIndex
+
+            local placement = gNetworkPlayers[0].globalIndex % 2
+            if placement == 0 then
+                placement = -1
+            end
+
+            local x = 150 * gNetworkPlayers[0].globalIndex * placement
             vec3f_set(m.pos, x, find_floor_height(x, 810, 0), 0)
             set_mario_action(m, ACT_GETTING_SUCKED_IN, 0)
         end
 
         if m.pos.y < -6000 then
-            if gIntroEvent.fallTimer >= 15 then
+            if gIntroEvent.fallTimer == 0 then
+                play_transition(WARP_TRANSITION_FADE_INTO_STAR, 0x10, 0x00, 0x00, 0x00)
+            elseif gIntroEvent.fallTimer >= 0x10 then
                 warp_to_level_global(LEVEL_BOB, 1, 0)
             end
             gIntroEvent.fallTimer = gIntroEvent.fallTimer + 1
@@ -456,10 +496,13 @@ end
 
 local function on_hud_render()
     djui_hud_set_resolution(RESOLUTION_DJUI)
-    djui_hud_set_render_behind_hud(false)
+    djui_hud_set_render_behind_hud(true)
 
     local width = djui_hud_get_screen_width()
     local height = djui_hud_get_screen_height()
+
+    --- @type MarioState
+    local m = gMarioStates[0]
 
     -- tint
     local risingCastle = obj_get_first_with_behavior_id(id_bhvRisingCastle)
@@ -474,7 +517,9 @@ local function on_hud_render()
     djui_hud_render_rect(0, 0, width, height)
 
     -- title
-    if gIntroEvent.titleTimer <= 180 and gNetworkPlayers[0].currLevelNum == LEVEL_CASTLE_GROUNDS then
+    if gIntroEvent.titleTimer <= 270 and gNetworkPlayers[0].currLevelNum == LEVEL_CASTLE_GROUNDS then
+        djui_hud_set_render_behind_hud(false)
+
         gMarioStates[0].freeze = 1
         gMarioStates[0].health = 0x880
         vec3f_copy(gMarioStates[0].pos, gMarioStates[0].spawnInfo.startPos)
@@ -482,18 +527,27 @@ local function on_hud_render()
         djui_hud_set_font(FONT_TINY)
 
         local alpha = 0
-        if gIntroEvent.titleTimer < 120 then
-            alpha = minf(gIntroEvent.titleTimer / 60, 1) * 255
+        if gIntroEvent.titleTimer < 180 then
+            alpha = minf(gIntroEvent.titleTimer / 90, 1) * 255
+            sound_banks_disable(SEQ_PLAYER_SFX, SOUND_BANKS_ALL)
         else
-            alpha = maxf(1 - ((gIntroEvent.titleTimer - 120) / 60), 0) * 255
+            alpha = maxf(1 - ((gIntroEvent.titleTimer - 180) / 90), 0) * 255
+            sound_banks_enable(SEQ_PLAYER_SFX, SOUND_BANKS_ALL)
         end
 
+        width = djui_hud_get_screen_width()
+        height = djui_hud_get_screen_height()
         djui_hud_set_color(0, 0, 0, if_then_else(gIntroEvent.titleTimer < 120, 255, alpha))
-        djui_hud_render_rect(0, 0, djui_hud_get_screen_width(), djui_hud_get_screen_height())
+        djui_hud_render_rect(0, 0, width, height)
+        djui_hud_set_color(255, 255, 255, if_then_else(gIntroEvent.titleTimer < 120, 255, alpha))
+        local scale = height / 512
+        djui_hud_render_texture(TEX_UNDERWORLD_BACKGROUND, (width * 0.5) - 512 * scale, 0, scale, scale)
 
         djui_hud_set_resolution(RESOLUTION_N64)
 
-        local scale = 1.5
+        scale = 1.5
+        width = djui_hud_get_screen_width()
+        height = djui_hud_get_screen_height()
         local x = djui_hud_get_screen_width() * 0.5 - djui_hud_measure_text(TITLE) * 0.5 * scale
         local y = djui_hud_get_screen_height() * 0.5
 
@@ -501,20 +555,24 @@ local function on_hud_render()
         djui_hud_print_text(TITLE, x, y - 16 * scale, scale)
         djui_hud_render_rect(x, y, djui_hud_measure_text(TITLE) * scale, 2)
 
-        djui_hud_set_color(50, 50, 50, alpha)
+        djui_hud_set_color(255, 255, 255, alpha)
+        djui_hud_print_text_centered(XLANG(TEXT_TIP), width * 0.5, (height * 0.5) + 10, 0.75)
+
+        djui_hud_set_color(127, 127, 127, alpha)
         djui_hud_print_text(VERSION, 2, djui_hud_get_screen_height() - 8, 0.5)
 
         gIntroEvent.titleTimer = gIntroEvent.titleTimer + 1
     end
 
-    hud_show()
+    if gNetworkPlayers[0].currLevelNum == LEVEL_CASTLE_GROUNDS and not gCustomCutscene.playing and m.action ~= ACT_GETTING_SUCKED_IN then
+        hud_show()
+    end
 
     if gNetworkPlayers[0].currLevelNum ~= LEVEL_BOB and gNetworkPlayers[0].currLevelNum ~= LEVEL_CASTLE_COURTYARD then return end
 
     hud_hide()
 
     djui_hud_set_resolution(RESOLUTION_N64)
-    djui_hud_set_render_behind_hud(true)
     djui_hud_set_font(FONT_TINY)
 
     width = djui_hud_get_screen_width()
@@ -524,14 +582,14 @@ local function on_hud_render()
 
     if gNetworkPlayers[0].currLevelNum == LEVEL_BOB and not gCustomCutscene.playing then
         djui_hud_set_color(255, 255, 255, 255)
-        hud_render_power_meter(gMarioStates[0].health, width - 64, 0, 64, 64)
+        hud_render_power_meter(m.health, width - 64, 0, 64, 64)
 
         djui_hud_render_texture(TEX_COMPASS_BACK, x, y, 1, 1)
 
         djui_hud_set_rotation(gLakituState.yaw, 0.5, 0.5)
         djui_hud_render_texture(TEX_COMPASS_CAMERA_DIAL, x, y, 1, 1)
 
-        djui_hud_set_rotation(gMarioStates[0].faceAngle.y, 0.5, 0.5)
+        djui_hud_set_rotation(m.faceAngle.y, 0.5, 0.5)
         djui_hud_render_texture(TEX_COMPASS_PLAYER_DIAL, x, y, 1, 1)
 
         djui_hud_set_rotation(0, 0, 0)
@@ -540,102 +598,18 @@ local function on_hud_render()
         djui_hud_print_text("x", 21, 5, 1)
         djui_hud_print_text(tostring(gGlobalSyncTable.stars), 37, 5, 1)
 
-        local star = obj_get_nearest_object_with_behavior_id(gMarioStates[0].marioObj, id_bhvStar)
+        local star = obj_get_nearest_object_with_behavior_id(m.marioObj, id_bhvStar)
         if gGlobalSyncTable.stars < STARS and star ~= nil then
-            render_hud_radar(gMarioStates[0], star, TEX_UNDERWORLD_STAR, 1, 1, 24, height - 32)
+            render_hud_radar(m, star, TEX_UNDERWORLD_STAR, 1, 1, 24, height - 32)
         end
     end
 
-    if gDialogState.currentDialog ~= nil then
-        if gDialogState.npc ~= nil and gDialogState.cutscene and not gCustomCutscene.playing then
-            start_custom_cutscene_generic(
-                gDialogState.npc.oPosX + sins(gDialogState.npc.header.gfx.angle.y) * gDialogState.cutsceneDistToCamera,
-                gDialogState.npc.oPosY + 200,
-                gDialogState.npc.oPosZ + coss(gDialogState.npc.header.gfx.angle.y) * gDialogState.cutsceneDistToCamera,
-                gDialogState.npc.oPosX,
-                gDialogState.npc.oPosY + 100,
-                gDialogState.npc.oPosZ,
-                25,
-                false,
-                gDialogState.overrideCurrent
-            )
-        end
-        gDialogState.dialogTimer = gDialogState.dialogTimer + 1
-
-        local alphaNormalized = minf(gDialogState.dialogTimer / 15, 1)
-        djui_hud_set_color(0, 0, 0, alphaNormalized * 127)
-        djui_hud_render_rect(6, height - 55, 200, 50)
-
-        local pos = { x = gLakituState.pos.x + sins(gLakituState.yaw), y = gLakituState.pos.y, z = gLakituState.pos.z + coss(gLakituState.yaw) }
-        local starsLeft = STARS - gGlobalSyncTable.stars
-
-        if gDialogState.skip then
-            gDialogState.currentLineContents = gDialogState.currentDialog.lines[gDialogState.currentLine]
-                :gsub("$CHARNAME", gMarioStates[0].character.name)
-                :gsub("$STARS", starsLeft .. " star" .. if_then_else(starsLeft == 1, ".", "s."))
-            gDialogState.canProceed = true
-        else
-            if gDialogState.dialogTimer % gDialogState.currentDialog.speed == 0 then
-                if gDialogState.currentChar <= #gDialogState.currentDialog.lines[gDialogState.currentLine] then
-                    local char = gDialogState.currentDialog.lines[gDialogState.currentLine]
-                        :gsub("$CHARNAME", gMarioStates[0].character.name)
-                        :gsub("$STARS", starsLeft .. " star" .. if_then_else(starsLeft == 1, ".", "s."))
-                        :sub(gDialogState.currentChar, gDialogState.currentChar)
-                    gDialogState.currentLineContents = gDialogState.currentLineContents .. char
-                    gDialogState.currentChar = gDialogState.currentChar + 1
-
-                    if char ~= " " then
-                        audio_sample_play(SOUND_CUSTOM_APPARITION_DIALOG, pos, 0.8)
-                    end
-                else
-                    gDialogState.canProceed = true
-                end
-            end
-        end
-
-        local splitLines = split_string(gDialogState.currentLineContents, 36)
-        if splitLines ~= nil and splitLines[1] ~= nil then
-            djui_hud_set_color(255, 255, 255, alphaNormalized * 255)
-
-            if gDialogState.currentDialog.id == 3 and gDialogState.currentLine >= 6 then
-                djui_hud_print_text("The Shitilizer", 10, height - 70, 1)
-            else
-                djui_hud_print_text(gDialogState.currentDialog.name, 10, height - 70, 1)
-            end
-
-            if splitLines[2] == nil then
-                djui_hud_print_text(gDialogState.currentLineContents, 10, height - 37, 1)
-            else
-                djui_hud_print_text(splitLines[1], 10, height - 47, 1)
-                djui_hud_print_text(splitLines[2], 10, height - 33, 1)
-            end
-        end
-
-        if gDialogState.canProceed then
-            djui_hud_set_color(255, 255, 255, (math.sin(gDialogState.dialogTimer * 0.3) * 127.5) + 127.5)
-            djui_hud_print_text("[A]", 185, height - 23, 1)
-
-            if (gMarioStates[0].controller.buttonPressed & (A_BUTTON | B_BUTTON)) ~= 0 then
-                play_sound(SOUND_MENU_MESSAGE_NEXT_PAGE, gMarioStates[0].marioObj.header.gfx.cameraToObject)
-                if (gMarioStates[0].controller.buttonPressed & B_BUTTON) ~= 0 then
-                    audio_sample_play(SOUND_CUSTOM_APPARITION_DIALOG, pos, 0.8)
-                    gDialogState.skip = true
-                else
-                    gDialogState.skip = false
-                end
-
-                gDialogState.currentLine = gDialogState.currentLine + 1
-                if gDialogState.currentLine > #gDialogState.currentDialog.lines then
-                    end_dialog()
-                else
-                    reset_dialog_line()
-                end
-            end
-        end
-    end
+    hud_render_dialog()
 end
 
 local function on_level_init()
+    save_file_set_using_backup_slot(true)
+
     gGlobalSyncTable.castleRisingTimer = 0
     musicChanged = false
     lastNpcId = 0
@@ -704,6 +678,10 @@ local function allow_interact(m, o)
             spawn_mist_particles()
             play_sound(SOUND_MENU_STAR_SOUND, m.marioObj.header.gfx.cameraToObject)
 
+            if gServerSettings.stayInLevelAfterStar < 2 then
+                set_mario_action(m, ACT_STAR_DANCE_NO_EXIT, 1)
+            end
+
             local starId = (o.oBehParams >> 24) + 1
             if network_is_server() then
                 on_packet_receive({ id = PACKET_STAR, starId = starId })
@@ -711,6 +689,7 @@ local function allow_interact(m, o)
                 network_send(true, { id = PACKET_STAR, starId = starId })
             end
 
+            o.oInteractStatus = INT_STATUS_INTERACTED
             obj_mark_for_deletion(o)
 
             return false
@@ -727,7 +706,11 @@ function on_packet_receive(dataTable)
             gGlobalSyncTable.stars = mod_storage_get_total_star_count()
         end
 
-        obj_mark_for_deletion(obj_get_star_by_id(dataTable.starId))
+        local star = obj_get_star_by_id(dataTable.starId)
+        if star ~= nil then
+            star.oInteractStatus = INT_STATUS_INTERACTED
+            obj_mark_for_deletion(star)
+        end
     end
 end
 
@@ -737,6 +720,8 @@ gLevelValues.floorLowerLimitShadow = -20000 + 1000.0
 gLevelValues.fixCollisionBugs = 1
 
 if _G.DayNightCycle ~= nil then _G.DayNightCycle.enabled = false end
+
+smlua_audio_utils_replace_sequence(SEQ_LEVEL_BOSS_KOOPA_FINAL, 0x2A, 100, "shitilizer")
 
 smlua_text_utils_course_acts_replace(COURSE_BOB, "   The Underworld", "The Land of the Condemned", "The Land of the Condemned", "The Land of the Condemned", "The Land of the Condemned", "The Land of the Condemned", "The Land of the Condemned")
 

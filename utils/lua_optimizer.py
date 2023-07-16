@@ -1555,6 +1555,7 @@ def process_file(path):
 
 def main():
     if len(sys.argv) > 1 and sys.argv[1] == "--help":
+        print('python lua_optimizer.py "path/to/mod_file_or_folder"')
         return
 
     # path = get_parameter(1, "Enter path to sm64ex-coop Lua function autogen: ")

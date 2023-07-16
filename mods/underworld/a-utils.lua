@@ -1,5 +1,5 @@
 -- localize functions to improve performance
-local is_player_active,get_behavior_from_id,get_object_list_from_behavior,obj_get_first,get_id_from_behavior,obj_get_next,obj_copy_angle,is_game_paused,djui_hud_set_color,obj_get_first_with_behavior_id,obj_mark_for_deletion,obj_get_next_with_same_behavior_id,table_insert,djui_hud_measure_text,djui_hud_print_text,set_lighting_color,math_floor,mod_storage_load,djui_hud_set_rotation,vec3f_dist,djui_hud_set_font,cur_obj_become_tangible,warp_to_level = is_player_active,get_behavior_from_id,get_object_list_from_behavior,obj_get_first,get_id_from_behavior,obj_get_next,obj_copy_angle,is_game_paused,djui_hud_set_color,obj_get_first_with_behavior_id,obj_mark_for_deletion,obj_get_next_with_same_behavior_id,table.insert,djui_hud_measure_text,djui_hud_print_text,set_lighting_color,math.floor,mod_storage_load,djui_hud_set_rotation,vec3f_dist,djui_hud_set_font,cur_obj_become_tangible,warp_to_level
+local is_player_active,get_behavior_from_id,get_object_list_from_behavior,obj_get_first,get_id_from_behavior,obj_get_next,obj_copy_angle,is_game_paused,djui_hud_set_color,obj_get_first_with_behavior_id,obj_mark_for_deletion,obj_get_next_with_same_behavior_id,table_insert,djui_hud_measure_text,djui_hud_print_text,set_lighting_color,math_floor,mod_storage_load,djui_hud_set_rotation,vec3f_dist,djui_hud_set_font,cur_obj_become_tangible,warp_to_level,smlua_text_utils_get_language = is_player_active,get_behavior_from_id,get_object_list_from_behavior,obj_get_first,get_id_from_behavior,obj_get_next,obj_copy_angle,is_game_paused,djui_hud_set_color,obj_get_first_with_behavior_id,obj_mark_for_deletion,obj_get_next_with_same_behavior_id,table.insert,djui_hud_measure_text,djui_hud_print_text,set_lighting_color,math.floor,mod_storage_load,djui_hud_set_rotation,vec3f_dist,djui_hud_set_font,cur_obj_become_tangible,warp_to_level,smlua_text_utils_get_language
 
 function if_then_else(cond, if_true, if_false)
     if cond then return if_true end
@@ -268,6 +268,29 @@ function obj_get_star_by_id(id)
         star = obj_get_next_with_same_behavior_id(star)
     end
     return nil
+end
+
+function get_factor(number)
+    local factors = 0
+    local factor = 0
+    while factor < 1 do
+        factor = factor + number
+        factors = factors + 1
+    end
+    return factors
+end
+
+function get_language()
+    local language = smlua_text_utils_get_language()
+    if not gLanguages[language] then return "English" end
+
+    return language
+end
+
+function XLANG(text)
+    if gLocalizedText[text] == nil or gLocalizedText[text][get_language()] == nil then return text end
+
+    return gLocalizedText[text][get_language()]
 end
 
 local courseToLevel = {

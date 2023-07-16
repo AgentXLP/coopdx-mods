@@ -468,8 +468,15 @@ end
 
 --- @param m MarioState
 local function on_set_mario_action(m)
-    if gNetworkPlayers[0].currLevelNum == LEVEL_CASTLE_COURTYARD and (m.prevAction == ACT_PUSHING_DOOR or m.prevAction == ACT_PULLING_DOOR) and obj_get_first_with_behavior_id(id_bhvApparition) == nil then
-        if m.playerIndex == 0 then
+    if m.playerIndex == 0 and gNetworkPlayers[0].currLevelNum == LEVEL_CASTLE_COURTYARD and obj_get_first_with_behavior_id(id_bhvApparition) == nil then
+        local spawn = true
+        for i = 1, (MAX_PLAYERS - 1) do
+            if gMarioStates[i].prevAction == ACT_PUSHING_DOOR then
+                spawn = false
+            end
+        end
+
+        if spawn and m.prevAction == ACT_PUSHING_DOOR then
             spawn_sync_object(
                 id_bhvApparition,
                 E_MODEL_APPARITION,

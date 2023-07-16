@@ -1,5 +1,5 @@
 -- localize functions to improve performance - objects.lua
-local obj_scale,set_override_far,obj_get_first_with_behavior_id,obj_get_next_with_same_behavior_id,nearest_player_to_object,get_network_player_smallest_global,spawn_non_sync_object,obj_set_model_extended,audio_stream_play,audio_stream_set_looping,play_sound,set_override_envfx,obj_set_billboard,cur_obj_hide,obj_mark_for_deletion,dist_between_objects,cur_obj_unhide,maxf,cur_obj_update_floor_height,mod_storage_load,cur_obj_scale,nearest_mario_state_to_object,sqrf,obj_turn_toward_object,approach_s16_symmetric,cur_obj_move_standard,obj_check_hitbox_overlap,play_character_sound = obj_scale,set_override_far,obj_get_first_with_behavior_id,obj_get_next_with_same_behavior_id,nearest_player_to_object,get_network_player_smallest_global,spawn_non_sync_object,obj_set_model_extended,audio_stream_play,audio_stream_set_looping,play_sound,set_override_envfx,obj_set_billboard,cur_obj_hide,obj_mark_for_deletion,dist_between_objects,cur_obj_unhide,maxf,cur_obj_update_floor_height,mod_storage_load,cur_obj_scale,nearest_mario_state_to_object,sqrf,obj_turn_toward_object,approach_s16_symmetric,cur_obj_move_standard,obj_check_hitbox_overlap,play_character_sound
+local obj_scale,set_override_far,obj_get_first_with_behavior_id,obj_get_next_with_same_behavior_id,nearest_player_to_object,get_network_player_smallest_global,spawn_non_sync_object,obj_set_model_extended,audio_stream_play,audio_stream_set_looping,play_sound,set_override_envfx,obj_set_billboard,cur_obj_hide,obj_mark_for_deletion,dist_between_objects,cur_obj_unhide,maxf,cur_obj_update_floor_height,mod_storage_load,network_is_server,cur_obj_scale,nearest_mario_state_to_object,sqrf,obj_turn_toward_object,approach_s16_symmetric,cur_obj_move_standard,obj_check_hitbox_overlap,play_character_sound = obj_scale,set_override_far,obj_get_first_with_behavior_id,obj_get_next_with_same_behavior_id,nearest_player_to_object,get_network_player_smallest_global,spawn_non_sync_object,obj_set_model_extended,audio_stream_play,audio_stream_set_looping,play_sound,set_override_envfx,obj_set_billboard,cur_obj_hide,obj_mark_for_deletion,dist_between_objects,cur_obj_unhide,maxf,cur_obj_update_floor_height,mod_storage_load,network_is_server,cur_obj_scale,nearest_mario_state_to_object,sqrf,obj_turn_toward_object,approach_s16_symmetric,cur_obj_move_standard,obj_check_hitbox_overlap,play_character_sound
 
 --- @param o Object
 local function bhv_sky_init(o)
@@ -30,7 +30,7 @@ local function bhv_sky_loop(o)
     end
 
     o.oPosY = o.oHomeY + math.sin(o.oTimer * 0.1) * 1000
-    o.oFaceAngleYaw = o.oFaceAngleYaw + 0x100
+    o.oFaceAngleYaw = o.oFaceAngleYaw + 0x7F
 end
 
 id_bhvSky = hook_behavior(nil, OBJ_LIST_DEFAULT, true, bhv_sky_init, bhv_sky_loop)
@@ -192,14 +192,6 @@ id_bhvBigStar = hook_behavior(nil, OBJ_LIST_LEVEL, true, bhv_big_star_init, bhv_
 
 
 --- @param o Object
-local function id_bhv_grand_star_loop(o)
-    obj_set_model_extended(o, E_MODEL_NORMAL_STAR)
-end
-
-id_bhvGrandStar = hook_behavior(id_bhvGrandStar, OBJ_LIST_LEVEL, false, nil, id_bhv_grand_star_loop)
-
-
---- @param o Object
 local function bhv_flame_init(o)
     o.oFlags = OBJ_FLAG_UPDATE_GFX_POS_AND_ANGLE
     obj_scale(o, 3)
@@ -250,7 +242,7 @@ local function bhv_noise_attack_loop(o)
     o.oFaceAngleYaw = obj_turn_toward_object(o, m.marioObj, 16, 0x2000)
     o.oMoveAnglePitch = approach_s16_symmetric(o.oMoveAnglePitch, angle, 0x1000)
     o.oVelY = sins(o.oMoveAnglePitch) * 30
-    o.oForwardVel = coss(o.oMoveAnglePitch) * 40
+    o.oForwardVel = coss(o.oMoveAnglePitch) * 35
 
     cur_obj_move_standard(-78)
 

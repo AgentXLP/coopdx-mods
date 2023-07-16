@@ -10,7 +10,7 @@ NPC_INTERACT_RANGE = 400
 lastNpcId = 0
 
 -- localize functions to improve performance
-local obj_mark_for_deletion,max,find_floor_height,spawn_non_sync_object,smlua_anim_util_set_animation,dist_between_objects,network_local_index_from_global,set_mario_action,obj_get_first_with_behavior_id,obj_get_next_with_same_behavior_id = obj_mark_for_deletion,max,find_floor_height,spawn_non_sync_object,smlua_anim_util_set_animation,dist_between_objects,network_local_index_from_global,set_mario_action,obj_get_first_with_behavior_id,obj_get_next_with_same_behavior_id
+local max,obj_mark_for_deletion,find_floor_height,spawn_non_sync_object,smlua_anim_util_set_animation,dist_between_objects,network_local_index_from_global,set_mario_action,obj_get_first_with_behavior_id,obj_get_next_with_same_behavior_id = max,obj_mark_for_deletion,find_floor_height,spawn_non_sync_object,smlua_anim_util_set_animation,dist_between_objects,network_local_index_from_global,set_mario_action,obj_get_first_with_behavior_id,obj_get_next_with_same_behavior_id
 
 local function increment_npc_id()
     lastNpcId = lastNpcId + 1
@@ -24,8 +24,13 @@ local function bhv_npc_init(o)
     o.oNpcTalkingTo = -1
     o.oNpcId = increment_npc_id()
     local targetDialogId = max(o.oBehParams >> 24, 1)
-    if targetDialogId == 1 and gGlobalSyncTable.stars > 0 then
-        o.oBehParams = 0x02000000
+    if targetDialogId == 1 then
+        if gGlobalSyncTable.stars >= STARS then
+            obj_mark_for_deletion(o)
+            return
+        elseif gGlobalSyncTable.stars > 0 then
+            o.oBehParams = 0x02000000
+        end
     end
 
     o.oPosY = find_floor_height(o.oPosX, o.oPosY + 200, o.oPosZ)
@@ -61,7 +66,7 @@ local function bhv_npc_loop(o)
     end
 
     if o.oNpcTalkingTo < 0 then
-        if dist_between_objects(o, gMarioStates[0].marioObj) < NPC_INTERACT_RANGE and (gMarioStates[0].input & INPUT_B_PRESSED) ~= 0 then
+        if dist_between_objects(o, gMarioStates[0].marioObj) < NPC_INTERACT_RANGE and (gMarioStates[0].input & INPUT_B_PRESSED) ~= 0 and (gMarioStates[0].action == ACT_PUNCHING or gMarioStates[0].action == ACT_MOVE_PUNCHING) then
             o.oNpcTalkingTo = gNetworkPlayers[0].globalIndex
             o.oDialogId = max(o.oBehParams >> 24, 1)
         end
