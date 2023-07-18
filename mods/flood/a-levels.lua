@@ -29,6 +29,9 @@ game = GAME_VANILLA
 gLevels = {}
 gMapRotation = {}
 
+-- localize functions to improve performance
+local table_insert,djui_popup_create = table.insert,djui_popup_create
+
 local function flood_define_level(bonus, level, name, goalPos, speed, area, type, customStartPos)
     gLevels[level] = { name = name, goalPos = goalPos, speed = speed, area = area, type = type, time = 0, customStartPos = customStartPos }
     table.insert(gMapRotation, level)
@@ -81,19 +84,10 @@ local function flood_load_star_road_levels()
     flood_define_level(true,  LEVEL_CASTLE_GROUNDS, "castle_grounds", { x = -8455, y = 2746,  z =  2876, a =  0x8000 }, 15.0, 1,   FLOOD_WATER, { x = -1644, y = -614, z = -1524, a = -0x4000 })
 end
 
--- make sure to update this whenever you add a new rom hack
---- @param mod Mod
-function is_supported_romhack(mod)
-    if mod.name:find("Star Road") then
-        return true
-    end
-    return false
-end
-
 -- load romhack levels
 for mod in pairs(gActiveMods) do
     if gActiveMods[mod].incompatible ~= nil and gActiveMods[mod].incompatible:find("romhack") then
-        if gActiveMods[mod].name:find("Star Road") then
+        if gActiveMods[mod].relativePath:find("star-road") then
             flood_load_star_road_levels()
         else
             unsupported = true

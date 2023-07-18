@@ -1,6 +1,6 @@
 -- name: Flood
 -- incompatible: gamemode
--- description: Flood v2.4.1\nBy \\#ec7731\\Agent X\\#dcdcdc\\\n\nThis mod adds a flood escape gamemode\nto sm64ex-coop, you must escape the flood and reach the top of the level before everything is flooded.
+-- description: Flood v2.4.2\nBy \\#ec7731\\Agent X\\#dcdcdc\\\n\nThis mod adds a flood escape gamemode\nto sm64ex-coop, you must escape the flood and reach the top of the level before everything is flooded.
 
 if unsupported then return end
 
@@ -27,46 +27,7 @@ local listedSurvivors = false
 local speedrunner = 0
 
 -- localize functions to improve performance
-local math_floor = math.floor
-local math_random = math.random
-local camera_set_use_course_specific_settings = camera_set_use_course_specific_settings
-local djui_chat_message_create = djui_chat_message_create
-local djui_hud_get_screen_height = djui_hud_get_screen_height
-local djui_hud_get_screen_width = djui_hud_get_screen_width
-local djui_hud_measure_text = djui_hud_measure_text
-local djui_hud_print_text = djui_hud_print_text
-local djui_hud_render_rect = djui_hud_render_rect
-local djui_hud_set_font = djui_hud_set_font
-local djui_hud_set_resolution = djui_hud_set_resolution
-local play_music = play_music
-local play_race_fanfare = play_race_fanfare
-local play_sound = play_sound
-local init_single_mario = init_single_mario
-local set_mario_action = set_mario_action
-local vec3f_copy = vec3f_copy
-local vec3f_dist = vec3f_dist
-local network_player_connected_count = network_player_connected_count
-local network_get_player_text_color_string = network_get_player_text_color_string
-local network_is_server = network_is_server
-local disable_time_stop = disable_time_stop
-local obj_scale = obj_scale
-local spawn_mist_particles = spawn_mist_particles
-local save_file_erase_current_backup_save = save_file_erase_current_backup_save
-local save_file_set_flags = save_file_set_flags
-local smlua_audio_utils_replace_sequence = smlua_audio_utils_replace_sequence
-local warp_to_level = warp_to_level
-local clamp = clamp
-local clampf = clampf
-local hud_hide = hud_hide
-local hud_render_power_meter = hud_render_power_meter
-local save_file_set_using_backup_slot = save_file_set_using_backup_slot
-local set_environment_region = set_environment_region
-local set_ttc_speed_setting = set_ttc_speed_setting
-local obj_check_hitbox_overlap = obj_check_hitbox_overlap
-local obj_get_first_with_behavior_id = obj_get_first_with_behavior_id
-local spawn_non_sync_object = spawn_non_sync_object
-local smlua_text_utils_secret_star_replace = smlua_text_utils_secret_star_replace
-local find_floor_height = find_floor_height
+local network_player_connected_count,init_single_mario,warp_to_level,play_sound,network_is_server,network_get_player_text_color_string,djui_chat_message_create,disable_time_stop,network_player_set_description,set_mario_action,obj_get_first_with_behavior_id,obj_check_hitbox_overlap,spawn_mist_particles,vec3f_dist,play_race_fanfare,play_music,djui_hud_set_resolution,djui_hud_get_screen_height,djui_hud_get_screen_width,djui_hud_render_rect,djui_hud_set_font,djui_hud_world_pos_to_screen_pos,clampf,math_floor,djui_hud_measure_text,djui_hud_print_text,hud_render_power_meter,hud_get_value,save_file_erase_current_backup_save,save_file_set_flags,save_file_set_using_backup_slot,find_floor_height,spawn_non_sync_object,set_environment_region,vec3f_set,vec3f_copy,math_random,set_ttc_speed_setting,get_level_name,hud_hide,smlua_text_utils_secret_star_replace,smlua_audio_utils_replace_sequence = network_player_connected_count,init_single_mario,warp_to_level,play_sound,network_is_server,network_get_player_text_color_string,djui_chat_message_create,disable_time_stop,network_player_set_description,set_mario_action,obj_get_first_with_behavior_id,obj_check_hitbox_overlap,spawn_mist_particles,vec3f_dist,play_race_fanfare,play_music,djui_hud_set_resolution,djui_hud_get_screen_height,djui_hud_get_screen_width,djui_hud_render_rect,djui_hud_set_font,djui_hud_world_pos_to_screen_pos,clampf,math.floor,djui_hud_measure_text,djui_hud_print_text,hud_render_power_meter,hud_get_value,save_file_erase_current_backup_save,save_file_set_flags,save_file_set_using_backup_slot,find_floor_height,spawn_non_sync_object,set_environment_region,vec3f_set,vec3f_copy,math.random,set_ttc_speed_setting,get_level_name,hud_hide,smlua_text_utils_secret_star_replace,smlua_audio_utils_replace_sequence
 
 function speedrun_mode(mode)
     if mode == nil then
@@ -286,15 +247,6 @@ local function mario_update(m)
         return
     end
 
-    if game == GAME_VANILLA then
-        if gNetworkPlayers[0].currLevelNum == LEVEL_SSL or gNetworkPlayers[0].currLevelNum == LEVEL_CTT or gNetworkPlayers[0].currLevelNum == LEVEL_HMC then
-            romhack_camera(m)
-            camera_set_use_course_specific_settings(false)
-        else
-            camera_set_use_course_specific_settings(true)
-        end
-    end
-
     -- dialog boxes
     if (m.action == ACT_SPAWN_NO_SPIN_AIRBORNE or m.action == ACT_SPAWN_NO_SPIN_LANDING or m.action == ACT_SPAWN_SPIN_AIRBORNE or m.action == ACT_SPAWN_SPIN_LANDING) and m.pos.y < m.floorHeight + 10 then
         set_mario_action(m, ACT_FREEFALL, 0)
@@ -391,8 +343,8 @@ local function on_hud_render()
     if level ~= nil and level.name ~= "ctt" then
         local out = { x = 0, y = 0, z = 0 }
         djui_hud_world_pos_to_screen_pos(level.goalPos, out)
-        local dX = clampf(out.x - 5, 0, djui_hud_get_screen_width())
-        local dY = clampf(out.y - 20, 0, djui_hud_get_screen_height())
+        local dX = clampf(out.x - 5, 0, djui_hud_get_screen_width() - 19.2)
+        local dY = clampf(out.y - 20, 0, djui_hud_get_screen_height() - 19.2)
 
         djui_hud_set_adjusted_color(255, 255, 255, 200)
         djui_hud_render_texture_interpolated(TEX_FLOOD_FLAG, sFlagIconPrevPos.x, sFlagIconPrevPos.y, 0.15, 0.15, dX, dY, 0.15, 0.15)

@@ -10,28 +10,8 @@ local sPlayerFirstPerson = {
     fov = 70
 }
 
--- localize functions to improve performance
-local djui_hud_get_raw_mouse_x = djui_hud_get_raw_mouse_x
-local djui_hud_get_raw_mouse_y = djui_hud_get_raw_mouse_y
-local djui_hud_set_mouse_locked = djui_hud_set_mouse_locked
-local mario_drop_held_object = mario_drop_held_object
-local set_mario_animation = set_mario_animation
-local vec3f_copy = vec3f_copy
-local vec3f_mul = vec3f_mul
-local vec3f_set = vec3f_set
-local clamp = clamp
-local allocate_mario_action = allocate_mario_action
-local camera_config_get_x_sensitivity = camera_config_get_x_sensitivity
-local camera_config_get_y_sensitivity = camera_config_get_y_sensitivity
-local camera_config_is_free_cam_enabled = camera_config_is_free_cam_enabled
-local camera_config_is_mouse_look_enabled = camera_config_is_mouse_look_enabled
-local camera_config_is_x_inverted = camera_config_is_x_inverted
-local camera_config_is_y_inverted = camera_config_is_y_inverted
-local camera_freeze = camera_freeze
-local camera_unfreeze = camera_unfreeze
-local is_game_paused = is_game_paused
-local set_override_fov = set_override_fov
-local set_override_near = set_override_near
+-- localize functions to improve performance - spectator.lua
+local camera_config_get_x_sensitivity,camera_config_get_y_sensitivity,camera_config_is_x_inverted,camera_config_is_y_inverted,is_game_paused,djui_hud_get_raw_mouse_y,clamp,djui_hud_get_raw_mouse_x,vec3f_copy,mario_drop_held_object,set_mario_animation,vec3f_set,vec3f_mul,djui_hud_set_mouse_locked,camera_freeze,maxf,camera_config_is_free_cam_enabled,set_override_near,set_override_fov,camera_unfreeze,camera_config_is_mouse_look_enabled,allocate_mario_action = camera_config_get_x_sensitivity,camera_config_get_y_sensitivity,camera_config_is_x_inverted,camera_config_is_y_inverted,is_game_paused,djui_hud_get_raw_mouse_y,clamp,djui_hud_get_raw_mouse_x,vec3f_copy,mario_drop_held_object,set_mario_animation,vec3f_set,vec3f_mul,djui_hud_set_mouse_locked,camera_freeze,maxf,camera_config_is_free_cam_enabled,set_override_near,set_override_fov,camera_unfreeze,camera_config_is_mouse_look_enabled,allocate_mario_action
 
 --- @param m MarioState
 local function update_fp_camera(m)

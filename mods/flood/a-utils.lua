@@ -18,30 +18,7 @@ for i in pairs(gActiveMods) do
 end
 
 -- localize functions to improve performance
-local set_camera_mode = set_camera_mode
-local djui_hud_set_color = djui_hud_set_color
-local is_game_paused = is_game_paused
-
-local sOverrideCameraModes = {
-    [CAMERA_MODE_RADIAL]            = true,
-    [CAMERA_MODE_OUTWARD_RADIAL]    = true,
-    [CAMERA_MODE_CLOSE]             = true,
-    [CAMERA_MODE_SLIDE_HOOT]        = true,
-    [CAMERA_MODE_PARALLEL_TRACKING] = true,
-    [CAMERA_MODE_FIXED]             = true,
-    [CAMERA_MODE_8_DIRECTIONS]      = true,
-    [CAMERA_MODE_FREE_ROAM]         = true,
-    [CAMERA_MODE_SPIRAL_STAIRS]     = true,
-}
-
---- @param m MarioState
-function romhack_camera(m)
-    if sOverrideCameraModes[m.area.camera.mode] == nil then return end
-
-    if (m.controller.buttonPressed & L_TRIG) ~= 0 then center_rom_hack_camera() end
-
-    set_camera_mode(m.area.camera, CAMERA_MODE_ROM_HACK, 0)
-end
+local math_floor,is_player_active,table_insert,is_game_paused,djui_hud_set_color = math.floor,is_player_active,table.insert,is_game_paused,djui_hud_set_color
 
 rom_hack_cam_set_collisions(false)
 
@@ -103,7 +80,22 @@ function if_then_else(cond, if_true, if_false)
     return if_false
 end
 
-function name_without_hex(name)
+function approach_number(current, target, inc, dec)
+    if current < target then
+        current = current + inc
+        if current > target then
+            current = target
+        end
+    else
+        current = current - dec
+        if current < target then
+            current = target
+        end
+    end
+    return current
+end
+
+function string_without_hex(name)
     local s = ''
     local inSlash = false
     for i = 1, #name do
