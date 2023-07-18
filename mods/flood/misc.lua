@@ -6,7 +6,7 @@ E_MODEL_LAUNCHPAD = smlua_model_util_get_id("launchpad_geo")
 
 local COL_LAUNCHPAD = smlua_collision_util_get("launchpad_collision")
 
--- localize functions to improve performance - misc.lua
+-- localize functions to improve performance
 local get_environment_region,set_environment_region,set_override_far,cur_obj_scale,cur_obj_init_animation,bhv_pole_base_loop,nearest_mario_state_to_object,play_mario_jump_sound,set_mario_action,spawn_non_sync_object,mario_set_forward_vel,vec3f_set,load_object_collision_model,obj_mark_for_deletion,network_is_server,obj_check_hitbox_overlap,obj_has_behavior_id = get_environment_region,set_environment_region,set_override_far,cur_obj_scale,cur_obj_init_animation,bhv_pole_base_loop,nearest_mario_state_to_object,play_mario_jump_sound,set_mario_action,spawn_non_sync_object,mario_set_forward_vel,vec3f_set,load_object_collision_model,obj_mark_for_deletion,network_is_server,obj_check_hitbox_overlap,obj_has_behavior_id
 
 --- @param o Object
