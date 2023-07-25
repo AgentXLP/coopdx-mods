@@ -34,7 +34,7 @@ local table_insert,djui_popup_create = table.insert,djui_popup_create
 
 local function flood_define_level(bonus, level, name, goalPos, speed, area, type, customStartPos)
     gLevels[level] = { name = name, goalPos = goalPos, speed = speed, area = area, type = type, time = 0, customStartPos = customStartPos }
-    table.insert(gMapRotation, level)
+    table_insert(gMapRotation, level)
 
     if bonus then FLOOD_BONUS_LEVELS = FLOOD_BONUS_LEVELS + 1 end
     FLOOD_LEVEL_COUNT = FLOOD_LEVEL_COUNT + 1
@@ -87,7 +87,7 @@ end
 -- load romhack levels
 for mod in pairs(gActiveMods) do
     if gActiveMods[mod].incompatible ~= nil and gActiveMods[mod].incompatible:find("romhack") then
-        if gActiveMods[mod].relativePath:find("star-road") then
+        if gActiveMods[mod].relativePath == "star-road" then
             flood_load_star_road_levels()
         else
             unsupported = true
