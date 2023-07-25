@@ -1,6 +1,6 @@
 -- name: Day Night Cycle
 -- incompatible: light
--- description: Day Night Cycle v1.1.1\nBy \\#ec7731\\Agent X\n\n\\#dcdcdc\\This mod adds a fully featured day night cycle system with night, sunrise, day and sunset to sm64ex-coop. Days last 24 minutes and you can switch to and from 24 hour time with /ampm\nSpecial thanks to \\#00ffff\\AngelicMiracles \\#dcdcdc\\for the sunset, sunrise and night time skyboxes
+-- description: Day Night Cycle v1.1.1\nBy \\#ec7731\\Agent X\n\n\\#dcdcdc\\This mod adds a fully featured day night cycle system with night, sunrise, day and sunset to sm64ex-coop. Days last 24 minutes and you can switch to and from 24 hour time with /ampm\n\nSpecial thanks to \\#00ffff\\AngelicMiracles \\#dcdcdc\\for the sunset, sunrise and night time skyboxes
 
 _G.DayNightCycle = {}
 
