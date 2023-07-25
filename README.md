@@ -26,3 +26,7 @@ To download single file mods click on the link and then press the "Raw" button t
 [Hats](./mods/hats/hats.zip)
 
 [Super Mario 64: The Underworld](./mods/underworld/underworld.zip)
+
+[Noclip](./mods/noclip.lua)
+
+[Action Display](./mods/action-display.lua)

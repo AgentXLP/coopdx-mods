@@ -18,3 +18,11 @@ This mod adds improved ceiling hang detection system so you can now begin clingi
 https://user-images.githubusercontent.com/44549182/197370948-e8e0cb0a-8c7e-4ee7-956e-071cbf25ef31.mp4
 
 This mod adds busting down doors by slide kicking into them, flying doors can deal damage to other players and normal doors will respawn after 10 seconds.
+
+## Noclip
+
+This mod improves ACT_DEBUG_FREE_MOVE and makes accessible by everyone if cheats are on, otherwise only the host and moderators.
+
+## Action Display
+
+This mod renders your action to the screen.
