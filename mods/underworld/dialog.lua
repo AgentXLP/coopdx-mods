@@ -1,6 +1,6 @@
 --- @class Dialog
 --- @field public id integer -- ID of the dialog
---- @field public name string -- Name of the thing speaking in English
+--- @field public nameEnglish string -- Name of the thing speaking in English
 --- @field public nameSpanish string -- Name of the thing speaking in Spanish
 --- @field public nameFrench string -- Name of the thing speaking in French
 --- @field public linesEnglish string[] -- Dialog lines in English

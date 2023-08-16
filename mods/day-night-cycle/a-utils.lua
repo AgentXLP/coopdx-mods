@@ -15,9 +15,9 @@ for mod in pairs(gActiveMods) do
     end
 end
 
-function if_then_else(cond, if_true, if_false)
-    if cond then return if_true end
-    return if_false
+function if_then_else(cond, ifTrue, ifFalse)
+    if cond then return ifTrue end
+    return ifFalse
 end
 
 function switch(param, case_table)

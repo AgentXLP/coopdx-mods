@@ -5,9 +5,9 @@ local cur_obj_scale,obj_mark_for_deletion,vec3f_to_object_pos,maxf,load_object_c
 
 local ACT_NOCLIP = allocate_mario_action(ACT_GROUP_CUTSCENE | ACT_FLAG_AIR)
 
-local function if_then_else(cond, if_true, if_false)
-    if cond then return if_true end
-    return if_false
+local function if_then_else(cond, ifTrue, ifFalse)
+    if cond then return ifTrue end
+    return ifFalse
 end
 
 --- @param o Object

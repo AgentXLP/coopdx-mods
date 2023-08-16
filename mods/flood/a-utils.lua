@@ -75,9 +75,9 @@ function active_player(m)
     return is_player_active(m)
 end
 
-function if_then_else(cond, if_true, if_false)
-    if cond then return if_true end
-    return if_false
+function if_then_else(cond, ifTrue, ifFalse)
+    if cond then return ifTrue end
+    return ifFalse
 end
 
 function approach_number(current, target, inc, dec)

@@ -28,9 +28,9 @@ downing = check_for_mod("Downing", false)
 
 function lerp(a,b,t) return a * (1-t) + b * t end
 
-function if_then_else(cond, if_true, if_false)
-    if cond then return if_true end
-    return if_false
+function if_then_else(cond, ifTrue, ifFalse)
+    if cond then return ifTrue end
+    return ifFalse
 end
 
 function clamp(x, a, b)

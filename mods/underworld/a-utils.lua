@@ -1,9 +1,9 @@
 -- localize functions to improve performance
 local is_player_active,get_behavior_from_id,get_object_list_from_behavior,obj_get_first,get_id_from_behavior,obj_get_next,obj_copy_angle,is_game_paused,djui_hud_set_color,obj_get_first_with_behavior_id,obj_mark_for_deletion,obj_get_next_with_same_behavior_id,table_insert,djui_hud_measure_text,djui_hud_print_text,set_lighting_color,math_floor,mod_storage_load,djui_hud_set_rotation,vec3f_dist,djui_hud_set_font,cur_obj_become_tangible,warp_to_level,smlua_text_utils_get_language = is_player_active,get_behavior_from_id,get_object_list_from_behavior,obj_get_first,get_id_from_behavior,obj_get_next,obj_copy_angle,is_game_paused,djui_hud_set_color,obj_get_first_with_behavior_id,obj_mark_for_deletion,obj_get_next_with_same_behavior_id,table.insert,djui_hud_measure_text,djui_hud_print_text,set_lighting_color,math.floor,mod_storage_load,djui_hud_set_rotation,vec3f_dist,djui_hud_set_font,cur_obj_become_tangible,warp_to_level,smlua_text_utils_get_language
 
-function if_then_else(cond, if_true, if_false)
-    if cond then return if_true end
-    return if_false
+function if_then_else(cond, ifTrue, ifFalse)
+    if cond then return ifTrue end
+    return ifFalse
 end
 
 function approach_number(current, target, inc, dec)
@@ -138,10 +138,10 @@ function delete_every_object_with_behavior_id(behaviorId)
     end
 end
 
-function for_each_object_with_behavior(behavior, func_f)
+function for_each_object_with_behavior(behavior, funcF)
     local obj = obj_get_first_with_behavior_id(behavior)
     while obj ~= nil do
-        func_f(obj)
+        funcF(obj)
         obj = obj_get_next_with_same_behavior_id(obj)
     end
 end

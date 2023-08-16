@@ -33,12 +33,6 @@ function on_or_off(value)
     return "\\#ff0000\\OFF"
 end
 
-function clamp(x, a, b)
-    if x < a then return a end
-    if x > b then return b end
-    return x
-end
-
 function approach_number(current, target, inc, dec)
     if current < target then
         current = current + inc

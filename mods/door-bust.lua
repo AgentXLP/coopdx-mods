@@ -53,9 +53,9 @@ local function lateral_dist_between_object_and_point(obj, pointX, pointZ)
     return math.sqrt(dx * dx + dz * dz)
 end
 
-local function if_then_else(cond, if_true, if_false)
-    if cond then return if_true end
-    return if_false
+local function if_then_else(cond, ifTrue, ifFalse)
+    if cond then return ifTrue end
+    return ifFalse
 end
 
 local function s16(num)
