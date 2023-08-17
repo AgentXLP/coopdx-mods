@@ -1,4 +1,5 @@
 import sys
+import os
 
 partNames = [
     "pants",
@@ -31,11 +32,17 @@ def main():
     out = []
     with open(path, "r") as f:
         lines = f.readlines()
+        dir = os.path.dirname(path)
+        name = os.path.basename(dir)
+
+        binFile = os.path.join(dir.split(name)[0], f"{name}_geo.bin")
+        if os.path.exists(binFile):
+            os.remove(binFile)
 
         for line in lines:
             for part in partNames:
-                for i in range(1, 5):
-                    light = f"gsSPSetLights1(mario_{part}{i if i > 1 else ''}_lights),"
+                for i in range(1, 10):
+                    light = f"gsSPSetLights1({name}_{part}{i if i > 1 else ''}_lights),"
                     if light in line:
                         line = line.replace(light, f"gsSPCopyLightsPlayerPart({part.upper()}),").replace("METAL", metalPart.upper())
             out.append(line)

@@ -1545,13 +1545,11 @@ def process_file(path):
                     functions += "math_floor,"
                 elif ("math.ceil(" in line or "math_ceil(" in line) and not "math_ceil" in functions:
                     functions += "math_ceil,"
-                elif ("math.random(" in line or "math_random(" in line) and not "math_random" in functions:
-                    functions += "math_random,"
                 elif ("table.insert(" in line or "table_insert(" in line) and not "table_insert" in functions:
                     functions += "table_insert,"
     functions = functions.rstrip(",")
     if functions != "":
-        return f"-- localize functions to improve performance - {os.path.basename(path)}\nlocal {functions} = {functions.replace('math_floor', 'math.floor').replace('math_ceil', 'math.ceil').replace('math_random', 'math.random').replace('table_insert', 'table.insert')}\n\n\n"
+        return f"-- localize functions to improve performance - {os.path.basename(path)}\nlocal {functions} = {functions.replace('math_floor', 'math.floor').replace('math_ceil', 'math.ceil').replace('table_insert', 'table.insert')}\n\n\n"
     else:
         return ""
 
