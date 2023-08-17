@@ -1,0 +1,10 @@
+{
+    "Lua.diagnostics.disable": [
+        "lowercase-global",
+        "param-type-mismatch",
+        "assign-type-mismatch",
+        "missing-parameter",
+        "undefined-field",
+        "cast-local-type"
+    ]
+}
