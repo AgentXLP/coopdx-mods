@@ -10,6 +10,47 @@ local function if_then_else(cond, ifTrue, ifFalse)
     return ifFalse
 end
 
+local function split(s)
+    local result = {}
+    for match in (s):gmatch(string.format("[^%s]+", " ")) do
+        table.insert(result, match)
+    end
+    return result
+end
+
+local levels = {
+    ["ccm"] = LEVEL_CCM,
+    ["castle"] = LEVEL_CASTLE,
+    ["hmc"] = LEVEL_HMC,
+    ["ssl"] = LEVEL_SSL,
+    ["bob"] = LEVEL_BOB,
+    ["sl"] = LEVEL_SL,
+    ["wdw"] = LEVEL_WDW,
+    ["jrb"] = LEVEL_JRB,
+    ["thi"] = LEVEL_THI,
+    ["ttc"] = LEVEL_TTC,
+    ["rr"] = LEVEL_RR,
+    ["castle_grounds"] = LEVEL_CASTLE_GROUNDS,
+    ["bitdw"] = LEVEL_BITDW,
+    ["vcutm"] = LEVEL_VCUTM,
+    ["bitfs"] = LEVEL_BITFS,
+    ["sa"] = LEVEL_SA,
+    ["bits"] = LEVEL_BITS,
+    ["lll"] = LEVEL_LLL,
+    ["ddd"] = LEVEL_DDD,
+    ["wf"] = LEVEL_WF,
+    ["ending"] = LEVEL_ENDING,
+    ["castle_courtyard"] = LEVEL_CASTLE_COURTYARD,
+    ["pss"] = LEVEL_PSS,
+    ["cotmc"] = LEVEL_COTMC,
+    ["totwc"] = LEVEL_TOTWC,
+    ["bowser_1"] = LEVEL_BOWSER_1,
+    ["wmotr"] = LEVEL_WMOTR,
+    ["bowser_2"] = LEVEL_BOWSER_2,
+    ["bowser_3"] = LEVEL_BOWSER_3,
+    ["ttm"] = LEVEL_TTM,
+}
+
 --- @param o Object
 local function bhv_noclip_floor_init(o)
     cur_obj_scale(2)
@@ -92,6 +133,24 @@ local function mario_update(m)
     end
 end
 
+local function on_warp_command(msg)
+    local args = split(msg)
+    args[1] = args[1]:lower()
+    local level = levels[args[1]]
+    local area = tonumber(args[2])
+    local act = tonumber(args[3])
+
+    if level == nil or area == nil or act == nil then
+        djui_chat_message_create("/warp \\#00ffff\\[LEVEL|AREA|ACT]\\#dcdcdc\\\nTo warp to a level")
+        return true
+    end
+
+    warp_to_level(level, area, act)
+    return true
+end
+
 hook_event(HOOK_MARIO_UPDATE, mario_update)
 
 hook_mario_action(ACT_NOCLIP, act_noclip)
+
+hook_chat_command("warp", "[LEVEL|AREA|ACT] to warp to a level", on_warp_command)
