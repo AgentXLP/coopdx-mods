@@ -1543,9 +1543,9 @@ def process_file(path):
                         functions += func + ","
                 if ("math.floor(" in line or "math_floor(" in line) and not "math_floor" in functions:
                     functions += "math_floor,"
-                elif ("math.ceil(" in line or "math_ceil(" in line) and not "math_ceil" in functions:
+                if ("math.ceil(" in line or "math_ceil(" in line) and not "math_ceil" in functions:
                     functions += "math_ceil,"
-                elif ("table.insert(" in line or "table_insert(" in line) and not "table_insert" in functions:
+                if ("table.insert(" in line or "table_insert(" in line) and not "table_insert" in functions:
                     functions += "table_insert,"
     functions = functions.rstrip(",")
     if functions != "":
