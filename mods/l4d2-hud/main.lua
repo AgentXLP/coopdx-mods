@@ -132,7 +132,7 @@ function render_health_bar(x, m, scale, name)
         djui_hud_set_adjusted_color(255, 255, 255, 255)
         djui_hud_render_texture(chars[m.character.type], x - (100 * scale), height - (69 * scale), 0.2 * scale, 0.2 * scale)
     else
-        if m.health > 0xff then djui_hud_set_adjusted_color(255, 255, 255, 255)
+        if m.health > 0xFF then djui_hud_set_adjusted_color(255, 255, 255, 255)
         else djui_hud_set_adjusted_color(230, 0, 0, 255) end
         if gNetworkPlayers[0].name:find("Spoomples") then
             djui_hud_render_texture(TEX_PAC, x - (126.2 * scale), height - (33.6 * scale), 0.1 * scale, 0.1 * scale)
@@ -206,7 +206,7 @@ function on_hud_render()
     local height = djui_hud_get_screen_height() * 0.5
     -- health bars
     local m = gMarioStates[0]
-    m.health = clamp(m.health, 0xff, 0x880)
+    m.health = clamp(m.health, 0xFF, 0x880)
     render_health_bar(width, m, 1, false)
     local spot = 0
     local gActiveMarioStates = {}

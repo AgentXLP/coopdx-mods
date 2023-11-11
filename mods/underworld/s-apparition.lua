@@ -343,7 +343,7 @@ local function bhv_apparition_loop(o)
     end
 
     cur_obj_update_floor()
-    if (o.oFloor ~= nil and o.oFloor.type == SURFACE_DEATH_PLANE) or m.health <= 0xff then
+    if (o.oFloor ~= nil and o.oFloor.type == SURFACE_DEATH_PLANE) or m.health <= 0xFF then
         o.oPosX = 0
         o.oPosY = 500
         o.oPosZ = -1700

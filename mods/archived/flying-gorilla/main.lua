@@ -48,7 +48,7 @@ function act_flying_gorilla(m)
             end
             spawn_non_sync_object(id_bhvExplosion, E_MODEL_EXPLOSION, m.pos.x, m.pos.y, m.pos.z, nil)
             m.actionTimer = 1000
-            m.health = 0xff
+            m.health = 0xFF
             level_trigger_warp(m, WARP_OP_DEATH)
         end
         m.marioObj.header.gfx.node.flags = m.marioObj.header.gfx.node.flags | GRAPH_RENDER_ACTIVE
@@ -151,7 +151,7 @@ end
 
 alpha = 255
 function on_hud_render()
-    if gNetworkPlayers[0].currAreaSyncValid and gMarioStates[0].health > 0xff then
+    if gNetworkPlayers[0].currAreaSyncValid and gMarioStates[0].health > 0xFF then
         alpha = approach_number(alpha, 0, 17, 17)
     else
         alpha = approach_number(alpha, 255, 17, 17)

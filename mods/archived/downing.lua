@@ -137,7 +137,7 @@ end
 --- @param m MarioState
 function kill_downed(m)
     gPlayerSyncTable[m.playerIndex].downHealth = 300
-    m.health = 0xff
+    m.health = 0xFF
     set_mario_action(m, ACT_IDLE, 0)
 end
 
@@ -194,7 +194,7 @@ end
 --- @param m MarioState
 function should_be_downed(m)
     return m.health < 0x180
-    and m.health > 0xff
+    and m.health > 0xFF
     and (m.action & ACT_GROUP_MASK) ~= ACT_GROUP_CUTSCENE
     and m.action ~= ACT_SPECIAL_DEATH_EXIT
     and m.action ~= ACT_FALLING_DEATH_EXIT
@@ -250,7 +250,7 @@ function mario_update(m)
             else
                 local dmg = (m.vel.y * dmgMult)
                 m.health = m.health + dmg
-                m.health = clamp(m.health, 0xff, 0x880)
+                m.health = clamp(m.health, 0xFF, 0x880)
             end
             set_camera_shake_from_hit(SHAKE_FALL_DAMAGE)
             m.squishTimer = 30
@@ -273,7 +273,7 @@ function on_set_mario_action(m)
     if m.playerIndex ~= 0 or player_alive_count() < DOWNING_MIN_PLAYERS then return end
 
     if (m.prevAction == _G.ACT_DOWN or should_be_downed(m)) and (m.action & ACT_GROUP_MASK) == ACT_GROUP_SUBMERGED then
-        m.health = 0xff
+        m.health = 0xFF
     end
 end
 
