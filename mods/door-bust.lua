@@ -1,25 +1,10 @@
 -- name: Door Bust
--- description: Door Bust v1.2.1\nBy \\#ec7731\\Agent X\\#dcdcdc\\\n\nThis mod adds busting down doors by slide kicking or jump kicking into them, flying doors can deal damage to other players and normal doors will respawn after 10 seconds.
+-- description: Door Bust v1.2.2\nBy \\#ec7731\\Agent X\\#dcdcdc\\\n\nThis mod adds busting down doors by slide kicking or jump kicking into them, flying doors can deal damage to other players and normal doors will respawn after 10 seconds.
 
 define_custom_obj_fields({
     oDoorDespawnedTimer = 'u32',
     oDoorBuster = 'u32'
 })
-
-local function approach_number(current, target, inc, dec)
-    if current < target then
-        current = current + inc
-        if current > target then
-            current = target
-        end
-    else
-        current = current - dec
-        if current < target then
-            current = target
-        end
-    end
-    return current
-end
 
 --- @param m MarioState
 local function active_player(m)
@@ -91,7 +76,7 @@ local function bhv_broken_door_loop(o)
         end
     else
         cur_obj_update_floor()
-        o.oFaceAnglePitch = approach_number(o.oFaceAnglePitch, -0x4000, 0x500, 0x500)
+        o.oFaceAnglePitch = approach_s32(o.oFaceAnglePitch, -0x4000, 0x500, 0x500)
     end
 
     o.header.gfx.angle.y = o.header.gfx.angle.y + 0x8000
@@ -235,7 +220,7 @@ local function mario_update(m)
         set_camera_shake_from_hit(SHAKE_MED_DAMAGE)
         play_sound(SOUND_GENERAL_METAL_POUND, m.marioObj.header.gfx.cameraToObject)
         if m.actionTimer == 6 then
-            djui_chat_message_create("\\#fbfb7d\\Lakitu:\\#ffffff\\ OH SH-")
+            djui_chat_message_create("\\#fbfb7d\\Lakitu\\#dcdcdc\\: OH SH-")
         end
     end
 end
