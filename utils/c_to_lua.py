@@ -1,6 +1,9 @@
 import sys
 import re
 
+print("C To Lua Script")
+print("Warning: you will need to edit the output, this just automates all of the little annoying bits.")
+
 cli = True
 path = ""
 # smart arg handler

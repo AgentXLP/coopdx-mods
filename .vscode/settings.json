@@ -3,6 +3,7 @@
         "lowercase-global",
         "param-type-mismatch",
         "assign-type-mismatch",
-        "missing-parameter"
+        "missing-parameter",
+        "undefined-field"
     ]
 }

@@ -1,6 +1,6 @@
 -- name: Flood
 -- incompatible: gamemode
--- description: Flood v2.4.4\nBy \\#ec7731\\Agent X\\#dcdcdc\\\n\nThis mod adds a flood escape gamemode\nto sm64ex-coop, you must escape the flood and reach the top of the level before everything is flooded.
+-- description: Flood v2.4.5\nBy \\#ec7731\\Agent X\\#dcdcdc\\\n\nThis mod adds a flood escape gamemode\nto sm64ex-coop, you must escape the flood and reach the top of the level before everything is flooded.
 
 if unsupported then return end
 
@@ -376,7 +376,7 @@ local function on_hud_render()
     djui_hud_set_font(FONT_HUD)
 
     djui_hud_render_texture(gTextures.coin, 5, 5, 1, 1)
-    djui_hud_print_text("=", 21, 5, 1)
+    djui_hud_print_text(">", 21, 5, 1)
     djui_hud_print_text(tostring(hud_get_value(HUD_DISPLAY_COINS)), 37, 5, 1)
 
     if gGlobalSyncTable.speedMultiplier ~= 1 then
