@@ -1,6 +1,6 @@
 -- name: Super Mario 64: The Underworld
 -- incompatible: romhack
--- description: Super Mario 64: The Underworld v1.1\nBy \\#ec7731\\Agent X\\#dcdcdc\\\n\nMario is pulled into another land some call The Underworld...\nHe must make his way through this condemned land and help in both the escape of\nhimself and someone he thinks he can trust\nfrom the Underworld.\nThis is a 30 star romhack with a fully custom cutscene system, dialog system and boss fight entirely in Lua created for the sm64ex-coop level competition.\n\nSpecial thanks to \\#005500\\Squishy\\#dcdcdc\\ for the compass textures
+-- description: Super Mario 64: The Underworld v1.1.1\nBy \\#ec7731\\Agent X\\#dcdcdc\\\n\nMario is pulled into another land some call The Underworld...\nHe must make his way through this condemned land and help in both the escape of\nhimself and someone he thinks he can trust\nfrom the Underworld.\nThis is a 30 star romhack with a fully custom cutscene system, dialog system and boss fight entirely in Lua created for the sm64ex-coop level competition.\n\nSpecial thanks to \\#005500\\Squishy\\#dcdcdc\\ for the compass textures
 
 STREAM_EARTHQUAKE = audio_stream_load("earthquake.mp3")
 STREAM_SRIATS_SSELDNE = audio_stream_load("sriats_sseldne.mp3")
@@ -719,7 +719,11 @@ gLevelValues.floorLowerLimitMisc = -20000 + 1000
 gLevelValues.floorLowerLimitShadow = -20000 + 1000.0
 gLevelValues.fixCollisionBugs = 1
 
-if _G.DayNightCycle ~= nil then _G.DayNightCycle.enabled = false end
+if _G.dayNightCycleApi ~= nil then
+    _G.dayNightCycleApi.enable_day_night_cycle(false)
+elseif _G.DayNightCycle ~= nil then
+    _G.DayNightCycle.enabled = false
+end
 
 smlua_audio_utils_replace_sequence(SEQ_LEVEL_BOSS_KOOPA_FINAL, 0x2A, 100, "shitilizer")
 
