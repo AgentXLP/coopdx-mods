@@ -7,7 +7,7 @@ To download single file mods click on the link and then press the "Raw" button t
 
 ## Mod Downloads
 
-[Gun Mod (Depreciated, no longer receiving updates)](./mods/gun-mod/gun-mod.zip)
+[Gun Mod DX](./mods/gun-mod/gun-mod.zip)
 
 [Pos Display](./mods/pos-display.lua)
 
