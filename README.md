@@ -7,8 +7,6 @@ To download single file mods click on the link and then press the "Raw" button t
 
 ## Mod Downloads
 
-[Gun Mod DX](./mods/gun-mod/gun-mod.zip)
-
 [Pos Display](./mods/pos-display.lua)
 
 [Left 4 Dead 2 HUD (Cross compatible with Downing)](./mods/l4d2-hud/l4d2-hud.zip)
@@ -21,8 +19,6 @@ To download single file mods click on the link and then press the "Raw" button t
 
 [Galaxy Star Select](./mods/galaxy-star-select/galaxy-star-select.zip)
 
-[Day Night Cycle](./mods/day-night-cycle/day-night-cycle.zip)
-
 [Hats](./mods/hats/hats.zip)
 
 [Super Mario 64: The Underworld](./mods/underworld/underworld.zip)
@@ -30,3 +26,7 @@ To download single file mods click on the link and then press the "Raw" button t
 [Noclip](./mods/noclip.lua)
 
 [Action Display](./mods/action-display.lua)
+
+[Day Night Cycle DX](./mods/day-night-cycle/day-night-cycle.zip)
+
+[Gun Mod DX](./mods/gun-mod/gun-mod.zip)
