@@ -1,10 +1,5 @@
 -- name: Door Bust
--- description: Door Bust v1.2.2\nBy \\#ec7731\\Agent X\\#dcdcdc\\\n\nThis mod adds busting down doors by slide kicking or jump kicking into them, flying doors can deal damage to other players and normal doors will respawn after 10 seconds.
-
-define_custom_obj_fields({
-    oDoorDespawnedTimer = 'u32',
-    oDoorBuster = 'u32'
-})
+-- description: Door Bust v1.2.3\nBy \\#ec7731\\Agent X\\#dcdcdc\\\n\nThis mod adds busting down doors by slide kicking or jump kicking into them, flying doors can deal damage to other players and normal doors will respawn after 10 seconds.
 
 --- @param m MarioState
 local function active_player(m)
@@ -79,8 +74,6 @@ local function bhv_broken_door_loop(o)
         o.oFaceAnglePitch = approach_s32(o.oFaceAnglePitch, -0x4000, 0x500, 0x500)
     end
 
-    o.header.gfx.angle.y = o.header.gfx.angle.y + 0x8000
-
     obj_flicker_and_disappear(o, 300)
 end
 
@@ -105,10 +98,9 @@ local function mario_update(m)
     if m.playerIndex == 0 then
         door = obj_get_first(OBJ_LIST_SURFACE)
         while door ~= nil do
-            if get_id_from_behavior(door.behavior) == id_bhvDoor or get_id_from_behavior(door.behavior) == id_bhvStarDoor or get_id_from_behavior(door.behavior) == id_bhvDoorWarp then
-                if door.oDoorDespawnedTimer > 0 then
-                    door.oDoorDespawnedTimer = door.oDoorDespawnedTimer - 1
-                else
+            local id = get_id_from_behavior(door.behavior)
+            if (id == id_bhvDoor or id == id_bhvStarDoor or id == id_bhvDoorWarp) and door.oPosY == 9999 then
+                if door.oTimer >= 339 then
                     door.oPosY = door.oHomeY
                 end
             end
@@ -167,9 +159,10 @@ local function mario_update(m)
             end
 
             if m.forwardVel >= 30 or (m.action == ACT_LONG_JUMP and m.forwardVel <= -70) then
-                play_sound(SOUND_GENERAL_BREAK_BOX, m.marioObj.header.gfx.cameraToObject)
-                targetDoor.oDoorDespawnedTimer = 339
+                targetDoor.oTimer = 0
                 targetDoor.oPosY = 9999
+                play_sound(SOUND_GENERAL_BREAK_BOX, targetDoor.header.gfx.cameraToObject)
+                network_send_object(targetDoor, false)
                 spawn_triangle_break_particles(30, 138, 1, 4)
                 spawn_non_sync_object(
                     id_bhvBrokenDoor,
@@ -177,19 +170,20 @@ local function mario_update(m)
                     targetDoor.oPosX, targetDoor.oHomeY, targetDoor.oPosZ,
                     --- @param o Object
                     function(o)
-                        o.oDoorBuster = gNetworkPlayers[m.playerIndex].globalIndex
+                        o.globalPlayerIndex = gNetworkPlayers[m.playerIndex].globalIndex
                         o.oForwardVel = 80
                         set_mario_particle_flags(m, PARTICLE_TRIANGLE, 0)
-                        play_sound(SOUND_ACTION_HIT_2, m.marioObj.header.gfx.cameraToObject)
+                        play_sound(SOUND_ACTION_HIT_2, targetDoor.header.gfx.cameraToObject)
                     end
                 )
+
                 if get_id_from_behavior(targetDoor.behavior) == id_bhvDoorWarp then
                     m.interactObj = targetDoor
                     m.usedObj = targetDoor
                     m.actionArg = should_push_or_pull_door(m, targetDoor)
 
                     level_trigger_warp(m, WARP_OP_WARP_DOOR)
-                else
+                elseif level_is_vanilla_level(LEVEL_CASTLE) then
                     if targetDoor.oBehParams >> 24 == 50 and m.action == ACT_LONG_JUMP and m.forwardVel <= -80 then
                         set_mario_action(m, ACT_THROWN_BACKWARD, 0)
                         m.forwardVel = -300
@@ -205,7 +199,7 @@ local function mario_update(m)
             end
         end
 
-        if lateral_dist_between_object_and_point(m.marioObj, -200, 6977) < 10 and gNetworkPlayers[m.playerIndex].currLevelNum == LEVEL_CASTLE and m.action == ACT_THROWN_BACKWARD then
+        if lateral_dist_between_object_and_point(m.marioObj, -200, 6977) < 10 and gNetworkPlayers[m.playerIndex].currLevelNum == LEVEL_CASTLE and level_is_vanilla_level(LEVEL_CASTLE) and m.action == ACT_THROWN_BACKWARD then
             set_mario_action(m, ACT_HARD_BACKWARD_AIR_KB, 0)
             m.hurtCounter = 4 * 4
             play_character_sound(m, CHAR_SOUND_ATTACKED)
@@ -228,9 +222,77 @@ end
 --- @param m MarioState
 --- @param o Object
 local function allow_interact(m, o)
-    if get_id_from_behavior(o.behavior) == id_bhvBrokenDoor and gNetworkPlayers[m.playerIndex].globalIndex == o.oDoorBuster then return false end
+    if get_id_from_behavior(o.behavior) == id_bhvBrokenDoor and gNetworkPlayers[m.playerIndex].globalIndex == o.globalPlayerIndex then return false end
+    return true
+end
+
+
+--- @param obj Object
+--- @param bulletObj Object
+local function hurt_door(obj, bulletObj)
+    local weapon =_G.gunModApi.get_weapon(_G.gunModApi.obj_get_weapon_id(bulletObj))
+    if weapon == nil or not weapon.strong then
+        play_sound(SOUND_OBJ_SNUFIT_SHOOT, obj.header.gfx.cameraToObject)
+        return true
+    end
+
+    local model = E_MODEL_CASTLE_CASTLE_DOOR
+
+    if get_id_from_behavior(obj.behavior) ~= id_bhvStarDoor then
+        if obj_has_model_extended(obj, E_MODEL_CASTLE_DOOR_1_STAR) ~= 0 then
+            model = E_MODEL_CASTLE_DOOR_1_STAR
+        elseif obj_has_model_extended(obj, E_MODEL_CASTLE_DOOR_3_STARS) ~= 0 then
+            model = E_MODEL_CASTLE_DOOR_3_STARS
+        elseif obj_has_model_extended(obj, E_MODEL_CCM_CABIN_DOOR) ~= 0 then
+            model = E_MODEL_CCM_CABIN_DOOR
+        elseif obj_has_model_extended(obj, E_MODEL_HMC_METAL_DOOR) ~= 0 then
+            model = E_MODEL_HMC_METAL_DOOR
+        elseif obj_has_model_extended(obj, E_MODEL_HMC_WOODEN_DOOR) ~= 0 then
+            model = E_MODEL_HMC_WOODEN_DOOR
+        elseif obj_has_model_extended(obj, E_MODEL_BBH_HAUNTED_DOOR) ~= 0 then
+            model = E_MODEL_BBH_HAUNTED_DOOR
+        elseif obj_has_model_extended(obj, E_MODEL_CASTLE_METAL_DOOR) ~= 0 then
+            model = E_MODEL_CASTLE_METAL_DOOR
+        elseif obj_has_model_extended(obj, E_MODEL_CASTLE_CASTLE_DOOR) ~= 0 then
+            model = E_MODEL_CASTLE_CASTLE_DOOR
+        elseif obj_has_model_extended(obj, E_MODEL_HMC_HAZY_MAZE_DOOR) ~= 0 then
+            model = E_MODEL_HMC_HAZY_MAZE_DOOR
+        elseif obj_has_model_extended(obj, E_MODEL_CASTLE_GROUNDS_METAL_DOOR) ~= 0 then
+            model = E_MODEL_CASTLE_GROUNDS_METAL_DOOR
+        elseif obj_has_model_extended(obj, E_MODEL_CASTLE_KEY_DOOR) ~= 0 then
+            model = E_MODEL_CASTLE_KEY_DOOR
+        end
+    else
+        model = E_MODEL_CASTLE_STAR_DOOR_8_STARS
+    end
+
+    obj.oTimer = 0
+    obj.oPosY = 9999
+    play_sound(SOUND_GENERAL_BREAK_BOX, obj.header.gfx.cameraToObject)
+    network_send_object(obj, false)
+    spawn_triangle_break_particles(30, 138, 1, 4)
+    spawn_non_sync_object(
+        id_bhvBrokenDoor,
+        model,
+        obj.oPosX, obj.oHomeY, obj.oPosZ,
+        --- @param o Object
+        function(o)
+            o.globalPlayerIndex = _G.gunModApi.obj_get_weapon_owner(bulletObj)
+            o.oForwardVel = 80
+            play_sound(SOUND_ACTION_HIT_2, obj.header.gfx.cameraToObject)
+        end
+    )
+
     return true
 end
 
 hook_event(HOOK_MARIO_UPDATE, mario_update)
 hook_event(HOOK_ALLOW_INTERACT, allow_interact)
+
+if _G.gunModApi ~= nil then
+    _G.gunModApi.shootable_register(id_bhvDoor, hurt_door)
+    _G.gunModApi.shootable_register(id_bhvStarDoor, hurt_door)
+
+    _G.gunModApi.gm_hook_behavior(id_bhvDoor, false, _G.gunModApi.obj_generate_hitbox_multiply_func(1, 2.5))
+    _G.gunModApi.gm_hook_behavior(id_bhvStarDoor, false, _G.gunModApi.obj_generate_hitbox_multiply_func(1, 2.5))
+end
