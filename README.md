@@ -1,5 +1,7 @@
 # agent-ex-coop-mods
-This repo contains every sm64ex-coop mod I have made publicly.
+This repo contains every sm64ex-coop/sm64coopdx mod I have made publicly.
+
+Some mods I make aren't as popular as I wanted them to be or drifted out of relevancy, you can find those mods in the `archived` folder.
 
 To download single file mods click on the link and then press the "Raw" button then press CTRL S to save it.
 

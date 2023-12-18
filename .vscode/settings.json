@@ -4,6 +4,7 @@
         "param-type-mismatch",
         "assign-type-mismatch",
         "missing-parameter",
-        "undefined-field"
+        "undefined-field",
+        "inject-field"
     ]
 }
