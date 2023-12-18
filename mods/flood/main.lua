@@ -1,6 +1,6 @@
 -- name: Flood
 -- incompatible: gamemode
--- description: Flood v2.4.5\nBy \\#ec7731\\Agent X\\#dcdcdc\\\n\nThis mod adds a flood escape gamemode\nto sm64ex-coop, you must escape the flood and reach the top of the level before everything is flooded.
+-- description: Flood v2.4.6\nBy \\#ec7731\\Agent X\\#dcdcdc\\\n\nThis mod adds a flood escape gamemode\nto sm64ex-coop, you must escape the flood and reach the top of the level before everything is flooded.
 
 if unsupported then return end
 
@@ -281,7 +281,7 @@ local function mario_update(m)
             string = string .. "\\#00ff00\\You escaped the \\#ffff00\\final\\#00ff00\\ flood! Congratulations!\n"
             play_music(0, SEQUENCE_ARGS(8, SEQ_EVENT_CUTSCENE_VICTORY), 0)
         end
-        string = string .. "\\#ffffff\\Time: " .. string.format("%.3f", gLevels[gGlobalSyncTable.level].time / 30) .. get_modifiers_string()
+        string = string .. "\\#dcdcdc\\Time: " .. string.format("%.3f", gLevels[gGlobalSyncTable.level].time / 30) .. get_modifiers_string()
 
         djui_chat_message_create(string)
     end
@@ -484,7 +484,7 @@ end
 
 local function on_start_command(msg)
     if msg == "?" then
-        djui_chat_message_create("/flood \\#00ffff\\start\\#ffff00\\ [random|1-" .. FLOOD_LEVEL_COUNT .. "]\\#ffffff\\\nSets the level to a random one or a specific one, you can also leave it empty for normal progression.")
+        djui_chat_message_create("/flood \\#00ffff\\start\\#ffff00\\ [random|1-" .. FLOOD_LEVEL_COUNT .. "]\\#dcdcdc\\\nSets the level to a random one or a specific one, you can also leave it empty for normal progression.")
         return true
     end
 
@@ -521,7 +521,7 @@ local function on_speed_command(msg)
         return true
     end
 
-    djui_chat_message_create("/flood \\#00ffff\\speed\\#ffff00\\ [number]\\#ffffff\\\nSets the speed multiplier of the flood")
+    djui_chat_message_create("/flood \\#00ffff\\speed\\#ffff00\\ [number]\\#dcdcdc\\\nSets the speed multiplier of the flood")
     return true
 end
 
@@ -550,7 +550,7 @@ local function on_ttc_speed_command(msg)
         return true
     end
 
-    djui_chat_message_create("/flood \\#00ffff\\ttc-speed\\#ffff00\\ [fast|slow|random|stopped]\\#ffffff\\\nChanges the speed of TTC")
+    djui_chat_message_create("/flood \\#00ffff\\ttc-speed\\#ffff00\\ [fast|slow|random|stopped]\\#dcdcdc\\\nChanges the speed of TTC")
     return true
 end
 
@@ -570,7 +570,7 @@ local function on_speedrun_command(msg)
         return true
     end
 
-    djui_chat_message_create("/flood \\#00ffff\\speedrun\\#ffff00\\ [off|progress|restart]\\#ffffff\\\nTo make adjustments to singleplayer Flood helpful for speedrunners")
+    djui_chat_message_create("/flood \\#00ffff\\speedrun\\#ffff00\\ [off|progress|restart]\\#dcdcdc\\\nTo make adjustments to singleplayer Flood helpful for speedrunners")
     return true
 end
 
@@ -591,13 +591,13 @@ end
 local function on_flood_command(msg)
     local args = split(msg)
     if args[1] == "start" then
-        return on_start_command(args[2])
+        return on_start_command(args[2] or "")
     elseif args[1] == "speed" then
-        return on_speed_command(args[2])
+        return on_speed_command(args[2] or "")
     elseif args[1] == "ttc-speed" then
-        return on_ttc_speed_command(args[2])
+        return on_ttc_speed_command(args[2] or "")
     elseif args[1] == "speedrun" then
-        return on_speedrun_command(args[2])
+        return on_speedrun_command(args[2] or "")
     elseif args[1] == "scoreboard" then
         return on_scoreboard_command()
     end
