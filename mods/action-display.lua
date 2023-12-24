@@ -243,11 +243,13 @@ local gActionTable = {
 local function on_hud_render()
     djui_hud_set_resolution(RESOLUTION_N64)
 
-    local text = gActionTable[gMarioStates[0].action] or "ACT_???"
+    --- @type MarioState
+    local m = gMarioStates[0]
+    local text = gActionTable[m.action] or "ACT_???"
 
     djui_hud_set_font(FONT_HUD)
     djui_hud_set_color(255, 255, 255, 255)
-    djui_hud_print_text("SPD " .. tostring(math.floor(gMarioStates[0].forwardVel)):gsub("-", "M"), 24, 32, 1)
+    djui_hud_print_text("SPD " .. tostring(math.floor(m.forwardVel)):gsub("-", "M"), 24, 32, 1)
 
     djui_hud_set_font(FONT_TINY)
     djui_hud_set_color(255, 255, 255, 255)
