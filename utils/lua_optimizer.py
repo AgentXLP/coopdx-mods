@@ -1,7 +1,6 @@
 import sys
 import os
 
-# there is code commented out to print out a list of all of these functions, you originally needed to supply the functions Lua file but I found this annoying to have to keep doing
 functionList = [
     "area_get_warp_node",
     "area_get_warp_node_from_params",
@@ -17,6 +16,7 @@ functionList = [
     "bhv_1up_loop",
     "bhv_1up_running_away_loop",
     "bhv_1up_sliding_loop",
+    "bhv_1up_trigger_init",
     "bhv_1up_walking_loop",
     "bhv_act_selector_init",
     "bhv_act_selector_loop",
@@ -558,7 +558,7 @@ functionList = [
     "clear_particle_flags",
     "common_anchor_mario_behavior",
     "cur_obj_spawn_strong_wind_particles",
-    "mario_moving_fast_enough_to_make_piranha_plant_bi",
+    "mario_moving_fast_enough_to_make_piranha_plant_bite",
     "obj_set_secondary_camera_focus",
     "play_penguin_walking_sound",
     "spawn_default_star",
@@ -667,16 +667,24 @@ functionList = [
     "vec3f_to_object_pos",
     "warp_camera",
     "get_character",
+    "get_character_anim",
     "get_character_anim_offset",
     "play_character_sound",
     "play_character_sound_if_no_flag",
     "play_character_sound_offset",
     "update_character_anim_offset",
     "djui_chat_message_create",
+    "djui_console_message_dequeue",
+    "djui_console_toggle",
+    "djui_hud_get_color",
+    "djui_hud_get_filter",
+    "djui_hud_get_font",
     "djui_hud_get_mouse_x",
     "djui_hud_get_mouse_y",
     "djui_hud_get_raw_mouse_x",
     "djui_hud_get_raw_mouse_y",
+    "djui_hud_get_resolution",
+    "djui_hud_get_rotation",
     "djui_hud_get_screen_height",
     "djui_hud_get_screen_width",
     "djui_hud_is_pause_menu_created",
@@ -687,9 +695,9 @@ functionList = [
     "djui_hud_render_rect_interpolated",
     "djui_hud_reset_color",
     "djui_hud_set_color",
+    "djui_hud_set_filter",
     "djui_hud_set_font",
     "djui_hud_set_mouse_locked",
-    "djui_hud_set_render_behind_hud",
     "djui_hud_set_resolution",
     "djui_hud_set_rotation",
     "djui_hud_world_pos_to_screen_pos",
@@ -726,6 +734,10 @@ functionList = [
     "stop_sound",
     "stop_sounds_from_source",
     "stop_sounds_in_continuous_banks",
+    "first_person_check_cancels",
+    "first_person_reset",
+    "get_first_person_enabled",
+    "set_first_person_enabled",
     "reset_dialog_override_color",
     "reset_dialog_override_pos",
     "set_dialog_override_color",
@@ -758,7 +770,10 @@ functionList = [
     "area_create_warp_node",
     "get_painting_warp_node",
     "initiate_painting_warp",
+    "level_control_timer_running",
     "level_trigger_warp",
+    "lvl_set_current_level",
+    "warp_special",
     "adjust_sound_for_speed",
     "check_common_action_exits",
     "check_common_hold_action_exits",
@@ -780,6 +795,7 @@ functionList = [
     "mario_floor_is_steep",
     "mario_get_floor_class",
     "mario_get_terrain_sound_addend",
+    "mario_is_crouching",
     "mario_set_bubbled",
     "mario_set_forward_vel",
     "mario_update_wall",
@@ -796,6 +812,8 @@ functionList = [
     "resolve_and_return_wall_collisions_data",
     "return_mario_anim_y_translation",
     "set_anim_to_frame",
+    "set_character_anim_with_accel",
+    "set_character_animation",
     "set_jump_from_landing",
     "set_jumping_action",
     "set_mario_action",
@@ -971,8 +989,14 @@ functionList = [
     "vec3s_sum",
     "vec3s_to_vec3f",
     "update_all_mario_stars",
+    "mod_storage_clear",
     "mod_storage_load",
+    "mod_storage_load_bool",
+    "mod_storage_load_number",
+    "mod_storage_remove",
     "mod_storage_save",
+    "mod_storage_save_bool",
+    "mod_storage_save_number",
     "get_network_player_from_area",
     "get_network_player_from_level",
     "get_network_player_smallest_global",
@@ -1156,7 +1180,6 @@ functionList = [
     "cur_obj_nearest_object_with_behavior",
     "cur_obj_outside_home_rectangle",
     "cur_obj_outside_home_square",
-    "cur_obj_progress_direction_table",
     "cur_obj_push_mario_away",
     "cur_obj_push_mario_away_from_cylinder",
     "cur_obj_reflect_move_angle_off_wall",
@@ -1170,7 +1193,6 @@ functionList = [
     "cur_obj_scale_over_time",
     "cur_obj_set_behavior",
     "cur_obj_set_billboard_if_vanilla_cam",
-    "cur_obj_set_direction_table",
     "cur_obj_set_face_angle_to_move_angle",
     "cur_obj_set_hitbox_and_die_if_attacked",
     "cur_obj_set_hitbox_radius_and_height",
@@ -1316,6 +1338,7 @@ functionList = [
     "save_file_get_total_star_count",
     "save_file_is_cannon_unlocked",
     "save_file_reload",
+    "save_file_remove_star_flags",
     "save_file_set_course_coin_score",
     "save_file_set_flags",
     "save_file_set_star_flags",
@@ -1343,16 +1366,23 @@ functionList = [
     "audio_stream_set_tempo",
     "audio_stream_set_volume",
     "audio_stream_stop",
+    "smlua_audio_utils_get_note_freq_scale",
     "smlua_audio_utils_replace_sequence",
     "smlua_audio_utils_reset_all",
+    "smlua_audio_utils_set_note_freq_scale",
+    "collision_find_ceil",
+    "collision_find_floor",
     "collision_find_surface_on_ray",
     "collision_get_temp_wall_collision_data",
     "get_water_surface_pseudo_floor",
     "smlua_collision_util_get",
+    "djui_hud_set_render_behind_hud",
     "network_discord_id_from_local_index",
     "level_is_vanilla_level",
     "level_register",
+    "smlua_level_util_change_area",
     "smlua_level_util_get_info",
+    "smlua_level_util_get_info_from_course_num",
     "smlua_level_util_get_info_from_short_name",
     "warp_exit_level",
     "warp_restart_level",
@@ -1370,6 +1400,7 @@ functionList = [
     "sqrf",
     "add_scroll_target",
     "allocate_mario_action",
+    "camera_allow_toxic_gas_camera",
     "camera_config_enable_analog_cam",
     "camera_config_enable_free_cam",
     "camera_config_enable_mouse_look",
@@ -1394,16 +1425,25 @@ functionList = [
     "camera_is_frozen",
     "camera_reset_overrides",
     "camera_romhack_allow_centering",
+    "camera_romhack_allow_dpad_usage",
     "camera_set_romhack_override",
     "camera_unfreeze",
     "course_is_main_course",
     "deref_s32_pointer",
+    "djui_is_popup_disabled",
     "djui_popup_create_global",
+    "djui_reset_popup_disabled_override",
+    "djui_set_popup_disabled_override",
+    "get_coop_compatibility_enabled",
     "get_current_save_file_num",
+    "get_date_and_time",
     "get_dialog_box_state",
     "get_dialog_id",
     "get_envfx",
     "get_environment_region",
+    "get_fog_color",
+    "get_fog_intensity",
+    "get_global_timer",
     "get_got_file_coin_hi_score",
     "get_hand_foot_pos_x",
     "get_hand_foot_pos_y",
@@ -1420,20 +1460,28 @@ functionList = [
     "get_temp_s32_pointer",
     "get_time",
     "get_ttc_speed_setting",
+    "get_vertex_color",
+    "gfx_enable_adjust_for_aspect_ratio",
+    "gfx_get_adjust_for_aspect_ratio",
+    "hud_get_flash",
     "hud_get_value",
     "hud_hide",
     "hud_is_hidden",
     "hud_render_power_meter",
     "hud_render_power_meter_interpolated",
+    "hud_set_flash",
     "hud_set_value",
     "hud_show",
     "is_game_paused",
     "is_transition_playing",
     "movtexqc_register",
     "play_transition",
+    "reset_window_title",
     "save_file_get_using_backup_slot",
     "save_file_set_using_backup_slot",
     "set_environment_region",
+    "set_fog_color",
+    "set_fog_intensity",
     "set_got_file_coin_hi_score",
     "set_last_completed_course_num",
     "set_last_completed_star_num",
@@ -1447,6 +1495,8 @@ functionList = [
     "set_override_skybox",
     "set_save_file_modified",
     "set_ttc_speed_setting",
+    "set_vertex_color",
+    "set_window_title",
     "smlua_model_util_get_id",
     "get_temp_object_hitbox",
     "get_trajectory",
@@ -1481,12 +1531,19 @@ functionList = [
     "set_whirlpools",
     "spawn_non_sync_object",
     "spawn_sync_object",
+    "smlua_text_utils_act_name_get",
+    "smlua_text_utils_act_name_mod_index",
+    "smlua_text_utils_act_name_replace",
+    "smlua_text_utils_act_name_reset",
     "smlua_text_utils_castle_secret_stars_replace",
     "smlua_text_utils_course_acts_replace",
+    "smlua_text_utils_course_name_get",
+    "smlua_text_utils_course_name_mod_index",
+    "smlua_text_utils_course_name_replace",
+    "smlua_text_utils_course_name_reset",
     "smlua_text_utils_dialog_replace",
     "smlua_text_utils_extra_text_replace",
     "smlua_text_utils_get_language",
-    "smlua_text_utils_reset_all",
     "smlua_text_utils_secret_star_replace",
     "disable_background_sound",
     "enable_background_sound",
@@ -1533,7 +1590,7 @@ def get_parameter(argIndex, message):
 def process_file(path):
     functions = ""
     ignoreFunctions = True
-    with open(path, "r") as f:
+    with open(path, "r", encoding="utf-8") as f:
         for line in f.readlines():
             if "function" in line:
                 ignoreFunctions = False
@@ -1558,14 +1615,6 @@ def main():
         print('python lua_optimizer.py "path/to/mod_file_or_folder"')
         return
 
-    # path = get_parameter(1, "Enter path to sm64ex-coop Lua function autogen: ")
-    # with open(path, "r") as f:
-    #     for line in f.readlines():
-    #         if line.startswith("function "):
-    #             function = line.replace("function ", "").split("(")[0]
-    #             print(function)
-    #             functionList.append(function)
-
     mod = get_parameter(1, "Enter path to mod: ")
 
     output = ""
@@ -1578,6 +1627,18 @@ def main():
         output += process_file(mod)
 
     with open("optimizations.lua", "w") as f:
+        f.write(output)
+
+def main_list_gen():
+    path = get_parameter(1, "Enter path to sm64ex-coop Lua function autogen: ")
+    output = "functionList = ["
+    with open(path, "r") as f:
+        for line in f.readlines():
+            if line.startswith("function "):
+                function = line.replace("function ", "").split("(")[0]
+                output += f'\n    "{function}",'
+        output += "\n]"
+    with open("output.txt", "w") as f:
         f.write(output)
 
 main()
