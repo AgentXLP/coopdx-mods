@@ -1593,6 +1593,11 @@ def get_parameter(argIndex, message):
         returnValue = input(message)
     return returnValue
 
+def add_function(name, line, functions):
+    optimizedName = name.replace(".", "_")
+    if (name + "(" in line or optimizedName + "(" in line) and not optimizedName in functions:
+        functions += optimizedName + ","
+
 def process_file(path):
     functions = ""
     ignoreFunctions = True
@@ -1605,10 +1610,42 @@ def process_file(path):
                     for func in functionList:
                         if func + "(" in line and not func in functions:
                             functions += func + ","
+                    add_function("math.floor", line, functions)
+                    add_function("math.ceil", line, functions)
+                    add_function("math.random", line, functions)
+                    add_function("math.min", line, functions)
+                    add_function("math.max", line, functions)
+                    add_function("math.abs", line, functions)
+                    add_function("math.sin", line, functions)
+                    add_function("math.cos", line, functions)
+                    add_function("math.tan", line, functions)
+                    add_function("math.asin", line, functions)
+                    add_function("math.acos", line, functions)
+                    add_function("math.atan", line, functions)
+                    add_function("math.deg", line, functions)
+                    add_function("math.rad", line, functions)
+                    add_function("table.insert", line, functions)
+                    add_function("table.sort", line, functions)
+                    add_function("table.pack", line, functions)
+                    add_function("table.unpack", line, functions)
+                    add_function("table.concat", line, functions)
+                    add_function("table.move", line, functions)
+                    add_function("string.lower", line, functions)
+                    add_function("string.upper", line, functions)
+                    add_function("string.gsub", line, functions)
+                    add_function("string.sub", line, functions)
                     if ("math.floor(" in line or "math_floor(" in line) and not "math_floor" in functions:
                         functions += "math_floor,"
                     if ("math.ceil(" in line or "math_ceil(" in line) and not "math_ceil" in functions:
                         functions += "math_ceil,"
+                    if ("math.random(" in line or "math_random(" in line) and not "math_random" in functions:
+                        functions += "math_random,"
+                    if ("math.min(" in line or "math_min(" in line) and not "math_min" in functions:
+                        functions += "math_min,"
+                    if ("math.max(" in line or "math_max(" in line) and not "math_max" in functions:
+                        functions += "math_max,"
+                    if ("math.abs(" in line or "math_abs(" in line) and not "math_abs" in functions:
+                        functions += "math_abs,"
                     if ("table.insert(" in line or "table_insert(" in line) and not "table_insert" in functions:
                         functions += "table_insert,"
             print(" Good.")
