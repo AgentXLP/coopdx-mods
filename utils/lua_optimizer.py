@@ -1591,19 +1591,23 @@ def process_file(path):
     functions = ""
     ignoreFunctions = True
     with open(path, "r", encoding="utf-8") as f:
-        for line in f.readlines():
-            if "function" in line:
-                ignoreFunctions = False
-            elif not ignoreFunctions:
-                for func in functionList:
-                    if func + "(" in line and not func in functions:
-                        functions += func + ","
-                if ("math.floor(" in line or "math_floor(" in line) and not "math_floor" in functions:
-                    functions += "math_floor,"
-                if ("math.ceil(" in line or "math_ceil(" in line) and not "math_ceil" in functions:
-                    functions += "math_ceil,"
-                if ("table.insert(" in line or "table_insert(" in line) and not "table_insert" in functions:
-                    functions += "table_insert,"
+        try:
+            for line in f.readlines():
+                if "function" in line:
+                    ignoreFunctions = False
+                elif not ignoreFunctions:
+                    for func in functionList:
+                        if func + "(" in line and not func in functions:
+                            functions += func + ","
+                    if ("math.floor(" in line or "math_floor(" in line) and not "math_floor" in functions:
+                        functions += "math_floor,"
+                    if ("math.ceil(" in line or "math_ceil(" in line) and not "math_ceil" in functions:
+                        functions += "math_ceil,"
+                    if ("table.insert(" in line or "table_insert(" in line) and not "table_insert" in functions:
+                        functions += "table_insert,"
+            print(" Good.")
+        except:
+            print(" Couldn't read, likely a compiled file.")
     functions = functions.rstrip(",")
     if functions != "":
         return f"-- localize functions to improve performance - {os.path.basename(path)}\nlocal {functions} = {functions.replace('math_floor', 'math.floor').replace('math_ceil', 'math.ceil').replace('table_insert', 'table.insert')}\n\n\n"
@@ -1621,7 +1625,7 @@ def main():
     if os.path.isdir(mod):
         for file in os.listdir(mod):
             if file.endswith(".lua"):
-                print(f"Optimizing {file}...")
+                print(f"Optimizing {file}...", end=" ")
                 output += process_file(os.path.join(mod, file))
     else:
         output += process_file(mod)
