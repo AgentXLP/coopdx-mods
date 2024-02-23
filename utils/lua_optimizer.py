@@ -1576,7 +1576,13 @@ functionList = [
     "clear_dynamic_surfaces",
     "get_area_terrain_size",
     "load_area_terrain",
-    "load_object_collision_model"
+    "load_object_collision_model",
+
+    "tostring",
+    "tonumber",
+    "type",
+    "error",
+    "warn"
 ]
 
 def get_parameter(argIndex, message):
