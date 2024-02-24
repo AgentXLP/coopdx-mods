@@ -41,6 +41,11 @@ local function flood_define_level(bonus, level, name, goalPos, speed, area, type
 end
 _G.flood_define_level = flood_define_level
 
+local function flood_clear_levels()
+    gLevels = {}
+end
+_G.flood_clear_levels = flood_clear_levels
+
 local function flood_load_vanilla_levels()
     game = GAME_VANILLA
 

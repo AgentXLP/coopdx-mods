@@ -1,6 +1,6 @@
 -- name: Flood
 -- incompatible: gamemode flood
--- description: Flood v2.4.6\nBy \\#ec7731\\Agent X\\#dcdcdc\\\n\nThis mod adds a flood escape gamemode\nto sm64ex-coop, you must escape the flood and reach the top of the level before everything is flooded.
+-- description: Flood v2.4.7\nBy \\#ec7731\\Agent X\\#dcdcdc\\\n\nThis mod adds a flood escape gamemode\nto sm64ex-coop, you must escape the flood and reach the top of the level before everything is flooded.
 
 if unsupported then return end
 
@@ -455,9 +455,7 @@ local function on_warp()
     --- @type MarioState
     local m = gMarioStates[0]
     if gNetworkPlayers[0].currLevelNum == LEVEL_CASTLE_GROUNDS then
-        if game == GAME_VANILLA then
-            m.faceAngle.y = m.faceAngle.y + 0x8000
-        elseif game == GAME_STAR_ROAD then
+        if game == GAME_STAR_ROAD then
             if gGlobalSyncTable.roundState == ROUND_STATE_INACTIVE then
                 vec3f_set(m.pos, -6797, 1830, 2710)
                 m.faceAngle.y = 0x6000

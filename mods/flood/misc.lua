@@ -39,7 +39,7 @@ local function bhv_water_loop(o)
     end
 end
 
-id_bhvWater = hook_behavior(nil, OBJ_LIST_SURFACE, true, bhv_water_init, bhv_water_loop)
+id_bhvWater = hook_behavior(nil, OBJ_LIST_SURFACE, true, bhv_water_init, bhv_water_loop, "bhvFloodWater")
 
 
 --- @param o Object
@@ -49,7 +49,7 @@ local function bhv_custom_static_object_init(o)
     set_override_far(50000)
 end
 
-id_bhvCustomStaticObject = hook_behavior(nil, OBJ_LIST_LEVEL, true, bhv_custom_static_object_init, nil)
+id_bhvCustomStaticObject = hook_behavior(nil, OBJ_LIST_LEVEL, true, bhv_custom_static_object_init, nil, "bhvFloodCustomStaticObject")
 
 
 --- @param o Object
@@ -66,7 +66,7 @@ local function bhv_final_star_loop(o)
     o.oFaceAngleYaw = o.oFaceAngleYaw + 0x800
 end
 
-id_bhvFinalStar = hook_behavior(nil, OBJ_LIST_GENACTOR, true, bhv_final_star_init, bhv_final_star_loop)
+id_bhvFinalStar = hook_behavior(nil, OBJ_LIST_GENACTOR, true, bhv_final_star_init, bhv_final_star_loop, "bhvFloodFinalStar")
 
 
 --- @param o Object
@@ -86,7 +86,7 @@ local function bhv_flood_flag_loop(o)
     bhv_pole_base_loop()
 end
 
-id_bhvFloodFlag = hook_behavior(nil, OBJ_LIST_POLELIKE, true, bhv_flood_flag_init, bhv_flood_flag_loop)
+id_bhvFloodFlag = hook_behavior(nil, OBJ_LIST_POLELIKE, true, bhv_flood_flag_init, bhv_flood_flag_loop, "bhvFloodFlag")
 
 
 local function bhv_launchpad_init(o)
@@ -120,7 +120,7 @@ local function bhv_launchpad_loop(o)
     load_object_collision_model()
 end
 
-id_bhvLaunchpad = hook_behavior(nil, OBJ_LIST_SURFACE, true, bhv_launchpad_init, bhv_launchpad_loop)
+id_bhvLaunchpad = hook_behavior(nil, OBJ_LIST_SURFACE, true, bhv_launchpad_init, bhv_launchpad_loop, "bhvFloodLaunchpad")
 
 
 --- @param o Object
