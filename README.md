@@ -9,8 +9,6 @@ To download single file mods click on the link and then press the "Raw" button t
 
 [Pos Display](./mods/pos-display.lua)
 
-[Left 4 Dead 2 HUD (Cross compatible with Downing)](./mods/l4d2-hud/l4d2-hud.zip)
-
 [Easy Ceiling Cling](./mods/easy-ceiling-cling.lua)
 
 [Door Bust](./mods/door-bust.lua)
