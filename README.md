@@ -15,8 +15,6 @@ To download single file mods click on the link and then press the "Raw" button t
 
 [Flood](./mods/flood/flood.zip)
 
-[Galaxy Star Select](./mods/galaxy-star-select/galaxy-star-select.zip)
-
 [Super Mario 64: The Underworld](./mods/underworld/underworld.zip)
 
 [Noclip](./mods/noclip.lua)
