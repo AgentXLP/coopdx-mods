@@ -1,10 +1,12 @@
 -- name: Noclip
--- description: Noclip\nBy \\#ec7731\\Agent X\\#dcdcdc\\\n\nThis mod improves ACT_DEBUG_FREE_MOVE and makes accessible by everyone if cheats are on, otherwise only the host and moderators.
+-- description: Noclip\nBy \\#ec7731\\Agent X\\#dcdcdc\\\n\nThis mod is a utility mod that improves ACT_DEBUG_FREE_MOVE and makes it easily accessible without the development build.
 
 local cur_obj_scale,obj_mark_for_deletion,vec3f_to_object_pos,maxf,load_object_collision_model,obj_get_first_with_behavior_id,spawn_non_sync_object,set_mario_anim_with_accel,set_mario_animation,vec3f_add,vec3f_copy,vec3f_length,vec3s_set,set_mario_action = cur_obj_scale,obj_mark_for_deletion,vec3f_to_object_pos,maxf,load_object_collision_model,obj_get_first_with_behavior_id,spawn_non_sync_object,set_mario_anim_with_accel,set_mario_animation,vec3f_add,vec3f_copy,vec3f_length,vec3s_set,set_mario_action
 
 local ACT_NOCLIP = allocate_mario_action(ACT_GROUP_CUTSCENE | ACT_FLAG_AIR)
 
+--- @param cond boolean
+--- Human readable ternary operator
 local function if_then_else(cond, ifTrue, ifFalse)
     if cond then return ifTrue end
     return ifFalse
@@ -87,7 +89,7 @@ end
 local function mario_update(m)
     if m.playerIndex ~= 0 then return end
 
-    if m.action == ACT_DEBUG_FREE_MOVE or ((m.controller.buttonDown & L_TRIG) ~= 0 and (m.controller.buttonDown & Z_TRIG) ~= 0 and (gServerSettings.enableCheats or network_is_server() or network_is_moderator())) then
+    if m.action == ACT_DEBUG_FREE_MOVE or ((m.controller.buttonDown & L_TRIG) ~= 0 and (m.controller.buttonDown & Z_TRIG) ~= 0 and (network_is_server() or network_is_moderator())) then
         set_mario_action(m, ACT_NOCLIP, 0)
     end
 end

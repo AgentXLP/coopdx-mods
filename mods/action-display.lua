@@ -1,9 +1,9 @@
 -- name: Action Display
--- description: Action Display\nBy \\#ec7731\\Agent X\\#dcdcdc\\\n\nThis mod renders your action to the screen.
+-- description: Action Display\nBy \\#ec7731\\Agent X\\#dcdcdc\\\n\nThis mod is a utility mod that renders your action and forward velocity to the screen.
 
 local djui_hud_set_resolution,djui_hud_set_font,djui_hud_set_color,djui_hud_print_text,math_floor = djui_hud_set_resolution,djui_hud_set_font,djui_hud_set_color,djui_hud_print_text,math.floor
 
-local gActionTable = {
+local sActionTable = {
     [ACT_UNINITIALIZED] = "ACT_UNINITIALIZED",
     [ACT_IDLE] = "ACT_IDLE",
     [ACT_START_SLEEPING] = "ACT_START_SLEEPING",
@@ -240,20 +240,20 @@ local gActionTable = {
     [ACT_RELEASING_BOWSER] = "ACT_RELEASING_BOWSER",
 }
 
-local function on_hud_render()
+local function on_hud_render_behind()
     djui_hud_set_resolution(RESOLUTION_N64)
 
     --- @type MarioState
     local m = gMarioStates[0]
-    local text = gActionTable[m.action] or "ACT_???"
+    local text = sActionTable[m.action] or "ACT_???"
 
     djui_hud_set_font(FONT_HUD)
     djui_hud_set_color(255, 255, 255, 255)
-    djui_hud_print_text("SPD " .. tostring(math.floor(m.forwardVel)):gsub("-", "M"), 24, 32, 1)
+    djui_hud_print_text("SPD " .. tostring(math_floor(m.forwardVel)):gsub("-", "M"), 24, 32, 1)
 
-    djui_hud_set_font(FONT_TINY)
+    djui_hud_set_font(FONT_NORMAL)
     djui_hud_set_color(255, 255, 255, 255)
     djui_hud_print_text(text, 24, 48, 1)
 end
 
-hook_event(HOOK_ON_HUD_RENDER, on_hud_render)
+hook_event(HOOK_ON_HUD_RENDER_BEHIND, on_hud_render_behind)
