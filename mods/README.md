@@ -21,8 +21,12 @@ This mod adds busting down doors by slide kicking into them, flying doors can de
 
 ## Noclip
 
-This mod improves ACT_DEBUG_FREE_MOVE and makes accessible by everyone if cheats are on, otherwise only the host and moderators.
+<img width="600" alt="noclip" src="https://github.com/Agent-11/agent-ex-coop-mods/assets/44549182/c8268b54-0e61-4558-9c68-6129cc877f56">
+
+This mod is a utility mod that improves ACT_DEBUG_FREE_MOVE and makes it easily accessible without the development build.
 
 ## Action Display
 
-This mod renders your action to the screen.
+<img width="600" alt="display" src="https://github.com/Agent-11/agent-ex-coop-mods/assets/44549182/2922e4f9-507f-4460-82c5-d63a098d6754">
+
+This mod is a utility mod that renders your action and forward velocity to the screen.
