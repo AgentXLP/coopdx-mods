@@ -7,4 +7,4 @@ mod.cache
 sm64_save_file*
 sm64config*.txt
 *-src
-utils/optimizations.lua
+optimizations.lua
