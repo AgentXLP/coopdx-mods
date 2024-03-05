@@ -1,5 +1,6 @@
 -- name: Action Display
 -- description: Action Display\nBy \\#ec7731\\Agent X\\#dcdcdc\\\n\nThis mod is a utility mod that renders your action and forward velocity to the screen.
+-- pausable: true
 
 local djui_hud_set_resolution,djui_hud_set_font,djui_hud_set_color,djui_hud_print_text,math_floor = djui_hud_set_resolution,djui_hud_set_font,djui_hud_set_color,djui_hud_print_text,math.floor
 
@@ -253,7 +254,7 @@ local function on_hud_render_behind()
 
     djui_hud_set_font(FONT_NORMAL)
     djui_hud_set_color(255, 255, 255, 255)
-    djui_hud_print_text(text, 24, 48, 1)
+    djui_hud_print_text(text, 24, 48, 0.5)
 end
 
 hook_event(HOOK_ON_HUD_RENDER_BEHIND, on_hud_render_behind)

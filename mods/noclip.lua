@@ -1,5 +1,6 @@
 -- name: Noclip
 -- description: Noclip\nBy \\#ec7731\\Agent X\\#dcdcdc\\\n\nThis mod is a utility mod that improves\nACT_DEBUG_FREE_MOVE and makes it easily accessible without the development build.
+-- pausable: true
 
 local cur_obj_scale,obj_mark_for_deletion,vec3f_to_object_pos,maxf,load_object_collision_model,obj_get_first_with_behavior_id,spawn_non_sync_object,set_mario_anim_with_accel,set_mario_animation,vec3f_add,vec3f_copy,vec3f_length,vec3s_set,set_mario_action = cur_obj_scale,obj_mark_for_deletion,vec3f_to_object_pos,maxf,load_object_collision_model,obj_get_first_with_behavior_id,spawn_non_sync_object,set_mario_anim_with_accel,set_mario_animation,vec3f_add,vec3f_copy,vec3f_length,vec3s_set,set_mario_action
 

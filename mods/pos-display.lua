@@ -1,5 +1,6 @@
 -- name: Pos Display
 -- description: Pos Display\nBy \\#ec7731\\Agent X\\#dcdcdc\\\n\nThis mod renders your coordinates to the screen.
+-- pausable: true
 
 local djui_hud_set_resolution,djui_hud_set_font,djui_hud_get_screen_width,djui_hud_get_screen_height,djui_hud_set_color,djui_hud_measure_text,djui_hud_render_rect,djui_hud_print_text,math_floor = djui_hud_set_resolution,djui_hud_set_font,djui_hud_get_screen_width,djui_hud_get_screen_height,djui_hud_set_color,djui_hud_measure_text,djui_hud_render_rect,djui_hud_print_text,math.floor
 
