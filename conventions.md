@@ -38,6 +38,15 @@ When declaring model IDs and textures using `smlua_model_util_get_id` and `get_t
 
 ## Practices
 
+Make everything local as much as reasonably possible. local variables, local tables, local functions. Lua can reference these different types of data quicker than it would globally.
+
+There is also I process I go through to optimize my mods even further this way. I have written a script that references a list of functions in the SMLua API and generates an `optimizations.lua` file that contains a line that localizes all of the functions for each file in the mod.
+```sh
+python utils/lua_optimizer.py mods/mod-name
+```
+
+Once you obtain this output file, you can paste the optimization lines into each one of the mod's files.
+
 ## Structure
 
 I typically structure my mods with a constants file and a utility functions file. These are executed first because they are prefixed with `a-`.
