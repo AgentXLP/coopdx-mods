@@ -25,7 +25,7 @@ Examples:
 * **BassAudio:** `SOUND_CUSTOM_*` or `STREAM_*` depending on whether or not you're loading a stream.
 
 ### Files:
-Prefix actors, behaviors and textures with your mod codename. This is so other mods with files of the same name don't get the game confused, it's also just good practice. Levels and sounds do not need to adhere to this naming convention because other mods can't access them anyway.
+Prefix actors, behaviors and textures with your mod codename. This is so other mods with files of the same name don't get the game confused, it's also just good practice. Sounds do not need to adhere to this naming convention because other mods can't access them anyway. I am in the process of looking into how custom level registration works and if levels should also be prefixed with the codename because I'm not entirely sure.
 
 Examples:
 * **Actor Example:** `uw_skybox_geo.bin`
