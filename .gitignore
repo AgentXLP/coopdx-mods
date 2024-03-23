@@ -6,3 +6,4 @@ mod.cache
 sm64_save_file.bin
 sm64config*.txt
 *-src
+baserom*
