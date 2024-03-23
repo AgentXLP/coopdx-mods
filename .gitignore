@@ -2,9 +2,7 @@ tmp
 dynos
 sav
 mods/wip
-*log.txt
 mod.cache
-sm64_save_file*
+sm64_save_file.bin
 sm64config*.txt
 *-src
-optimizations.lua

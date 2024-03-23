@@ -1,7 +1,7 @@
 import bpy
 
 # filmic is mid
-bpy.context.scene.view_settings.view_transform = 'Standard'
+bpy.context.scene.view_settings.view_transform = "Standard"
 
 def bake_all_meshes(self, context):
     # save choice of renderer
@@ -26,7 +26,6 @@ def bake_all_meshes(self, context):
     for obj in bpy.context.selected_objects:
         if obj.type != "MESH" or obj.hide_render:
             self.report({ "WARNING" }, "Please make sure you have only meshes selected and they do not have hide render on.")
-            ret = True
             return
         bpy.ops.object.editmode_toggle()
         bpy.ops.mesh.select_all(action="SELECT")
