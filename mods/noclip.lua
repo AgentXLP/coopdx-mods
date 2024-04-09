@@ -65,7 +65,7 @@ local function act_noclip(m)
         vel.y = 16 * speed
     end
     if (m.controller.buttonDown & Z_TRIG) ~= 0 then
-        vel.y = -16 * speed
+        vel.y = vel.y - 16 * speed
     end
 
     if obj_get_first_with_behavior_id(id_bhvNoclipFloor) == nil then
