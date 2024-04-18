@@ -45,7 +45,7 @@ local id_bhvNoclipFloor = hook_behavior(nil, OBJ_LIST_SURFACE, true, bhv_noclip_
 local function act_noclip(m)
     if (m.controller.buttonPressed & L_TRIG) ~= 0 and m.marioObj.oTimer > 10 then
         obj_mark_for_deletion(obj_get_first_with_behavior_id(id_bhvNoclipFloor))
-        if fp then
+        if SM64COOPDX_VERSION ~= nil and fp then
             set_first_person_enabled(false)
         end
         return set_mario_action(m, if_then_else(m.pos.y <= m.waterLevel - 100, ACT_WATER_IDLE, ACT_IDLE), 0)
@@ -91,7 +91,9 @@ local function act_noclip(m)
         cur_obj_unhide()
     end
 
-    set_first_person_enabled(fp)
+    if SM64COOPDX_VERSION ~= nil then
+        set_first_person_enabled(fp)
+    end
 
     return 0
 end
@@ -114,6 +116,8 @@ end
 
 hook_event(HOOK_MARIO_UPDATE, mario_update)
 
-hook_chat_command("noclip-fp", "Toggles Noclip first person on or off", on_noclip_fp_command)
+if SM64COOPDX_VERSION ~= nil then
+    hook_chat_command("noclip-fp", "Toggles Noclip first person on or off", on_noclip_fp_command)
+end
 
 hook_mario_action(ACT_NOCLIP, act_noclip)
