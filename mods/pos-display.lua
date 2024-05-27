@@ -4,7 +4,7 @@
 
 local djui_hud_set_resolution,djui_hud_set_font,djui_hud_get_screen_width,djui_hud_get_screen_height,djui_hud_set_color,djui_hud_measure_text,djui_hud_render_rect,djui_hud_print_text,math_floor = djui_hud_set_resolution,djui_hud_set_font,djui_hud_get_screen_width,djui_hud_get_screen_height,djui_hud_set_color,djui_hud_measure_text,djui_hud_render_rect,djui_hud_print_text,math.floor
 
-local function on_hud_render()
+local function on_hud_render_behind()
     djui_hud_set_resolution(RESOLUTION_N64)
     djui_hud_set_font(FONT_NORMAL)
 
@@ -21,4 +21,4 @@ local function on_hud_render()
     djui_hud_print_text("z: " .. math_floor(pos.z), x - 7, y + 21, 0.5)
 end
 
-hook_event(HOOK_ON_HUD_RENDER, on_hud_render)
+hook_event(HOOK_ON_HUD_RENDER_BEHIND, on_hud_render_behind)
