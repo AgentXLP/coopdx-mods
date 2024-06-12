@@ -1,6 +1,6 @@
 -- name: Noclip
 -- incompatible: noclip
--- description: Noclip\nBy \\#ec7731\\Agent X\\#dcdcdc\\\n\nThis mod is a utility mod that improves\nACT_DEBUG_FREE_MOVE and makes it easily accessible without the development build.
+-- description: Noclip v1.1.1\nBy \\#ec7731\\Agent X\\#dcdcdc\\\n\nThis mod is a utility mod that improves\nACT_DEBUG_FREE_MOVE and makes it easily accessible without the development build.
 -- pausable: true
 
 local cur_obj_scale,vec3f_to_object_pos,maxf,load_object_collision_model,obj_mark_for_deletion,obj_get_first_with_behavior_id,set_first_person_enabled,set_mario_action,set_character_anim_with_accel,set_character_animation,spawn_non_sync_object,vec3f_add,vec3f_copy,vec3f_length,vec3s_set,cur_obj_hide,cur_obj_unhide,network_is_moderator,network_is_server,djui_chat_message_create = cur_obj_scale,vec3f_to_object_pos,maxf,load_object_collision_model,obj_mark_for_deletion,obj_get_first_with_behavior_id,set_first_person_enabled,set_mario_action,set_character_anim_with_accel,set_character_animation,spawn_non_sync_object,vec3f_add,vec3f_copy,vec3f_length,vec3s_set,cur_obj_hide,cur_obj_unhide,network_is_moderator,network_is_server,djui_chat_message_create
