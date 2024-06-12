@@ -1,4 +1,5 @@
 -- name: Noclip
+-- incompatible: noclip
 -- description: Noclip\nBy \\#ec7731\\Agent X\\#dcdcdc\\\n\nThis mod is a utility mod that improves\nACT_DEBUG_FREE_MOVE and makes it easily accessible without the development build.
 -- pausable: true
 
