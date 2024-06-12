@@ -26,3 +26,5 @@ To download single file mods click on the link and then press the "Raw" button t
 [Day Night Cycle DX](./mods/day-night-cycle/day-night-cycle.zip)
 
 [Gun Mod DX](./mods/gun-mod/gun-mod.zip)
+
+[Breaking Bad Death Cutscene](./mods/bb-death/bb-death.zip)
