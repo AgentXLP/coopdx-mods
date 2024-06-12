@@ -47,6 +47,12 @@ python utils/lua_optimizer.py mods/mod-name
 
 Once you obtain this output file, you can paste the optimization lines into each one of the mod's files.
 
+Another practice I have is that when I'm working with HUD rendering, any rendering property that's used or set (resolution, font, color, ect) is declared in the function. If I set the filter and font for example, I'm going to run this:
+```lua
+djui_hud_set_filter(FILTER_NEAREST)
+djui_hud_set_font(FONT_HUD)
+```
+
 ## Structure
 
 I typically structure my mods with a constants file and a utility functions file. These are executed first because they are prefixed with `a-`.
@@ -58,3 +64,7 @@ I typically structure my mods with a constants file and a utility functions file
 * `main.lua`: This file is the entry point of the mod, it contains the name, description, incompatibility tags, deluxe tag and pausable tag. I usually put vital hooks, variables and functions in this file.
 
 * Other Lua Files: These files contain different components or systems that are in the mod. For example, Underworld has files such as `cutscene.lua`, `dialog.lua`, `npc.lua`.
+
+## Mod Storage 
+
+In Mod Storage keys, I use snake_case for naming them.

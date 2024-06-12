@@ -4,7 +4,7 @@ import os
 from mathutils import Euler
 import math
 
-LEVEL = "rr"
+LEVEL = "bob"
 
 macro_yellow_coin = "macro_yellow_coin"
 macro_yellow_coin_2 = "macro_yellow_coin_2"        
@@ -373,6 +373,8 @@ macro_empty_363 = "macro_empty_363"
 macro_empty_364 = "macro_empty_364"
 macro_empty_36 = "macro_empty_36"
 
+special_bubble_tree = "special_bubble_tree"
+
 DIALOG_000 = "DIALOG_000"
 DIALOG_001 = "DIALOG_001"
 DIALOG_002 = "DIALOG_002"
@@ -568,7 +570,7 @@ def SPECIAL_OBJECT_WITH_YAW_AND_PARAM(preset, posX, posY, posZ, yaw, behParam):
 def SPECIAL_OBJECT(preset, posX, posY, posZ):
     return MACRO_OBJECT(preset, 0, posX, posY, posZ)
 
-with open(os.path.join(bpy.context.scene.decompPath, f"levels\\{LEVEL}\\areas\\1\\macro.inc.c"), "r") as f:
+with open(os.path.join(bpy.context.scene.decompPath, f"levels/{LEVEL}/areas/1/macro.inc.c"), "r") as f:
     data = f.read().split("\n")
     for line in data:
         line = line.strip()
@@ -593,3 +595,28 @@ with open(os.path.join(bpy.context.scene.decompPath, f"levels\\{LEVEL}\\areas\\1
             if len(macro) > 5:
                 obj.fast64.sm64.game_object.bparams = str(macro[5])
                 obj.fast64.sm64.game_object.use_individual_params = False
+
+'''               
+with open(os.path.join(bpy.context.scene.decompPath, f"levels/{LEVEL}/areas/1/collision.inc.c"), "r") as f:
+    data = f.read().split("\n")
+    for line in data:
+        line = line.strip()
+        if line.startswith("SPECIAL_OBJECT"):
+            line = line.replace("),", ")")
+            line = line.replace("/*preset*/ ", "")
+            line = line.replace(" /*pos*/", "")
+
+            special = eval(line)
+
+            obj = bpy.data.objects.new("Empty", None)
+            bpy.context.scene.collection.objects.link(obj)
+            obj.name = "Special " + special[0]
+            obj.sm64_obj_type = "Special"
+            obj.sm64_special_enum = "Custom"
+            obj.sm64_obj_preset = special[0]
+            obj.location = [special[2], special[3], special[4]]
+            obj.rotation_euler.rotate(Euler((0, math.radians(special[1]), 0)))
+            # if len(special) > 5:
+            #     obj.fast64.sm64.game_object.bparams = str(special[5])
+            #     obj.fast64.sm64.game_object.use_individual_params = False
+'''
