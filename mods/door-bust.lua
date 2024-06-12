@@ -1,4 +1,5 @@
 -- name: Door Bust
+-- incompatible: door-bust
 -- description: Door Bust v1.2.3\nBy \\#ec7731\\Agent X\\#dcdcdc\\\n\nThis mod adds busting down doors by slide kicking or jump kicking into them, flying doors can deal damage to other players and normal doors will respawn after 10 seconds.
 -- pausable: true
 
