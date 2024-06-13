@@ -1,6 +1,6 @@
 -- name: Breaking Bad Death Cutscene
 -- incompatible: death-cutscene
--- description: Breaking Bad Death Cutscene\nBy Agent\\#ec7731\\X\n\n\\#dcdcdc\\This mod replaces the normal death sequence with the final shot of Breaking Bad where the camera pans away from Walter White's body. Bubbling is automatically disabled and the sequence is only triggered by dying\nstanding, on your back, on your stomach, suffocating, being electrocuted or drowning.\n\nRun /bb-gameover to toggle the death cutscene only playing if you have 0 lives left.
+-- description: Breaking Bad Death Cutscene v1.0.1\nBy Agent\\#ec7731\\X\n\n\\#dcdcdc\\This mod replaces the normal death sequence with the final shot of Breaking Bad where the camera pans away from Walter White's body. Bubbling is automatically disabled and the sequence is only triggered by dying\nstanding, on your back, on your stomach, suffocating, being electrocuted or drowning.\n\nWhen a player dies, the music will play\nand get louder the closer you are to the body and quieter the farther away.\nThe vanilla music also fades out the closer you are to the body.\n\nPress A or B to skip the cutscene.\n\nRun /bb-gameover to toggle the death cutscene only playing if you have 0 lives left.
 -- pausable: true
 
 local STREAM_BABY_BLUE = audio_stream_load("baby_blue.ogg")
