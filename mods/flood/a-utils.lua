@@ -1,18 +1,13 @@
 moveset = false
-cheats = false
 
 for mod in pairs(gActiveMods) do
-    if gActiveMods[mod].name:find("Object Spawner") then
+    if gActiveMods[mod].name:find("Object Spawner") or gActiveMods[mod].name:find("Noclip") then
         cheats = true
     end
 end
 
-if gServerSettings.enableCheats ~= 0 then
-    cheats = true
-end
-
 for i in pairs(gActiveMods) do
-    if (gActiveMods[i].incompatible ~= nil and gActiveMods[i].incompatible:find("moveset")) or gActiveMods[i].name:find("Squishy's Server") or (gActiveMods[i].name:find("Pasta") and gActiveMods[i].name:find("Castle")) then
+    if (gActiveMods[i].incompatible ~= nil and gActiveMods[i].incompatible:find("moveset")) or (gActiveMods[i].name:find("Pasta") and gActiveMods[i].name:find("Castle")) then
         moveset = true
     end
 end
