@@ -1,5 +1,3 @@
-if SM64COOPDX_VERSION == nil then return end
-
 --- @param weapon Weapon
 --- @return nil
 function common_shoot(weapon)

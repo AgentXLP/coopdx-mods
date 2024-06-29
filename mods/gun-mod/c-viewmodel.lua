@@ -1,5 +1,3 @@
-if SM64COOPDX_VERSION == nil then return end
-
 local CAP_FLICKER_FRAMES = 0x4444449249255555 -- this is beyond my comprehension
 
 gFirstPersonViewmodels = {

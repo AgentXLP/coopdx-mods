@@ -1,15 +1,3 @@
-if SM64COOPDX_VERSION == nil then
-    local first = false
-    hook_event(HOOK_ON_LEVEL_INIT, function()
-        if not first then
-            first = true
-            play_sound(SOUND_MENU_CAMERA_BUZZ, { x = 0, y = 0, z = 0 })
-            djui_chat_message_create("\\#ff7f7f\\Gun Mod is no longer supported with sm64ex-coop as it uses sm64coopdx exclusive Lua functionality.\n\\#dcdcdc\\To play this mod, try out sm64coopdx, at\n\\#7f7fff\\https://sm64coopdx.com")
-        end
-    end)
-    return
-end
-
 -- models
 E_MODEL_BULLET_HOLE = smlua_model_util_get_id("bullet_hole_geo")
 E_MODEL_SINGLE_ARM = smlua_model_util_get_id("arm_geo")
