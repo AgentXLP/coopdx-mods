@@ -1,13 +1,16 @@
 -- name: Breaking Bad Death Cutscene
--- incompatible: death-cutscene
--- description: Breaking Bad Death Cutscene v1.0.1\nBy Agent\\#ec7731\\X\n\n\\#dcdcdc\\This mod replaces the normal death sequence with the final shot of Breaking Bad where the camera pans away from Walter White's body. Bubbling is automatically disabled and the sequence is only triggered by dying\nstanding, on your back, on your stomach, suffocating, being electrocuted or drowning.\n\nWhen a player dies, the music will play\nand get louder the closer you are to the body and quieter the farther away.\nThe vanilla music also fades out the closer you are to the body.\n\nPress A or B to skip the cutscene.\n\nRun /bb-gameover to toggle the death cutscene only playing if you have 0 lives left.
+-- incompatible: death-cutscene bb-death arena
+-- description: Breaking Bad Death Cutscene v1.0.2\nBy \\#ec7731\\AgentX\n\n\\#dcdcdc\\This mod replaces the normal death sequence with the final shot of Breaking Bad where the camera pans away from Walter White's body. Bubbling is automatically disabled and the sequence is only triggered by dying\nstanding, on your back, on your stomach, suffocating, being electrocuted or drowning.\n\nWhen a player dies, the music will play\nand get louder the closer you are to the body and quieter the farther away.\nThe vanilla music also fades out the closer you are to the body.\n\nPress A or B to skip the cutscene.\n\nRun /bb-gameover to toggle the death cutscene only playing if you have 0 lives left.
 -- pausable: true
+
+-- localize functions to improve performance
+local audio_stream_load,allocate_mario_action,set_character_anim_with_accel,vec3f_set,audio_stream_set_position,vec3f_copy,audio_stream_get_position,dist_between_objects,audio_stream_set_volume,fade_volume_scale,clampf,level_trigger_warp,get_current_background_music,stop_background_music,audio_stream_play,camera_unfreeze,hud_show,audio_stream_stop,sound_banks_enable,set_mario_action,camera_freeze,hud_hide,sound_banks_disable,djui_chat_message_create = audio_stream_load,allocate_mario_action,set_character_anim_with_accel,vec3f_set,audio_stream_set_position,vec3f_copy,audio_stream_get_position,dist_between_objects,audio_stream_set_volume,fade_volume_scale,clampf,level_trigger_warp,get_current_background_music,stop_background_music,audio_stream_play,camera_unfreeze,hud_show,audio_stream_stop,sound_banks_enable,set_mario_action,camera_freeze,hud_hide,sound_banks_disable,djui_chat_message_create
 
 local STREAM_BABY_BLUE = audio_stream_load("baby_blue.ogg")
 
 local PACKET_MUSIC = 0
 
-local ACT_DEAD = allocate_mario_action(ACT_GROUP_CUTSCENE | ACT_FLAG_STATIONARY | ACT_FLAG_INTANGIBLE | ACT_FLAG_INVULNERABLE)
+local ACT_BB_DEATH = allocate_mario_action(ACT_GROUP_CUTSCENE | ACT_FLAG_STATIONARY | ACT_FLAG_INTANGIBLE | ACT_FLAG_INVULNERABLE)
 
 local sCutsceneState = {
     playing = false,
@@ -62,6 +65,7 @@ local function packet_send(reliable, packet, dataTable)
 end
 
 --- @param action integer
+--- Checks if the action is one suitable for the death cutscene to play from
 local function is_death_action_acceptable(action)
     return action == ACT_DEATH_ON_BACK or
         action == ACT_DEATH_ON_STOMACH or
@@ -71,13 +75,14 @@ local function is_death_action_acceptable(action)
         action == ACT_DROWNING
 end
 
+--- Checks if Day Night Cycle DX v2.1 or greater is enabled
 local function is_dnc_mod_enabled()
     return _G.dayNightCycleApi ~= nil and _G.dayNightCycleApi.version ~= nil -- check version since that will be a new field in Day Night Cycle DX v2.1 
 end
 
 --- @param m MarioState
 --- He's dead, Jim.
-local function act_dead(m)
+local function act_bb_death(m)
     set_character_anim_with_accel(m, CHAR_ANIM_DYING_ON_BACK, 0)
     m.marioObj.header.gfx.animInfo.animFrame = 55
     m.marioBodyState.eyeState = MARIO_EYES_DEAD
@@ -96,14 +101,14 @@ end
 
 local function update()
     -- for players that aren't the ones dying
-    if audio_stream_get_position(STREAM_BABY_BLUE) ~= 0 and gMarioStates[0].action ~= ACT_DEAD and not is_death_action_acceptable(gMarioStates[0].action) then
+    if audio_stream_get_position(STREAM_BABY_BLUE) ~= 0 and gMarioStates[0].action ~= ACT_BB_DEATH and not is_death_action_acceptable(gMarioStates[0].action) then
         -- get the nearest Mario in the death cutscene
         local nearest = nil
         local nearestDist = 0
         local count = 0
         for i = 1, MAX_PLAYERS - 1 do
             local m = gMarioStates[i]
-            if active_player(m) and m.action == ACT_DEAD then
+            if active_player(m) and m.action == ACT_BB_DEATH then
                 local dist = dist_between_objects(gMarioStates[0].marioObj, gMarioStates[i].marioObj)
                 if nearest == nil or dist < nearestDist then
                     nearest = gMarioStates[i]
@@ -169,6 +174,8 @@ local function on_set_mario_action(m)
         if is_dnc_mod_enabled() then
             _G.dayNightCycleApi.playNightMusic = false
         end
+    elseif m.action == ACT_BB_DEATH then
+        stop_background_music(get_current_background_music()) -- just to make sure
     end
 end
 
@@ -204,7 +211,7 @@ local function on_death(m)
         if m.action == ACT_DROWNING then
             m.pos.y = m.waterLevel - 20
         end
-        set_mario_action(m, ACT_DEAD, 0)
+        set_mario_action(m, ACT_BB_DEATH, 0)
         camera_freeze()
         hud_hide()
         sound_banks_disable(SEQ_PLAYER_SFX, SOUND_BANKS_ALL)
@@ -220,7 +227,7 @@ end
 
 local function on_packet_receive(dataTable)
     if gNetworkPlayers[0].currLevelNum ~= dataTable.level or gNetworkPlayers[0].currAreaIndex ~= dataTable.area or gNetworkPlayers[0].currActNum ~= dataTable.act then return end
-    if gMarioStates[0].action == ACT_DEAD then return end
+    if gMarioStates[0].action == ACT_BB_DEATH then return end
 
     if dataTable.id == PACKET_MUSIC and audio_stream_get_position(STREAM_BABY_BLUE) == 0.0 then
         if is_dnc_mod_enabled() then
@@ -245,6 +252,6 @@ hook_event(HOOK_ON_LEVEL_INIT, on_level_init)
 hook_event(HOOK_ON_DEATH, on_death)
 hook_event(HOOK_ON_PACKET_RECEIVE, on_packet_receive)
 
-hook_mario_action(ACT_DEAD, act_dead)
+hook_mario_action(ACT_BB_DEATH, act_bb_death)
 
-hook_chat_command("bb-gameover", "To toggle the option of only triggering the cutscene when you are going to Game Over", on_bb_gameover_command)
+hook_chat_command("bb-gameover", "- To toggle the option of only triggering the cutscene when you are going to Game Over", on_bb_gameover_command)
