@@ -1,13 +1,13 @@
 -- name: Noclip
 -- incompatible: noclip
--- description: Noclip v1.1.1\nBy \\#ec7731\\Agent X\\#dcdcdc\\\n\nThis mod is a utility mod that improves\nACT_DEBUG_FREE_MOVE and makes it easily accessible without the development build.
+-- description: Noclip v1.1.2\nBy \\#ec7731\\Agent X\\#dcdcdc\\\n\nThis mod is a utility mod that improves\nACT_DEBUG_FREE_MOVE and makes it easily accessible without the development build.
 -- pausable: true
 
-local cur_obj_scale,vec3f_to_object_pos,maxf,load_object_collision_model,obj_mark_for_deletion,obj_get_first_with_behavior_id,set_first_person_enabled,set_mario_action,set_character_anim_with_accel,set_character_animation,spawn_non_sync_object,vec3f_add,vec3f_copy,vec3f_length,vec3s_set,cur_obj_hide,cur_obj_unhide,network_is_moderator,network_is_server,djui_chat_message_create = cur_obj_scale,vec3f_to_object_pos,maxf,load_object_collision_model,obj_mark_for_deletion,obj_get_first_with_behavior_id,set_first_person_enabled,set_mario_action,set_character_anim_with_accel,set_character_animation,spawn_non_sync_object,vec3f_add,vec3f_copy,vec3f_length,vec3s_set,cur_obj_hide,cur_obj_unhide,network_is_moderator,network_is_server,djui_chat_message_create
+local cur_obj_scale,network_local_index_from_global,obj_mark_for_deletion,vec3f_to_object_pos,load_object_collision_model,set_first_person_enabled,set_mario_action,set_character_anim_with_accel,set_character_animation,vec3f_add,vec3f_copy,vec3f_length,vec3s_set,cur_obj_hide,cur_obj_unhide,obj_get_first_with_behavior_id,obj_get_next_with_same_behavior_id,spawn_non_sync_object,djui_chat_message_create = cur_obj_scale,network_local_index_from_global,obj_mark_for_deletion,vec3f_to_object_pos,load_object_collision_model,set_first_person_enabled,set_mario_action,set_character_anim_with_accel,set_character_animation,vec3f_add,vec3f_copy,vec3f_length,vec3s_set,cur_obj_hide,cur_obj_unhide,obj_get_first_with_behavior_id,obj_get_next_with_same_behavior_id,spawn_non_sync_object,djui_chat_message_create
 
 local ACT_NOCLIP = allocate_mario_action(ACT_GROUP_CUTSCENE | ACT_FLAG_AIR)
 
-local fp = false
+local firstPersonEnabled = false
 
 --- @param cond boolean
 --- Human readable ternary operator
@@ -23,6 +23,31 @@ function on_or_off(value)
     return "\\#ff0000\\OFF"
 end
 
+--- @param m MarioState
+--- Checks if a player is currently active
+function active_player(m)
+    local np = gNetworkPlayers[m.playerIndex]
+    if m.playerIndex == 0 then
+        return true
+    end
+    if not np.connected then
+        return false
+    end
+    if np.currCourseNum ~= gNetworkPlayers[0].currCourseNum then
+        return false
+    end
+    if np.currActNum ~= gNetworkPlayers[0].currActNum then
+        return false
+    end
+    if np.currLevelNum ~= gNetworkPlayers[0].currLevelNum then
+        return false
+    end
+    if np.currAreaIndex ~= gNetworkPlayers[0].currAreaIndex then
+        return false
+    end
+    return true
+end
+
 
 --- @param o Object
 local function bhv_noclip_floor_init(o)
@@ -33,8 +58,14 @@ end
 
 --- @param o Object
 local function bhv_noclip_floor_loop(o)
-    vec3f_to_object_pos(o, gMarioStates[0].pos)
-    o.oPosY = maxf(o.oPosY - 10000, -11000)
+    local m = gMarioStates[network_local_index_from_global(o.globalPlayerIndex)]
+    if m.action ~= ACT_NOCLIP then
+        obj_mark_for_deletion(o)
+        return
+    end
+
+    vec3f_to_object_pos(o, m.pos)
+    o.oPosY = gLevelValues.floorLowerLimit
 
     load_object_collision_model()
 end
@@ -45,8 +76,7 @@ local id_bhvNoclipFloor = hook_behavior(nil, OBJ_LIST_SURFACE, true, bhv_noclip_
 --- @param m MarioState
 local function act_noclip(m)
     if (m.controller.buttonPressed & L_TRIG) ~= 0 and m.marioObj.oTimer > 10 then
-        obj_mark_for_deletion(obj_get_first_with_behavior_id(id_bhvNoclipFloor))
-        if SM64COOPDX_VERSION ~= nil and fp then
+        if firstPersonEnabled then
             set_first_person_enabled(false)
         end
         return set_mario_action(m, if_then_else(m.pos.y <= m.waterLevel - 100, ACT_WATER_IDLE, ACT_IDLE), 0)
@@ -69,15 +99,6 @@ local function act_noclip(m)
         vel.y = vel.y - 16 * speed
     end
 
-    if obj_get_first_with_behavior_id(id_bhvNoclipFloor) == nil then
-        spawn_non_sync_object(
-            id_bhvNoclipFloor,
-            E_MODEL_NONE,
-            m.pos.x, m.pos.y - 1000, m.pos.z,
-            nil
-        )
-    end
-
     vec3f_add(m.pos, vel)
     vec3f_copy(m.vel, vel)
     m.forwardVel = vec3f_length({ x = vel.x, y = 0, z = m.vel.z })
@@ -93,7 +114,7 @@ local function act_noclip(m)
     end
 
     if SM64COOPDX_VERSION ~= nil then
-        set_first_person_enabled(fp)
+        set_first_person_enabled(firstPersonEnabled)
     end
 
     return 0
@@ -101,24 +122,48 @@ end
 
 --- @param m MarioState
 local function mario_update(m)
-    if m.playerIndex ~= 0 then return end
+    if active_player(m) == 0 then return end
 
-    if m.action == ACT_DEBUG_FREE_MOVE or ((m.controller.buttonDown & L_TRIG) ~= 0 and (m.controller.buttonDown & Z_TRIG) ~= 0 and (network_is_server() or network_is_moderator())) then
+    if (m.action == ACT_DEBUG_FREE_MOVE or ((m.controller.buttonDown & L_TRIG) ~= 0 and (m.controller.buttonDown & Z_TRIG) ~= 0)) then
         set_mario_action(m, ACT_NOCLIP, 0)
+    end
+
+    if m.action ~= ACT_NOCLIP then return end
+
+    local spawned = false
+    local noclipFloor = obj_get_first_with_behavior_id(id_bhvNoclipFloor)
+    while noclipFloor ~= nil do
+        if noclipFloor.globalPlayerIndex == gNetworkPlayers[m.playerIndex].globalIndex then
+            spawned = true
+            break
+        end
+        noclipFloor = obj_get_next_with_same_behavior_id(noclipFloor)
+    end
+
+    if not spawned then
+        spawn_non_sync_object(
+            id_bhvNoclipFloor,
+            E_MODEL_NONE,
+            m.pos.x, gLevelValues.floorLowerLimit, m.pos.z,
+            --- @param obj Object
+            function(obj)
+                obj.globalPlayerIndex = gNetworkPlayers[m.playerIndex].globalIndex
+            end
+        )
     end
 end
 
 
 local function on_noclip_fp_command()
-    fp = not fp
-    djui_chat_message_create("[Noclip] First person status: " .. on_or_off(fp))
+    firstPersonEnabled = not firstPersonEnabled
+    djui_chat_message_create("[Noclip] First person status: " .. on_or_off(firstPersonEnabled))
     return true
 end
 
 hook_event(HOOK_MARIO_UPDATE, mario_update)
 
 if SM64COOPDX_VERSION ~= nil then
-    hook_chat_command("noclip-fp", "Toggles Noclip first person on or off", on_noclip_fp_command)
+    hook_chat_command("noclip-fp", "- Toggles first person noclip on or off", on_noclip_fp_command)
 end
 
 hook_mario_action(ACT_NOCLIP, act_noclip)
