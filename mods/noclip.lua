@@ -76,7 +76,7 @@ local id_bhvNoclipFloor = hook_behavior(nil, OBJ_LIST_SURFACE, true, bhv_noclip_
 --- @param m MarioState
 local function act_noclip(m)
     if (m.controller.buttonPressed & L_TRIG) ~= 0 and m.marioObj.oTimer > 10 then
-        if firstPersonEnabled then
+        if m.playerIndex == 0 and firstPersonEnabled then
             set_first_person_enabled(false)
         end
         return set_mario_action(m, if_then_else(m.pos.y <= m.waterLevel - 100, ACT_WATER_IDLE, ACT_IDLE), 0)
@@ -113,7 +113,7 @@ local function act_noclip(m)
         cur_obj_unhide()
     end
 
-    if SM64COOPDX_VERSION ~= nil then
+    if m.playerIndex == 0 and SM64COOPDX_VERSION ~= nil then
         set_first_person_enabled(firstPersonEnabled)
     end
 
