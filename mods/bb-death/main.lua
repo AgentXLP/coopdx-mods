@@ -1,7 +1,6 @@
 -- name: Breaking Bad Death Cutscene
 -- incompatible: death-cutscene bb-death arena
--- description: Breaking Bad Death Cutscene v1.0.2\nBy \\#ec7731\\AgentX\n\n\\#dcdcdc\\This mod replaces the normal death sequence with the final shot of Breaking Bad where the camera pans away from Walter White's body. Bubbling is automatically disabled and the sequence is only triggered by dying\nstanding, on your back, on your stomach, suffocating, being electrocuted or drowning.\n\nWhen a player dies, the music will play\nand get louder the closer you are to the body and quieter the farther away.\nThe vanilla music also fades out the closer you are to the body.\n\nPress A or B to skip the cutscene.\n\nRun /bb-gameover to toggle the death cutscene only playing if you have 0 lives left.
--- pausable: true
+-- description: Breaking Bad Death Cutscene v1.0.2\nBy \\#ec7731\\AgentX\n\n\\#dcdcdc\\This mod replaces the normal death sequence with the final shot of Breaking Bad where the camera pans away from Walter White's body. Bubbling is automatically disabled and the sequence is only triggered by dying\nstanding, on your back, on your stomach, suffocating, being electrocuted or drowning.\n\nWhen a player dies, the music will play\nand get louder the closer you are to the body and quieter the farther away.\nThe vanilla music also fades out the closer you are to the body.\n\nPress [\\#3040ff\\A\\#dcdcdc\\] or [\\#3040ff\\B\\#dcdcdc\\] to skip the cutscene.\n\nRun /bb-gameover to toggle the death cutscene only playing if you have 0 lives left.
 
 -- localize functions to improve performance
 local audio_stream_load,allocate_mario_action,set_character_anim_with_accel,vec3f_set,audio_stream_set_position,vec3f_copy,audio_stream_get_position,dist_between_objects,audio_stream_set_volume,fade_volume_scale,clampf,level_trigger_warp,get_current_background_music,stop_background_music,audio_stream_play,camera_unfreeze,hud_show,audio_stream_stop,sound_banks_enable,set_mario_action,camera_freeze,hud_hide,sound_banks_disable,djui_chat_message_create = audio_stream_load,allocate_mario_action,set_character_anim_with_accel,vec3f_set,audio_stream_set_position,vec3f_copy,audio_stream_get_position,dist_between_objects,audio_stream_set_volume,fade_volume_scale,clampf,level_trigger_warp,get_current_background_music,stop_background_music,audio_stream_play,camera_unfreeze,hud_show,audio_stream_stop,sound_banks_enable,set_mario_action,camera_freeze,hud_hide,sound_banks_disable,djui_chat_message_create
@@ -17,52 +16,8 @@ local sCutsceneState = {
     timer = 0
 }
 
-local gameoverMode = false
-
---- @param value boolean
---- Returns an on or off string depending on value
-local function on_or_off(value)
-    if value then return "\\#00ff00\\ON" end
-    return "\\#ff0000\\OFF"
-end
-
---- @param m MarioState
---- Checks if a player is currently active
-local function active_player(m)
-    local np = gNetworkPlayers[m.playerIndex]
-    if m.playerIndex == 0 then
-        return true
-    end
-    if not np.connected then
-        return false
-    end
-    if np.currCourseNum ~= gNetworkPlayers[0].currCourseNum then
-        return false
-    end
-    if np.currActNum ~= gNetworkPlayers[0].currActNum then
-        return false
-    end
-    if np.currLevelNum ~= gNetworkPlayers[0].currLevelNum then
-        return false
-    end
-    if np.currAreaIndex ~= gNetworkPlayers[0].currAreaIndex then
-        return false
-    end
-    return true
-end
-
---- @param reliable boolean
---- @param packet integer
---- @param dataTable table
---- Sends a packet with the level, area, and act it came from
-local function packet_send(reliable, packet, dataTable)
-    dataTable = dataTable or {}
-    dataTable.id = packet
-    dataTable.level = gNetworkPlayers[0].currLevelNum
-    dataTable.area = gNetworkPlayers[0].currAreaIndex
-    dataTable.act = gNetworkPlayers[0].currActNum
-    network_send(reliable, dataTable)
-end
+local gameoverMode = mod_storage_load_bool("gameover_mode")
+local cakeScreen = if_then_else(mod_storage_load("cake_screen") == nil, true, mod_storage_load_bool("cake_screen"))
 
 --- @param action integer
 --- Checks if the action is one suitable for the death cutscene to play from
@@ -77,7 +32,7 @@ end
 
 --- Checks if Day Night Cycle DX v2.1 or greater is enabled
 local function is_dnc_mod_enabled()
-    return _G.dayNightCycleApi ~= nil and _G.dayNightCycleApi.version ~= nil -- check version since that will be a new field in Day Night Cycle DX v2.1 
+    return _G.dayNightCycleApi ~= nil and _G.dayNightCycleApi.version ~= nil -- check version since that is a new field in Day Night Cycle DX v2.1 
 end
 
 --- @param m MarioState
@@ -89,9 +44,9 @@ local function act_bb_death(m)
     if m.playerIndex == 0 then
         vec3f_set(m.marioObj.header.gfx.angle, 0, 0x8000, 0)
 
-        if (m.controller.buttonPressed & (A_BUTTON | B_BUTTON)) ~= 0 then
+        if (m.controller.buttonPressed & (A_BUTTON | B_BUTTON)) ~= 0 and sCutsceneState.timer < 1740 then
             sCutsceneState.timer = 1740
-            audio_stream_set_position(STREAM_BABY_BLUE, 61)
+            audio_stream_set_position(STREAM_BABY_BLUE, 55)
         end
     end
 
@@ -157,7 +112,7 @@ local function update()
     -- increment the timer and trigger the ending screen if the time has come
     sCutsceneState.timer = sCutsceneState.timer + 1
     if sCutsceneState.timer == 1770 then
-        level_trigger_warp(m, WARP_OP_CREDITS_END)
+        level_trigger_warp(m, if_then_else(cakeScreen, WARP_OP_CREDITS_END, WARP_OP_DEATH))
     end
 end
 
@@ -204,9 +159,11 @@ local function on_death(m)
 
     -- setup the death cutscene
     if is_death_action_acceptable(m.action) then
-        m.numLives = m.numLives - 1
-        if m.numLives < 0 then
-            m.numLives = 4
+        if cakeScreen then
+            m.numLives = m.numLives - 1
+            if m.numLives < 0 then
+                m.numLives = 4
+            end
         end
         if m.action == ACT_DROWNING then
             m.pos.y = m.waterLevel - 20
@@ -238,10 +195,14 @@ local function on_packet_receive(dataTable)
 end
 
 
-local function on_bb_gameover_command()
-    gameoverMode = not gameoverMode
-    djui_chat_message_create("[Breaking Bad Death Cutscene] Game Over Mode: " .. on_or_off(gameoverMode))
-    return true
+local function on_set_game_over_mode(_, value)
+    gameoverMode = value
+    mod_storage_save_bool("gameover_mode", value)
+end
+
+local function on_set_show_cake_screen(_, value)
+    cakeScreen = value
+    mod_storage_save_bool("cake_screen", value)
 end
 
 gServerSettings.bubbleDeath = false
@@ -254,4 +215,5 @@ hook_event(HOOK_ON_PACKET_RECEIVE, on_packet_receive)
 
 hook_mario_action(ACT_BB_DEATH, act_bb_death)
 
-hook_chat_command("bb-gameover", "- To toggle the option of only triggering the cutscene when you are going to Game Over", on_bb_gameover_command)
+hook_mod_menu_checkbox("Game Over Mode", gameoverMode, on_set_game_over_mode)
+hook_mod_menu_checkbox("Show Cake Screen", cakeScreen, on_set_show_cake_screen)
