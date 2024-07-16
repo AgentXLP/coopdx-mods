@@ -6,6 +6,8 @@ Days last 24 minutes and with the /time command, you can set/scale/query the tim
 
 There is also now a new menu in the pause menu for Day Night Cycle DX!
 
+Special thanks to MaiskX3 for the night time music.
+
 Special thanks to AngelicMiracles for the sunset, sunrise and night time skyboxes.
 
 Special thanks to eros71 for salvaging the mod files.
