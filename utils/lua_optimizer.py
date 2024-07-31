@@ -1684,7 +1684,10 @@ specialFunctions = [
     "string.upper",
     "string.gsub",
     "string.sub",
-    "string.format"
+    "string.format",
+    "string.rep",
+    "string.find",
+    "string.len"
 ]
 
 def get_parameter(argIndex, message):
