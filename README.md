@@ -30,3 +30,5 @@ To download single file mods click on the link and then press the "Raw" button t
 [Breaking Bad Death Cutscene](./mods/bb-death/bb-death.zip)
 
 [[PET] Propeller Fly Guy](./mods/pet-propeller-flyguy/pet-propeller-flyguy.zip)
+
+[Weather Cycle DX](./mods/weather-cycle-dx/weather-cycle-dx.zip)
