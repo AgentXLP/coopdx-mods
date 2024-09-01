@@ -1755,7 +1755,7 @@ def main():
         f.write(output)
 
 def main_list_gen():
-    path = get_parameter(1, "Enter path to sm64ex-coop Lua function autogen: ")
+    path = get_parameter(1, "Enter path to sm64coopdx Lua function autogen: ")
     output = "functionList = ["
     with open(path, "r") as f:
         for line in f.readlines():
