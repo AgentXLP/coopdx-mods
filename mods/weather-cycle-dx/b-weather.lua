@@ -1,4 +1,4 @@
-if _G.dayNightCycleApi == nil or _G.dayNightCycleApi.version == nil then return end
+if not check_dnc_compatible() then return end
 
 -- localize functions to improve performance
 local type,error,get_skybox,clamp,get_network_player_smallest_global,math_random,collision_find_floor,spawn_sync_object = type,error,get_skybox,clamp,get_network_player_smallest_global,math.random,collision_find_floor,spawn_sync_object
@@ -15,7 +15,7 @@ local type,error,get_skybox,clamp,get_network_player_smallest_global,math_random
 --- @field public rainAmount integer
 --- @field public rainScaleY number
 --- @field public rainSpeed number
---- @field public eventFunc function
+--- @field public updateFunc function
 
 weatherTypeCount = 0
 
@@ -29,9 +29,8 @@ gWeatherTable = {}
 --- @param fogIntensity number
 --- @param skyboxModel ModelExtendedId
 --- @param skyboxRotSpeed number
---- @param eventFunc function
 --- Registers a type of weather
-function weather_register(name, color, opacity, lightingDir, fogIntensity, skyboxModel, skyboxRotSpeed, eventFunc)
+function weather_register(name, color, opacity, lightingDir, fogIntensity, skyboxModel, skyboxRotSpeed)
     if type(name) ~= "string" then
         error("weather_register: Parameter 'name' must be a string")
         return
@@ -60,10 +59,6 @@ function weather_register(name, color, opacity, lightingDir, fogIntensity, skybo
         error("weather_register: Parameter 'skyboxRotSpeed' must be a number")
         return
     end
-    if type(eventFunc) ~= "function" and eventFunc ~= nil then
-        error("weather_register: Parameter 'eventFunc' must be a function")
-        return
-    end
 
     weatherTypeCount = weatherTypeCount + 1
     local weatherTypeIndex = weatherTypeCount - 1
@@ -75,11 +70,11 @@ function weather_register(name, color, opacity, lightingDir, fogIntensity, skybo
         fogIntensity = fogIntensity,
         skyboxModel = skyboxModel,
         skyboxRotSpeed = skyboxRotSpeed,
+        updateFunc = nil,
         rain = false,
         rainAmount = 0,
         rainScaleY = 0.0,
-        rainSpeed = 0.0,
-        eventFunc = eventFunc
+        rainSpeed = 0.0
     }
     return weatherTypeIndex
 end
@@ -114,6 +109,23 @@ function weather_add_rain(weatherType, amount, scaleY, speed)
     weather.rainSpeed = speed
 end
 
+--- @param weatherType integer
+--- @param updateFunc function
+--- Adds an update function to the weather
+function weather_add_update_func(weatherType, updateFunc)
+    if gWeatherTable[weatherType] == nil then
+        error("weather_add_rain: Weather type '" .. weatherType .. "' does not exist!")
+        return
+    end
+    if type(updateFunc) ~= "function" then
+        error("weather_add_update_func: Parameter 'updateFunc' must be a function")
+        return
+    end
+
+    local weather = gWeatherTable[weatherType]
+    weather.updateFunc = updateFunc
+end
+
 --- @param weather Weather
 --- Gets the color of the weather, accounts for blue tinting in snow levels
 function get_weather_color(weather)
@@ -130,7 +142,7 @@ function get_weather_color(weather)
 end
 
 --- Spawns lightning
-function event_lightning()
+function lightning_update()
     if get_network_player_smallest_global().localIndex ~= 0 or get_skybox() == BACKGROUND_SNOW_MOUNTAINS then return end
 
     if gWeatherState.timeUntilLightning > 0 then
@@ -166,8 +178,7 @@ WEATHER_CLEAR = weather_register(
     1.0, -- lighting dir
     1.0, -- fog intensity
     E_MODEL_NONE, -- skybox model
-    1, -- skybox rotation speed
-    nil -- event function
+    1 -- skybox rotation speed
 )
 
 WEATHER_CLOUDY = weather_register(
@@ -177,8 +188,7 @@ WEATHER_CLOUDY = weather_register(
     0.9, -- lighting dir
     1.01, -- fog intensity
     E_MODEL_WC_SKYBOX_CLOUDY, -- skybox model
-    1, -- skybox rotation speed
-    nil -- event function
+    1 -- skybox rotation speed
 )
 
 WEATHER_RAIN = weather_register(
@@ -188,10 +198,9 @@ WEATHER_RAIN = weather_register(
     0.9, -- lighting dir
     1.01, -- fog intensity
     E_MODEL_WC_SKYBOX_CLOUDY, -- skybox model
-    6, -- skybox rotation speed
-    nil -- event function
+    6 -- skybox rotation speed
 )
-weather_add_rain(WEATHER_RAIN, 40, 0.5, 40)
+weather_add_rain(WEATHER_RAIN, 50, 0.6, 50)
 
 WEATHER_STORM = weather_register(
     "Storm", -- name
@@ -200,7 +209,7 @@ WEATHER_STORM = weather_register(
     0.8, -- lighting dir
     1.02, -- fog intensity
     E_MODEL_WC_SKYBOX_STORM, -- skybox model
-    12, -- skybox rotation speed
-    event_lightning -- event function
+    12 -- skybox rotation speed
 )
-weather_add_rain(WEATHER_STORM, 60, 1.0, 80)
+weather_add_rain(WEATHER_STORM, 60, 1.5, 80)
+weather_add_update_func(WEATHER_STORM, lightning_update)

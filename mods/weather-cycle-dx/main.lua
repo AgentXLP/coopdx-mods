@@ -1,8 +1,8 @@
 -- name: Weather Cycle DX
 -- incompatible: weather weather-cycle
--- description: Weather Cycle DX\nBy \\#ec7731\\Agent X\n\n\\#dcdcdc\\This mod adds a weather cycle system with cloudy skies, rain, and storms to sm64coopdx. It uses Day Night Cycle DX as a base library, meaning you need\nto have the mod enabled in order to use this one. There is also a toggleable\nAurora Borealis that starts after midnight.\n\nSpecial thanks to Floralys for the original concept.\nSpecial thanks to \\#344ee1\\eros71\\#dcdcdc\\ for saving the mod!
+-- description: Weather Cycle DX v1.0.1\nBy \\#ec7731\\Agent X\n\n\\#dcdcdc\\This mod adds a weather cycle system with cloudy skies, rain, and storms to sm64coopdx. It uses Day Night Cycle DX as a base library, meaning you need\nto have the mod enabled in order to use this one. There is also a toggleable\nAurora Borealis that starts after midnight.\n\nSpecial thanks to Floralys for the original concept.\nSpecial thanks to \\#344ee1\\eros71\\#dcdcdc\\ for saving the mod!
 
-if _G.dayNightCycleApi == nil or _G.dayNightCycleApi.version == nil then return end
+if not check_dnc_compatible() then return end
 
 -- localize functions to improve performance
 local get_skybox,network_is_server,error,mod_storage_save_number,math_random,network_check_singleplayer_pause,type,set_override_envfx,get_network_area_timer,play_transition,obj_get_first_with_behavior_id,spawn_non_sync_object,play_sound,obj_count_objects_with_behavior_id,djui_chat_message_create,string_format,mod_storage_save_bool = get_skybox,network_is_server,error,mod_storage_save_number,math.random,network_check_singleplayer_pause,type,set_override_envfx,get_network_area_timer,play_transition,obj_get_first_with_behavior_id,spawn_non_sync_object,play_sound,obj_count_objects_with_behavior_id,djui_chat_message_create,string.format,mod_storage_save_bool
@@ -33,8 +33,8 @@ function show_weather_cycle()
 end
 
 --- Returns whether or not Weather Cycle is enabled (also factoring in DNC)
-function is_weather_cycle_enabled()
-    return gGlobalSyncTable.wcEnabled and _G.dayNightCycleApi.enabled
+function is_wc_enabled()
+    return gGlobalSyncTable.wcEnabled and _G.weatherCycleApi.enabled and _G.dayNightCycleApi.enabled
 end
 
 
@@ -51,13 +51,14 @@ local function set_weather_type(weatherType)
     end
 
     gGlobalSyncTable.weatherType = weatherType
-    mod_storage_save_number("weather_type", weatherType)
     gGlobalSyncTable.timeUntilWeatherChange = math_random(WEATHER_MIN_DURATION, WEATHER_MAX_DURATION)
-    mod_storage_save_number("time_until_weather_change", gGlobalSyncTable.timeUntilWeatherChange)
 end
 
 local function weather_update()
     if network_check_singleplayer_pause() then return end
+
+    local timeScale = _G.dayNightCycleApi.get_time_scale()
+    if timeScale == 0.0 then return end
 
     if gGlobalSyncTable.timeUntilWeatherChange <= 0 then
         local weatherType = math_random(WEATHER_CLEAR, weatherTypeCount - 1)
@@ -68,11 +69,11 @@ local function weather_update()
         set_weather_type(weatherType)
     end
 
-    gGlobalSyncTable.timeUntilWeatherChange = gGlobalSyncTable.timeUntilWeatherChange - _G.dayNightCycleApi.get_time_scale()
+    gGlobalSyncTable.timeUntilWeatherChange = gGlobalSyncTable.timeUntilWeatherChange - timeScale
 end
 
 local function update()
-    if not is_weather_cycle_enabled() then
+    if not is_wc_enabled() then
         set_override_envfx(ENVFX_MODE_NO_OVERRIDE)
         return
     end
@@ -132,7 +133,7 @@ local function update()
     end
 
     local weather = gWeatherTable[gGlobalSyncTable.weatherType]
-    if weather.eventFunc ~= nil then weather.eventFunc() end
+    if weather.updateFunc ~= nil then weather.updateFunc() end
     if not weather.rain then
         set_override_envfx(ENVFX_MODE_NO_OVERRIDE)
         return
@@ -164,13 +165,20 @@ local function update()
 end
 
 local function on_level_init()
-    if not is_weather_cycle_enabled() then return end
+    if not is_wc_enabled() then return end
 
     if gNetworkPlayers[0].currActNum ~= 99 then return end
 
     if gNetworkPlayers[0].currLevelNum == LEVEL_CASTLE_GROUNDS and gMarioStates[0].action ~= ACT_END_WAVING_CUTSCENE then
         gGlobalSyncTable.weatherType = WEATHER_STORM
         gGlobalSyncTable.timeUntilWeatherChange = 43200
+    end
+end
+
+local function on_exit()
+    if network_is_server() then
+        mod_storage_save_number("weather_type", gGlobalSyncTable.weatherType)
+        mod_storage_save_number("time_until_weather_change", gGlobalSyncTable.timeUntilWeatherChange)
     end
 end
 
@@ -227,24 +235,41 @@ local function on_weather_type_changed(_, oldVal, newVal)
     local np = gNetworkPlayers[0]
     local weather = gWeatherTable[newVal]
     local noTransition = (np.currActNum == 99 and np.currLevelNum == LEVEL_CASTLE_GROUNDS and gMarioStates[0].action ~= ACT_END_WAVING_CUTSCENE and newVal == WEATHER_STORM) or
-                         (gWeatherTable[oldVal].rain and weather.rain)
-    print(noTransition)
+                         (gWeatherTable[oldVal].rain and weather.rain) or
+                         (_G.dayNightCycleApi.get_time_scale() == 0.0)
 
     gWeatherState.transitionTimer = if_then_else(noTransition, WEATHER_TRANSITION_TIME, 0)
 
-    if noTransition and weather.eventFunc == event_lightning then
-        gWeatherState.timeUntilLightning = 0
+    if noTransition then
+        if weather.updateFunc == lightning_update then
+            gWeatherState.timeUntilLightning = 0
+        elseif gWeatherTable[oldVal].updateFunc == lightning_update then
+            gWeatherState.timeUntilLightning = 0
+            lightning_update()
+        end
     end
 end
 
 
 --- @param value boolean
 local function on_set_wc_enabled(_, value)
+    if _G.weatherCycleApi.lockWeather then
+        play_sound(SOUND_MENU_CAMERA_BUZZ, gGlobalSoundSource)
+        djui_chat_message_create("\\#ffa0a0\\[Weather Cycle] The Weather Cycle settings have been locked by another mod.")
+        return
+    end
+
     gGlobalSyncTable.wcEnabled = value
 end
 
 --- @param value boolean
 local function on_set_aurora(_, value)
+    if _G.weatherCycleApi.lockWeather then
+        play_sound(SOUND_MENU_CAMERA_BUZZ, gGlobalSoundSource)
+        djui_chat_message_create("\\#ffa0a0\\[Weather Cycle] The Weather Cycle settings have been locked by another mod.")
+        return
+    end
+
     gWeatherState.aurora = value
     mod_storage_save_bool("aurora", value)
 end
@@ -255,23 +280,36 @@ local sReadonlyMetatable = {
     end,
 
     __newindex = function()
-        error("attempt to update a read-only table", 2)
+        error("Attempt to update a read-only table", 2)
     end
 }
 
 _G.weatherCycleApi = {
-    version = WC_VERSION,
+    version = WC_VERSION, -- The version of the mod
+    enabled = true, -- Whether or not the weather cycle is enabled
+    lockWeather = false, -- Whether or not the player should be prevented from changing the weather
     weather_register = weather_register,
     weather_add_rain = weather_add_rain,
+    weather_add_update_func = weather_add_update_func,
     show_weather_cycle = show_weather_cycle,
     set_weather_type = set_weather_type,
     get_weather_color = get_weather_color,
-    event_lightning = event_lightning,
+    event_lightning = lightning_update,
     constants = {
+        WC_VERSION_MAJOR = WC_VERSION_MAJOR,
+        WC_VERSION_MINOR = WC_VERSION_MINOR,
+        WC_VERSION_PATCH = WC_VERSION_PATCH,
+        WC_VERSION = WC_VERSION,
+
         SKYBOX_SCALE = SKYBOX_SCALE,
         WEATHER_TRANSITION_TIME = WEATHER_TRANSITION_TIME,
 
-        COLOR_AURORA = COLOR_AURORA
+        COLOR_AURORA = COLOR_AURORA,
+
+        WEATHER_CLEAR = WEATHER_CLEAR,
+        WEATHER_CLOUDY = WEATHER_CLOUDY,
+        WEATHER_RAIN = WEATHER_RAIN,
+        WEATHER_STORM = WEATHER_STORM
     }
 }
 setmetatable(_G.weatherCycleApi, sReadonlyMetatable)
@@ -280,6 +318,7 @@ gLevelValues.zoomOutCameraOnPause = false
 
 hook_event(HOOK_UPDATE, update)
 hook_event(HOOK_ON_LEVEL_INIT, on_level_init)
+hook_event(HOOK_ON_EXIT, on_exit)
 
 hook_chat_command("weather", "\\#00ffff\\[set|query]\\#dcdcdc\\ - The command handle for Weather Cycle DX", on_weather_command)
 
@@ -290,3 +329,4 @@ if network_is_server() then
 end
 
 hook_mod_menu_checkbox("Aurora Borealis", gWeatherState.aurora, on_set_aurora)
+hook_mod_menu_button("Query Weather", on_query_command)

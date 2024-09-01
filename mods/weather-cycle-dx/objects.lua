@@ -1,4 +1,4 @@
-if _G.dayNightCycleApi == nil or _G.dayNightCycleApi.version == nil then return end
+if not check_dnc_compatible() then return end
 
 -- localize functions to improve performance
 local cur_obj_scale,obj_mark_for_deletion,obj_has_model_extended,obj_set_model_extended,vec3f_to_object_pos,calculate_yaw,math_random,maxf,find_water_level,collision_find_ceil,cur_obj_hide,find_floor_height,obj_scale_xyz,obj_set_pos,cur_obj_unhide,spawn_non_sync_object,play_sound,set_camera_shake_from_hit,cur_obj_update_floor_height_and_get_floor,obj_check_hitbox_overlap,set_mario_action,clampf,math_sin = cur_obj_scale,obj_mark_for_deletion,obj_has_model_extended,obj_set_model_extended,vec3f_to_object_pos,calculate_yaw,math.random,maxf,find_water_level,collision_find_ceil,cur_obj_hide,find_floor_height,obj_scale_xyz,obj_set_pos,cur_obj_unhide,spawn_non_sync_object,play_sound,set_camera_shake_from_hit,cur_obj_update_floor_height_and_get_floor,obj_check_hitbox_overlap,set_mario_action,clampf,math.sin
@@ -11,7 +11,7 @@ end
 
 --- @param o Object
 function bhv_wc_skybox_loop(o)
-    if not is_weather_cycle_enabled() or not show_weather_cycle() then
+    if not is_wc_enabled() or not show_weather_cycle() then
         obj_mark_for_deletion(o)
         return
     end
@@ -72,7 +72,7 @@ end
 
 --- @param o Object
 function bhv_wc_rain_droplet_loop(o)
-    if not is_weather_cycle_enabled() then
+    if not is_wc_enabled() then
         obj_mark_for_deletion(o)
         return
     end
@@ -92,7 +92,7 @@ function bhv_wc_rain_droplet_loop(o)
     end
     o.oPosY = o.oPosY - weather.rainSpeed
     if o.oPosY < o.oFloorHeight then
-        for _ = 1, 2 do
+        for _ = 1, 3 do
             spawn_non_sync_object(
                 id_bhvWaterDropletSplash,
                 E_MODEL_SMALL_WATER_SPLASH,
@@ -102,7 +102,7 @@ function bhv_wc_rain_droplet_loop(o)
         end
         bhv_wc_rain_droplet_init(o)
     end
-    if o.oTimer > 60 then
+    if o.oTimer > 40 then
         bhv_wc_rain_droplet_init(o)
     end
 end
@@ -168,7 +168,7 @@ end
 
 --- @param o Object
 function bhv_wc_aurora_loop(o)
-    if not is_weather_cycle_enabled() or not show_weather_cycle() then
+    if not is_wc_enabled() or not show_weather_cycle() then
         obj_mark_for_deletion(o)
         return
     end

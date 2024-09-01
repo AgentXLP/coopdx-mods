@@ -1,4 +1,4 @@
-if _G.dayNightCycleApi == nil or _G.dayNightCycleApi.version == nil then return end
+if not check_dnc_compatible() then return end
 
 -- localize functions to improve performance
 local djui_hud_get_color,djui_hud_set_color,djui_hud_print_text,djui_hud_measure_text,math_floor,math_ceil,string_format,table_insert,level_is_vanilla_level,type = djui_hud_get_color,djui_hud_set_color,djui_hud_print_text,djui_hud_measure_text,math.floor,math.ceil,string.format,table.insert,level_is_vanilla_level,type

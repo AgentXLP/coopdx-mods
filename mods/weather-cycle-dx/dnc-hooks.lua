@@ -1,4 +1,4 @@
-if _G.dayNightCycleApi == nil or _G.dayNightCycleApi.version == nil then return end
+if not check_dnc_compatible() then return end
 
 -- localize functions to improve performance
 local math_random,obj_get_first_with_behavior_id,clamp = math.random,obj_get_first_with_behavior_id,clamp

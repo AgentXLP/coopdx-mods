@@ -1,19 +1,27 @@
 -- localize functions to improve performance
 local play_sound,djui_chat_message_create,smlua_model_util_get_id = play_sound,djui_chat_message_create,smlua_model_util_get_id
 
-if _G.dayNightCycleApi == nil or _G.dayNightCycleApi.version == nil then
+--- Checks if DNC is enabled and the version is high enough
+function check_dnc_compatible()
+    return _G.dayNightCycleApi ~= nil and _G.dayNightCycleApi.version ~= nil and _G.dayNightCycleApi.version >= 222
+end
+
+if not check_dnc_compatible() then
     local first = false
     hook_event(HOOK_ON_LEVEL_INIT, function()
         if not first then
             first = true
             play_sound(SOUND_MENU_CAMERA_BUZZ, gGlobalSoundSource)
-            djui_chat_message_create("\\#ffa0a0\\Weather Cycle DX requires Day Night Cycle >v2.1 to be enabled.\nPlease rehost with it enabled.")
+            djui_chat_message_create("\\#ffa0a0\\Weather Cycle DX requires Day Night Cycle v2.2.2 or higher to be enabled. Please rehost with it enabled.")
         end
     end)
     return
 end
 
-WC_VERSION = "v1.0"
+WC_VERSION_MAJOR = 1
+WC_VERSION_MINOR = 0
+WC_VERSION_PATCH = 1
+WC_VERSION = math.tointeger(string.format("%d%d%d", WC_VERSION_MAJOR, WC_VERSION_MINOR, WC_VERSION_PATCH))
 
 -- skybox constants
 E_MODEL_WC_SKYBOX_CLOUDY = smlua_model_util_get_id("wc_skybox_cloudy_geo")
@@ -46,4 +54,4 @@ DIR_BRIGHT = _G.dayNightCycleApi.constants.DIR_BRIGHT
 
 -- colors
 COLOR_WHITE = { r = 255, g = 255, b = 255 }
-COLOR_AURORA = { r = 100, g = 150, b = 100 }
+COLOR_AURORA = { r = 100, g = 175, b = 100 }
