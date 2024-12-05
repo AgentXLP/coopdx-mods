@@ -30,3 +30,7 @@ This mod is a utility mod that improves ACT_DEBUG_FREE_MOVE and makes it easily 
 <img width="600" alt="display" src="https://github.com/Agent-11/agent-ex-coop-mods/assets/44549182/2922e4f9-507f-4460-82c5-d63a098d6754">
 
 This mod is a utility mod that renders your action and forward velocity to the screen.
+
+## Environment Tint
+
+This mod tints your environment lighting based on the skybox. It's a very simple concept and execution, but I think the results look pretty nice.
