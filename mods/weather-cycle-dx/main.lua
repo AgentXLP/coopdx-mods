@@ -1,11 +1,11 @@
 -- name: Weather Cycle DX
--- incompatible: weather weather-cycle
--- description: Weather Cycle DX v1.0.1\nBy \\#ec7731\\Agent X\n\n\\#dcdcdc\\This mod adds a weather cycle system with cloudy skies, rain, and storms to sm64coopdx. It uses Day Night Cycle DX as a base library, meaning you need\nto have the mod enabled in order to use this one. There is also a toggleable\nAurora Borealis that starts after midnight.\n\nSpecial thanks to Floralys for the original concept.\nSpecial thanks to \\#344ee1\\eros71\\#dcdcdc\\ for saving the mod!
+-- incompatible: weather
+-- description: Weather Cycle DX v1.1\nBy \\#ec7731\\Agent X\n\n\\#dcdcdc\\This mod adds a weather cycle system with cloudy skies, rain, and storms to sm64coopdx. It uses Day Night Cycle DX as a base library, meaning you need\nto have the mod enabled in order to use this one. There is also a toggleable\nAurora Borealis that starts after midnight.\n\nSpecial thanks to Floralys for the original concept.\nSpecial thanks to \\#344ee1\\eros71\\#dcdcdc\\ for saving the mod!
 
 if not check_dnc_compatible() then return end
 
 -- localize functions to improve performance
-local get_skybox,network_is_server,error,mod_storage_save_number,math_random,network_check_singleplayer_pause,type,set_override_envfx,get_network_area_timer,play_transition,obj_get_first_with_behavior_id,spawn_non_sync_object,play_sound,obj_count_objects_with_behavior_id,djui_chat_message_create,string_format,mod_storage_save_bool = get_skybox,network_is_server,error,mod_storage_save_number,math.random,network_check_singleplayer_pause,type,set_override_envfx,get_network_area_timer,play_transition,obj_get_first_with_behavior_id,spawn_non_sync_object,play_sound,obj_count_objects_with_behavior_id,djui_chat_message_create,string.format,mod_storage_save_bool
+local mod_storage_load_number,math_random,mod_storage_load_bool,get_skybox,network_check_singleplayer_pause,maxf,set_override_envfx,network_is_server,get_network_area_timer,play_transition,obj_get_first_with_behavior_id,spawn_non_sync_object,play_sound,obj_count_objects_with_behavior_id,mod_storage_save_number,djui_chat_message_create,string_format,mod_storage_save_bool = mod_storage_load_number,math.random,mod_storage_load_bool,get_skybox,network_check_singleplayer_pause,maxf,set_override_envfx,network_is_server,get_network_area_timer,play_transition,obj_get_first_with_behavior_id,spawn_non_sync_object,play_sound,obj_count_objects_with_behavior_id,mod_storage_save_number,djui_chat_message_create,string.format,mod_storage_save_bool
 
 gGlobalSyncTable.wcEnabled = true
 gGlobalSyncTable.weatherType = mod_storage_load_number("weather_type")
@@ -27,7 +27,6 @@ function show_weather_cycle()
         skybox ~= BACKGROUND_CUSTOM and
         skybox ~= BACKGROUND_FLAMING_SKY and
         skybox ~= BACKGROUND_GREEN_SKY and
-        skybox ~= BACKGROUND_PURPLE_SKY and
         area ~= nil and area.terrainType ~= TERRAIN_SAND)
         or in_vanilla_level(LEVEL_DDD) or in_vanilla_level(LEVEL_WDW)
 end
@@ -37,14 +36,15 @@ function is_wc_enabled()
     return gGlobalSyncTable.wcEnabled and _G.weatherCycleApi.enabled and _G.dayNightCycleApi.enabled
 end
 
+--- Gets the weather type
+--- @return integer
+local function get_weather_type()
+    return gGlobalSyncTable.weatherType
+end
 
 --- @param weatherType integer
 --- Sets the weather type
 local function set_weather_type(weatherType)
-    if not network_is_server() then
-        error("set_weather_type: This function can only be run by the server")
-        return
-    end
     if not isinteger(weatherType) then
         error("set_weather_type: Parameter 'weatherType' must be an integer")
         return
@@ -60,23 +60,23 @@ local function weather_update()
     local timeScale = _G.dayNightCycleApi.get_time_scale()
     if timeScale == 0.0 then return end
 
-    if gGlobalSyncTable.timeUntilWeatherChange <= 0 then
+    if gGlobalSyncTable.timeUntilWeatherChange == 0 then
         local weatherType = math_random(WEATHER_CLEAR, weatherTypeCount - 1)
         while gGlobalSyncTable.weatherType == weatherType do
             weatherType = math_random(WEATHER_CLEAR, weatherTypeCount - 1)
         end
 
         set_weather_type(weatherType)
+    elseif gGlobalSyncTable.timeUntilWeatherChange ~= -1 then
+        gGlobalSyncTable.timeUntilWeatherChange = maxf(gGlobalSyncTable.timeUntilWeatherChange - timeScale, 0)
     end
-
-    gGlobalSyncTable.timeUntilWeatherChange = gGlobalSyncTable.timeUntilWeatherChange - timeScale
 end
 
 local function update()
-    if not is_wc_enabled() then
-        set_override_envfx(ENVFX_MODE_NO_OVERRIDE)
-        return
-    end
+    -- bugs with the snow effect have been eradicated
+    set_override_envfx(ENVFX_MODE_NO_OVERRIDE)
+
+    if not is_wc_enabled() then return end
 
     if network_is_server() then weather_update() end
 
@@ -101,17 +101,15 @@ local function update()
         gWeatherState.transitionTimer = gWeatherState.transitionTimer + _G.dayNightCycleApi.get_time_scale()
     end
 
-    if not show_weather_cycle() or get_skybox() == -1 then
-        set_override_envfx(ENVFX_MODE_NO_OVERRIDE)
-        return
-    end
+    if not show_weather_cycle() then return end
 
     -- spawn aurora
     -- despite having the same position and everything, the order
     -- in which the skybox and aurora are spawned will determine
     -- who goes in front of the other, transparency wise...
     -- interesting!
-    if gWeatherState.aurora and get_skybox() ~= BACKGROUND_HAUNTED and obj_get_first_with_behavior_id(bhvWCAurora) == nil then
+    local skybox = get_skybox()
+    if gWeatherState.aurora and _G.weatherCycleApi.aurora and not _G.dayNightCycleApi.is_static_skybox(skybox) and obj_get_first_with_behavior_id(bhvWCAurora) == nil then
         spawn_non_sync_object(
             bhvWCAurora,
             E_MODEL_WC_AURORA,
@@ -134,12 +132,7 @@ local function update()
 
     local weather = gWeatherTable[gGlobalSyncTable.weatherType]
     if weather.updateFunc ~= nil then weather.updateFunc() end
-    if not weather.rain then
-        set_override_envfx(ENVFX_MODE_NO_OVERRIDE)
-        return
-    end
-
-    local skybox = get_skybox()
+    if not weather.rain then return end
 
     if gWeatherState.transitionTimer > WEATHER_TRANSITION_TIME * 0.5 or (prevWeather.rain and weather.rain) then
         if skybox == BACKGROUND_SNOW_MOUNTAINS then
@@ -167,11 +160,23 @@ end
 local function on_level_init()
     if not is_wc_enabled() then return end
 
-    if gNetworkPlayers[0].currActNum ~= 99 then return end
-
-    if gNetworkPlayers[0].currLevelNum == LEVEL_CASTLE_GROUNDS and gMarioStates[0].action ~= ACT_END_WAVING_CUTSCENE then
+    local level = gNetworkPlayers[0].currLevelNum
+    if gNetworkPlayers[0].currActNum ~= 99 then
+        if in_vanilla_level(LEVEL_BITS) then
+            gGlobalSyncTable.weatherType = WEATHER_RAIN
+            gGlobalSyncTable.timeUntilWeatherChange = -1
+        elseif in_vanilla_level(LEVEL_BOWSER_3) then
+            gGlobalSyncTable.weatherType = WEATHER_STORM
+            gGlobalSyncTable.timeUntilWeatherChange = -1
+            gWeatherState.timeUntilLightning = 150
+        elseif gGlobalSyncTable.timeUntilWeatherChange == -1 and
+               not any_player_in_vanilla_level(LEVEL_BITS) and
+               not any_player_in_vanilla_level(LEVEL_BOWSER_3) then
+            set_weather_type(WEATHER_CLOUDY)
+        end
+    elseif level == LEVEL_CASTLE_GROUNDS and gMarioStates[0].action ~= ACT_END_WAVING_CUTSCENE then
         gGlobalSyncTable.weatherType = WEATHER_STORM
-        gGlobalSyncTable.timeUntilWeatherChange = 43200
+        gGlobalSyncTable.timeUntilWeatherChange = 129600
     end
 end
 
@@ -197,7 +202,7 @@ end
 
 local function on_query_command()
     djui_chat_message_create("[Weather Cycle] Current weather: " .. gWeatherTable[gGlobalSyncTable.weatherType].name)
-    djui_chat_message_create("[Weather Cycle] Time until weather change: " .. format_time(gGlobalSyncTable.timeUntilWeatherChange))
+    djui_chat_message_create("[Weather Cycle] Time until weather change: " .. if_then_else(gGlobalSyncTable.timeUntilWeatherChange == -1, "Unknown", format_time(gGlobalSyncTable.timeUntilWeatherChange)))
 end
 
 --- @param msg string
@@ -236,7 +241,8 @@ local function on_weather_type_changed(_, oldVal, newVal)
     local weather = gWeatherTable[newVal]
     local noTransition = (np.currActNum == 99 and np.currLevelNum == LEVEL_CASTLE_GROUNDS and gMarioStates[0].action ~= ACT_END_WAVING_CUTSCENE and newVal == WEATHER_STORM) or
                          (gWeatherTable[oldVal].rain and weather.rain) or
-                         (_G.dayNightCycleApi.get_time_scale() == 0.0)
+                         _G.dayNightCycleApi.get_time_scale() == 0.0 or
+                         get_network_area_timer() < 30
 
     gWeatherState.transitionTimer = if_then_else(noTransition, WEATHER_TRANSITION_TIME, 0)
 
@@ -288,10 +294,12 @@ _G.weatherCycleApi = {
     version = WC_VERSION, -- The version of the mod
     enabled = true, -- Whether or not the weather cycle is enabled
     lockWeather = false, -- Whether or not the player should be prevented from changing the weather
+    aurora = true, -- Whether or not the Aurora should appear
     weather_register = weather_register,
     weather_add_rain = weather_add_rain,
     weather_add_update_func = weather_add_update_func,
     show_weather_cycle = show_weather_cycle,
+    get_weather_type = get_weather_type,
     set_weather_type = set_weather_type,
     get_weather_color = get_weather_color,
     event_lightning = lightning_update,
@@ -313,6 +321,9 @@ _G.weatherCycleApi = {
     }
 }
 setmetatable(_G.weatherCycleApi, sReadonlyMetatable)
+setmetatable(_G.weatherCycleApi.constants, sReadonlyMetatable)
+
+_G.dayNightCycleApi.dddCeiling = false
 
 gLevelValues.zoomOutCameraOnPause = false
 

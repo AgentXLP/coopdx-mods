@@ -1,7 +1,7 @@
 if not check_dnc_compatible() then return end
 
 -- localize functions to improve performance
-local cur_obj_scale,obj_mark_for_deletion,obj_has_model_extended,obj_set_model_extended,vec3f_to_object_pos,calculate_yaw,math_random,maxf,find_water_level,collision_find_ceil,cur_obj_hide,find_floor_height,obj_scale_xyz,obj_set_pos,cur_obj_unhide,spawn_non_sync_object,play_sound,set_camera_shake_from_hit,cur_obj_update_floor_height_and_get_floor,obj_check_hitbox_overlap,set_mario_action,clampf,math_sin = cur_obj_scale,obj_mark_for_deletion,obj_has_model_extended,obj_set_model_extended,vec3f_to_object_pos,calculate_yaw,math.random,maxf,find_water_level,collision_find_ceil,cur_obj_hide,find_floor_height,obj_scale_xyz,obj_set_pos,cur_obj_unhide,spawn_non_sync_object,play_sound,set_camera_shake_from_hit,cur_obj_update_floor_height_and_get_floor,obj_check_hitbox_overlap,set_mario_action,clampf,math.sin
+local cur_obj_scale,obj_mark_for_deletion,obj_has_model_extended,obj_set_model_extended,vec3f_to_object_pos,calculate_yaw,math_random,sins,coss,maxf,find_water_level,collision_find_ceil,cur_obj_hide,find_floor_height,obj_scale_xyz,obj_set_pos,cur_obj_unhide,spawn_non_sync_object,play_sound,set_camera_shake_from_hit,cur_obj_update_floor_height_and_get_floor,obj_check_hitbox_overlap,set_mario_action,clampf,math_sin = cur_obj_scale,obj_mark_for_deletion,obj_has_model_extended,obj_set_model_extended,vec3f_to_object_pos,calculate_yaw,math.random,sins,coss,maxf,find_water_level,collision_find_ceil,cur_obj_hide,find_floor_height,obj_scale_xyz,obj_set_pos,cur_obj_unhide,spawn_non_sync_object,play_sound,set_camera_shake_from_hit,cur_obj_update_floor_height_and_get_floor,obj_check_hitbox_overlap,set_mario_action,clampf,math.sin
 
 --- @param o Object
 function bhv_wc_skybox_init(o)
@@ -18,10 +18,17 @@ function bhv_wc_skybox_loop(o)
 
     local prevWeather = gWeatherTable[gWeatherState.prevWeatherType]
     local weather = gWeatherTable[gGlobalSyncTable.weatherType]
-    if obj_has_model_extended(o, weather.skyboxModel) == 0 and weather.skyboxModel ~= E_MODEL_NONE then
-        obj_set_model_extended(o, weather.skyboxModel)
+
+    -- BITS specific changes
+    local bits = in_vanilla_level(LEVEL_BITS)
+    local model = if_then_else(bits, E_MODEL_WC_SKYBOX_STORM, weather.skyboxModel)
+    local opacity = if_then_else(bits, 200, weather.opacity)
+
+    if obj_has_model_extended(o, model) == 0 and model ~= E_MODEL_NONE then
+        obj_set_model_extended(o, model)
     end
-    o.oOpacity = lerp_round(prevWeather.opacity, weather.opacity, gWeatherState.transitionTimer / WEATHER_TRANSITION_TIME)
+
+    o.oOpacity = lerp_round(prevWeather.opacity, opacity, gWeatherState.transitionTimer / WEATHER_TRANSITION_TIME)
 
     vec3f_to_object_pos(o, gLakituState.pos)
 
@@ -50,16 +57,18 @@ function bhv_wc_rain_droplet_init(o)
     local posZ = pos.z + coss(rainYaw) * math_random(500, 2000) + vel.z * 20
     local posY = maxf(pos.y, find_water_level(posX, posZ))
 
-    local sanity = 0
-    while collision_find_ceil(posX, posY, posZ) ~= nil do
-        if sanity == 10 then
-            cur_obj_hide()
-            o.oAction = 1
-            return
+    if not in_vanilla_level(LEVEL_DDD) or gNetworkPlayers[0].currAreaIndex ~= 2 then
+        local sanity = 0
+        while collision_find_ceil(posX, posY, posZ) ~= nil do
+            if sanity == 10 then
+                cur_obj_hide()
+                o.oAction = 1
+                return
+            end
+            posX = pos.x + sins(rainYaw) * math_random(500, 2000) + vel.x * 20
+            posZ = pos.z + coss(rainYaw) * math_random(500, 2000) + vel.z * 20
+            sanity = sanity + 1
         end
-        posX = pos.x + sins(rainYaw) * math_random(500, 2000) + vel.x * 20
-        posZ = pos.z + coss(rainYaw) * math_random(500, 2000) + vel.z * 20
-        sanity = sanity + 1
     end
 
     o.oAction = 0
@@ -172,7 +181,7 @@ function bhv_wc_aurora_loop(o)
         obj_mark_for_deletion(o)
         return
     end
-    if not gWeatherState.aurora then
+    if not gWeatherState.aurora or not _G.weatherCycleApi.aurora then
         if o.oTimer > 30 then
             o.oTimer = 0
         end

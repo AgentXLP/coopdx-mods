@@ -1,7 +1,7 @@
 if not check_dnc_compatible() then return end
 
 -- localize functions to improve performance
-local type,error,get_skybox,clamp,get_network_player_smallest_global,math_random,collision_find_floor,spawn_sync_object = type,error,get_skybox,clamp,get_network_player_smallest_global,math.random,collision_find_floor,spawn_sync_object
+local get_skybox,clamp,get_network_player_smallest_global,math_random,collision_find_floor,spawn_sync_object = get_skybox,clamp,get_network_player_smallest_global,math.random,collision_find_floor,spawn_sync_object
 
 --- @class Weather
 --- @field public name string
@@ -29,35 +29,36 @@ gWeatherTable = {}
 --- @param fogIntensity number
 --- @param skyboxModel ModelExtendedId
 --- @param skyboxRotSpeed number
+--- @return integer
 --- Registers a type of weather
 function weather_register(name, color, opacity, lightingDir, fogIntensity, skyboxModel, skyboxRotSpeed)
     if type(name) ~= "string" then
         error("weather_register: Parameter 'name' must be a string")
-        return
+        return 0
     end
     if type(color) ~= "table" then
         error("weather_register: Parameter 'color' must be a Color")
-        return
+        return 0
     end
     if not isinteger(opacity) then
         error("weather_register: Parameter 'opacity' must be an integer")
-        return
+        return 0
     end
     if type(lightingDir) ~= "number" then
         error("weather_register: Parameter 'lightingDir' must be a number")
-        return
+        return 0
     end
     if type(fogIntensity) ~= "number" then
         error("weather_register: Parameter 'fogIntensity' must be a number")
-        return
+        return 0
     end
     if not isinteger(skyboxModel) then
         error("weather_register: Parameter 'skyboxModel' must be an ModelExtendedId")
-        return
+        return 0
     end
     if type(skyboxRotSpeed) ~= "number" then
         error("weather_register: Parameter 'skyboxRotSpeed' must be a number")
-        return
+        return 0
     end
 
     weatherTypeCount = weatherTypeCount + 1
@@ -127,15 +128,23 @@ function weather_add_update_func(weatherType, updateFunc)
 end
 
 --- @param weather Weather
---- Gets the color of the weather, accounts for blue tinting in snow levels
+--- Gets the color of the weather, accounts for tinting with some skyboxes
 function get_weather_color(weather)
     if type(weather) ~= "table" then
         error("get_weather_color: Parameter 'weather' must be a Weather (" .. weather .. ")")
-        return
+        return nil
     end
+    if weather == gWeatherTable[WEATHER_CLEAR] then return weather.color end
 
-    if get_skybox() == BACKGROUND_SNOW_MOUNTAINS then
-        return { r = clamp(weather.color.r * 1.2, 0, 255), g = clamp(weather.color.g * 1.5, 0, 255), b = clamp(weather.color.b * 1.8, 0, 255) }
+    local skybox = get_skybox()
+    if skybox == BACKGROUND_UNDERWATER_CITY then
+        return { r = weather.color.r * 0.6, g = weather.color.g * 0.65, b = weather.color.b * 0.9 }
+    elseif skybox == BACKGROUND_SNOW_MOUNTAINS then
+        return { r = clamp(weather.color.r * 1.1, 0, 255), g = clamp(weather.color.g * 1.4, 0, 255), b = clamp(weather.color.b * 1.7, 0, 255) }
+    elseif skybox == BACKGROUND_HAUNTED then
+        return { r = weather.color.r * 0.6, g = weather.color.g * 0.6, b = weather.color.b }
+    elseif skybox == BACKGROUND_PURPLE_SKY then
+        return { r = clamp(weather.color.r * 1.75, 0, 255), g = clamp(weather.color.r * 1, 0, 255), b = clamp(weather.color.b * 2.0, 0, 255) }
     end
 
     return weather.color
@@ -146,7 +155,7 @@ function lightning_update()
     if get_network_player_smallest_global().localIndex ~= 0 or get_skybox() == BACKGROUND_SNOW_MOUNTAINS then return end
 
     if gWeatherState.timeUntilLightning > 0 then
-        gWeatherState.timeUntilLightning = gWeatherState.timeUntilLightning - _G.dayNightCycleApi.get_time_scale()
+        gWeatherState.timeUntilLightning = gWeatherState.timeUntilLightning - 1
         return
     end
 
@@ -167,8 +176,8 @@ function lightning_update()
         pos.x, pos.y, pos.z,
         nil
     )
-    gWeatherState.timeUntilLightning = math_random(SECOND * 5, SECOND * 20)
-    gWeatherState.flashTimer = 10
+    gWeatherState.timeUntilLightning = math_random(SECOND * 5, SECOND * if_then_else(gNetworkPlayers[0].currLevelNum == LEVEL_BOWSER_3, 10, 20))
+    gWeatherState.flashTimer = 15
 end
 
 WEATHER_CLEAR = weather_register(
@@ -193,7 +202,7 @@ WEATHER_CLOUDY = weather_register(
 
 WEATHER_RAIN = weather_register(
     "Rain", -- name
-    { r = 150, g = 150, b = 150 }, -- color
+    { r = 170, g = 170, b = 180 }, -- color
     240, -- skybox opacity
     0.9, -- lighting dir
     1.01, -- fog intensity
@@ -204,7 +213,7 @@ weather_add_rain(WEATHER_RAIN, 50, 0.6, 50)
 
 WEATHER_STORM = weather_register(
     "Storm", -- name
-    { r = 100, g = 90, b = 130 }, -- color
+    { r = 100, g = 90, b = 140 }, -- color
     255, -- opacity
     0.8, -- lighting dir
     1.02, -- fog intensity

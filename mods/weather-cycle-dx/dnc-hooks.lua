@@ -74,8 +74,8 @@ end
 local function dnc_set_display_time_pos(pos)
     if not gGlobalSyncTable.wcEnabled or gWeatherState.flashTimer <= 0 then return nil end
 
-    pos.x = pos.x + math_random(-3, 3)
-    pos.y = pos.y + math_random(-3, 3)
+    pos.x = pos.x + random_nonzero(-3, 3)
+    pos.y = pos.y + random_nonzero(-3, 3)
 
     return pos
 end
@@ -100,6 +100,15 @@ local function dnc_set_time(oldTime, newTime)
     end
 end
 
+local function dnc_sun_times_changed()
+    HOUR_SUNRISE_START = _G.dayNightCycleApi.constants.HOUR_SUNRISE_START
+    HOUR_SUNRISE_END = _G.dayNightCycleApi.constants.HOUR_SUNRISE_END
+
+    HOUR_SUNSET_END = _G.dayNightCycleApi.constants.HOUR_SUNSET_END
+
+    HOUR_NIGHT_START = _G.dayNightCycleApi.constants.HOUR_NIGHT_START
+end
+
 _G.dayNightCycleApi.dnc_hook_event(_G.dayNightCycleApi.constants.DNC_HOOK_SET_LIGHTING_COLOR, dnc_set_lighting_color)
 _G.dayNightCycleApi.dnc_hook_event(_G.dayNightCycleApi.constants.DNC_HOOK_SET_AMBIENT_LIGHTING_COLOR, dnc_set_ambient_lighting_color)
 _G.dayNightCycleApi.dnc_hook_event(_G.dayNightCycleApi.constants.DNC_HOOK_SET_LIGHTING_DIR, dnc_set_lighting_dir)
@@ -108,3 +117,4 @@ _G.dayNightCycleApi.dnc_hook_event(_G.dayNightCycleApi.constants.DNC_HOOK_SET_FO
 _G.dayNightCycleApi.dnc_hook_event(_G.dayNightCycleApi.constants.DNC_HOOK_SET_DISPLAY_TIME_POS, dnc_set_display_time_pos)
 _G.dayNightCycleApi.dnc_hook_event(_G.dayNightCycleApi.constants.DNC_HOOK_DELETE_AT_DARK, dnc_delete_at_dark)
 _G.dayNightCycleApi.dnc_hook_event(_G.dayNightCycleApi.constants.DNC_HOOK_SET_TIME, dnc_set_time)
+_G.dayNightCycleApi.dnc_hook_event(_G.dayNightCycleApi.constants.DNC_HOOK_SUN_TIMES_CHANGED, dnc_sun_times_changed)

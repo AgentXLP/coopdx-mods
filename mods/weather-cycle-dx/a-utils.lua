@@ -1,7 +1,7 @@
 if not check_dnc_compatible() then return end
 
 -- localize functions to improve performance
-local djui_hud_get_color,djui_hud_set_color,djui_hud_print_text,djui_hud_measure_text,math_floor,math_ceil,string_format,table_insert,level_is_vanilla_level,type = djui_hud_get_color,djui_hud_set_color,djui_hud_print_text,djui_hud_measure_text,math.floor,math.ceil,string.format,table.insert,level_is_vanilla_level,type
+local djui_hud_get_color,djui_hud_set_color,djui_hud_print_text,djui_hud_measure_text,math_floor,math_ceil,string_format,table_insert,level_is_vanilla_level,math_random = djui_hud_get_color,djui_hud_set_color,djui_hud_print_text,djui_hud_measure_text,math.floor,math.ceil,string.format,table.insert,level_is_vanilla_level,math.random
 
 --- @param cond boolean
 --- Human readable ternary operator
@@ -146,4 +146,32 @@ end
 function isinteger(value)
     if type(value) ~= "number" then return false end
     return value % 1 == 0
+end
+
+--- @param minRange integer
+--- @param maxRange integer
+--- Generates a random number between `minRange` and `maxRange` that isn't zero
+function random_nonzero(minRange, maxRange)
+    local random = math_random(minRange, maxRange)
+    if not (minRange == 0 and maxRange == 0) then
+        while random == 0 do
+            random = math_random(minRange, maxRange)
+        end
+    end
+    return random
+end
+
+--- Checks if any player is in a level
+function any_player_in_level(levelNum)
+    for i = 0, MAX_PLAYERS - 1 do
+        if gNetworkPlayers[i].connected and gNetworkPlayers[i].currLevelNum == levelNum and level_is_vanilla_level(levelNum) then
+            return true
+        end
+    end
+    return false
+end
+
+--- Checks if any player is in a vanilla level
+function any_player_in_vanilla_level(levelNum)
+    return level_is_vanilla_level(levelNum) and any_player_in_level(levelNum)
 end
