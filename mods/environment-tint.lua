@@ -1,8 +1,9 @@
 -- name: Environment Tint
 -- incompatible: light environment-tint
--- description: Environment Tint\nBy \\#ec7731\\AgentX\n\n\\#dcdcdc\\This mod tints your environment lighting based on the skybox. It's a very simple concept and execution, but I think the results look pretty nice.
+-- description: Environment Tint v1.0.1\nBy \\#ec7731\\AgentX\n\n\\#dcdcdc\\This mod tints your environment lighting based on the skybox. It's a very simple concept and execution, but I think the results look pretty nice.
 
 local TINT_DEFAULT = { tintSky = false, color = { r = 255, g = 255, b = 255 }, lightingDir = { x = 0, y = 0, z = 0 } }
+local TINT_TTC     = { tintSky = false, color = { r = 220, g = 255, b = 255 }, lightingDir = { x = 0, y = 1, z = 0 } }
 
 local sTintTable = {
     [BACKGROUND_OCEAN_SKY] =       { color = { r = 255, g = 255, b = 255 }, lightingDir = { x = 0, y = 1,     z = 1    } },
@@ -33,6 +34,8 @@ local function update()
             tint = sTintTable[BACKGROUND_UNDERWATER_CITY]
         elseif in_vanilla_level(LEVEL_THI) then
             tint = sTintTable[BACKGROUND_OCEAN_SKY]
+        elseif in_vanilla_level(LEVEL_TTC) then
+            tint = TINT_TTC
         else
             tint = TINT_DEFAULT
         end
