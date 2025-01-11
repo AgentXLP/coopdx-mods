@@ -1,6 +1,6 @@
 -- name: Weather Cycle DX
 -- incompatible: weather
--- description: Weather Cycle DX v1.1\nBy \\#ec7731\\Agent X\n\n\\#dcdcdc\\This mod adds a weather cycle system with cloudy skies, rain, and storms to sm64coopdx. It uses Day Night Cycle DX as a base library, meaning you need\nto have the mod enabled in order to use this one. There is also a toggleable\nAurora Borealis that starts after midnight.\n\nSpecial thanks to Floralys for the original concept.\nSpecial thanks to \\#344ee1\\eros71\\#dcdcdc\\ for saving the mod!
+-- description: Weather Cycle DX v1.1.1\nBy \\#ec7731\\Agent X\n\n\\#dcdcdc\\This mod adds a weather cycle system with cloudy skies, rain, and storms to sm64coopdx. It uses Day Night Cycle DX as a base library, meaning you need\nto have the mod enabled in order to use this one. There is also a toggleable\nAurora Borealis that starts after midnight.\n\nSpecial thanks to Floralys for the original concept.\nSpecial thanks to \\#344ee1\\eros71\\#dcdcdc\\ for saving the mod!
 
 if not check_dnc_compatible() then return end
 
@@ -33,7 +33,7 @@ end
 
 --- Returns whether or not Weather Cycle is enabled (also factoring in DNC)
 function is_wc_enabled()
-    return gGlobalSyncTable.wcEnabled and _G.weatherCycleApi.enabled and _G.dayNightCycleApi.enabled
+    return _G.dayNightCycleApi.is_dnc_enabled() and gGlobalSyncTable.wcEnabled and _G.weatherCycleApi.enabled
 end
 
 --- Gets the weather type

@@ -20,7 +20,7 @@ end
 
 WC_VERSION_MAJOR = 1
 WC_VERSION_MINOR = 1
-WC_VERSION_PATCH = 0
+WC_VERSION_PATCH = 1
 WC_VERSION = math_tointeger(string_format("%d%d%d", WC_VERSION_MAJOR, WC_VERSION_MINOR, WC_VERSION_PATCH))
 
 -- skybox constants
