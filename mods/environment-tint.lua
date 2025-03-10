@@ -1,22 +1,23 @@
 -- name: Environment Tint
 -- incompatible: light environment-tint
--- description: Environment Tint v1.1\nBy \\#ec7731\\AgentX\n\n\\#dcdcdc\\This mod tints your environment lighting based on the skybox, level, or region. It's a simple concept, but I think the results speak for themselves. Enjoy!
+-- description: Environment Tint v1.2\nBy \\#ec7731\\AgentX\n\n\\#dcdcdc\\This mod tints your environment lighting based on the skybox, level, or region. It's a simple concept, but I think the results speak for themselves. Enjoy!
 
 local TINT_DEFAULT = { color = { r = 255, g = 255, b = 255 }, lightingDir = { x = 0, y = 0, z = 0 } }
 local TINT_CASTLE  = { color = { r = 180, g = 220, b = 255 }, lightingDir = { x = 0, y = 0, z = 1 } }
 local TINT_TTC     = { color = { r = 200, g = 255, b = 255 }, lightingDir = { x = 0, y = 1, z = 0 } }
+local TINT_PSS     = { color = { r = 255, g = 180, b = 120 }, lightingDir = { x = 0, y = 1, z = 0 } }
 
 local sTintTable = {
-    [BACKGROUND_OCEAN_SKY] =       { color = { r = 220, g = 255, b = 200 }, lightingDir = { x = 0, y = 1,     z = 1    } },
-    [BACKGROUND_FLAMING_SKY] =     { color = { r = 255, g = 110, b = 50  }, lightingDir = { x = 0, y = -0.25, z = 1    } },
-    [BACKGROUND_UNDERWATER_CITY] = { color = { r = 130, g = 150, b = 255 }, lightingDir = { x = 0, y = 0,     z = -0.5 } },
-    [BACKGROUND_BELOW_CLOUDS] =    { color = { r = 255, g = 240, b = 150 }, lightingDir = { x = 0, y = 1,     z = 1    } },
-    [BACKGROUND_SNOW_MOUNTAINS] =  { color = { r = 160, g = 220, b = 255 }, lightingDir = { x = 0, y = 1,     z = 0    } },
-    [BACKGROUND_DESERT] =          { color = { r = 255, g = 200, b = 120 }, lightingDir = { x = 0, y = 0,     z = 0    } },
-    [BACKGROUND_HAUNTED] =         { color = { r = 130, g = 100, b = 200 }, lightingDir = { x = 0, y = -1,    z = 0    } },
-    [BACKGROUND_GREEN_SKY] =       { color = { r = 140, g = 200, b = 140 }, lightingDir = { x = 0, y = -1,    z = 0    } },
-    [BACKGROUND_ABOVE_CLOUDS] =    { color = { r = 120, g = 180, b = 200 }, lightingDir = { x = 0, y = 1,     z = 0    } },
-    [BACKGROUND_PURPLE_SKY] =      { color = { r = 255, g = 120, b = 255 }, lightingDir = { x = 0, y = 0,     z = 0    } }
+    [BACKGROUND_OCEAN_SKY] =       { color = { r = 220, g = 255, b = 210 }, lightingDir = { x = 0, y = 1,     z = 1     } },
+    [BACKGROUND_FLAMING_SKY] =     { color = { r = 255, g = 110, b = 50  }, lightingDir = { x = 0, y = -0.25, z = 0     } },
+    [BACKGROUND_UNDERWATER_CITY] = { color = { r = 130, g = 150, b = 255 }, lightingDir = { x = 0, y = 0,     z = -0.25 } },
+    [BACKGROUND_BELOW_CLOUDS] =    { color = { r = 200, g = 220, b = 255 }, lightingDir = { x = 0, y = 1,     z = 1     } },
+    [BACKGROUND_SNOW_MOUNTAINS] =  { color = { r = 160, g = 220, b = 255 }, lightingDir = { x = 0, y = 1,     z = 0     } },
+    [BACKGROUND_DESERT] =          { color = { r = 255, g = 200, b = 120 }, lightingDir = { x = 0, y = 0,     z = 0     } },
+    [BACKGROUND_HAUNTED] =         { color = { r = 180, g = 150, b = 255 }, lightingDir = { x = 0, y = -1,    z = 0     } },
+    [BACKGROUND_GREEN_SKY] =       { color = { r = 140, g = 210, b = 140 }, lightingDir = { x = 0, y = -1,    z = 0     } },
+    [BACKGROUND_ABOVE_CLOUDS] =    { color = { r = 120, g = 200, b = 200 }, lightingDir = { x = 0, y = 1,     z = 0     } },
+    [BACKGROUND_PURPLE_SKY] =      { color = { r = 255, g = 120, b = 255 }, lightingDir = { x = 0, y = 0,     z = 0     } }
 }
 
 --- @param levelNum LevelNum
@@ -72,6 +73,8 @@ local function update()
             tint = sTintTable[BACKGROUND_DESERT]
         elseif in_vanilla_level(LEVEL_TTC) then
             tint = TINT_TTC
+        elseif in_vanilla_level(LEVEL_PSS) then
+            tint = TINT_PSS
         else
             tint = TINT_DEFAULT
         end
@@ -81,6 +84,8 @@ local function update()
 end
 
 local function on_hud_render_behind()
+    if gNetworkPlayers[0].currActNum == 99 then return end
+
     --- @type MarioState
     local m = gMarioStates[0]
     if gLakituState.pos.y < m.waterLevel then
@@ -91,7 +96,7 @@ local function on_hud_render_behind()
         elseif in_vanilla_level(LEVEL_LLL) then
             djui_hud_set_color(255, 20, 0, 175)
         else
-            djui_hud_set_color(0, 50, 230, 100)
+            djui_hud_set_color(0, 50, 250, 100)
         end
         djui_hud_render_rect(0, 0, djui_hud_get_screen_width(), djui_hud_get_screen_height())
     elseif gLakituState.pos.y < find_poison_gas_level(m.pos.x, m.pos.z) then
