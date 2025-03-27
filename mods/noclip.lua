@@ -1,13 +1,17 @@
 -- name: Noclip
 -- incompatible: noclip
--- description: Noclip v1.1.2\nBy \\#ec7731\\Agent X\\#dcdcdc\\\n\nThis mod is a utility mod that improves\nACT_DEBUG_FREE_MOVE and makes it easily accessible without the development build.
+-- description: Noclip v1.1.3\nBy \\#ec7731\\Agent X\\#dcdcdc\\\n\nThis mod is a utility mod that improves\nACT_DEBUG_FREE_MOVE and makes it easily accessible without the development build.
 -- pausable: true
 
 local cur_obj_scale,network_local_index_from_global,obj_mark_for_deletion,vec3f_to_object_pos,load_object_collision_model,set_first_person_enabled,set_mario_action,set_character_anim_with_accel,set_character_animation,vec3f_add,vec3f_copy,vec3f_length,vec3s_set,cur_obj_hide,cur_obj_unhide,obj_get_first_with_behavior_id,obj_get_next_with_same_behavior_id,spawn_non_sync_object,djui_chat_message_create = cur_obj_scale,network_local_index_from_global,obj_mark_for_deletion,vec3f_to_object_pos,load_object_collision_model,set_first_person_enabled,set_mario_action,set_character_anim_with_accel,set_character_animation,vec3f_add,vec3f_copy,vec3f_length,vec3s_set,cur_obj_hide,cur_obj_unhide,obj_get_first_with_behavior_id,obj_get_next_with_same_behavior_id,spawn_non_sync_object,djui_chat_message_create
 
 local ACT_NOCLIP = allocate_mario_action(ACT_GROUP_CUTSCENE | ACT_FLAG_AIR)
 
-local firstPersonEnabled = false
+local H_SPEED = 30
+local V_SPEED = 20
+
+local mquake = _G.mQuake_API ~= nil
+local firstPersonEnabled = mquake
 
 --- @param cond boolean
 --- Human readable ternary operator
@@ -86,17 +90,17 @@ local function act_noclip(m)
     local speed = if_then_else((m.controller.buttonDown & B_BUTTON) ~= 0, 1, 4)
 
     if m.intendedMag > 0 then
-        vel.x = 26 * speed * sins(m.intendedYaw)
-        vel.z = 26 * speed * coss(m.intendedYaw)
+        vel.x = H_SPEED * speed * sins(m.intendedYaw)
+        vel.z = H_SPEED * speed * coss(m.intendedYaw)
         set_character_anim_with_accel(m, CHAR_ANIM_WALKING, 65536 * speed * 1.5)
     else
         set_character_animation(m, CHAR_ANIM_DOUBLE_JUMP_FALL)
     end
     if (m.controller.buttonDown & A_BUTTON) ~= 0 then
-        vel.y = 16 * speed
+        vel.y = V_SPEED * speed
     end
     if (m.controller.buttonDown & Z_TRIG) ~= 0 then
-        vel.y = vel.y - 16 * speed
+        vel.y = vel.y - V_SPEED * speed
     end
 
     vec3f_add(m.pos, vel)
@@ -158,6 +162,10 @@ local function on_noclip_fp_command()
     firstPersonEnabled = not firstPersonEnabled
     djui_chat_message_create("[Noclip] First person status: " .. on_or_off(firstPersonEnabled))
     return true
+end
+
+if mquake then
+    _G.mQuake_API.actions.set_allow_action(ACT_NOCLIP, 1)
 end
 
 hook_event(HOOK_MARIO_UPDATE, mario_update)
