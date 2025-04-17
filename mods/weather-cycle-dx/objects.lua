@@ -24,7 +24,7 @@ function bhv_wc_skybox_loop(o)
     local model = if_then_else(bits, E_MODEL_WC_SKYBOX_STORM, weather.skyboxModel)
     local opacity = if_then_else(bits, 200, weather.opacity)
 
-    if obj_has_model_extended(o, model) == 0 and model ~= E_MODEL_NONE then
+    if obj_get_model_id_extended(o) ~= model and model ~= E_MODEL_NONE then
         obj_set_model_extended(o, model)
     end
 

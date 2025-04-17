@@ -101,7 +101,7 @@ end
 --- @param a Color
 --- @param b Color
 --- @return Color
---- Multiplies two colors
+--- Multiplies two colors together
 function color_mul(a, b)
     return {
         r = a.r * (b.r / 255.0),
@@ -161,6 +161,7 @@ function random_nonzero(minRange, maxRange)
     return random
 end
 
+--- @param levelNum LevelNum
 --- Checks if any player is in a level
 function any_player_in_level(levelNum)
     for i = 0, MAX_PLAYERS - 1 do
@@ -171,7 +172,30 @@ function any_player_in_level(levelNum)
     return false
 end
 
+--- @param levelNum LevelNum
 --- Checks if any player is in a vanilla level
 function any_player_in_vanilla_level(levelNum)
     return level_is_vanilla_level(levelNum) and any_player_in_level(levelNum)
+end
+
+local function tobool(value)
+    local type = type(value)
+    if type == "boolean" then
+        return value
+    elseif type == "number" then
+        return value == 1
+    elseif type == "string" then
+        return value == "true"
+    elseif type == "table" or type == "function" or type == "thread" or type == "userdata" then
+        return true
+    end
+    return false
+end
+
+--- @param key string
+--- `mod_storage_load_bool` except it returns true by default
+function mod_storage_load_bool_2(key)
+    local value = mod_storage_load(key)
+    if value == nil then return true end
+    return tobool(value)
 end

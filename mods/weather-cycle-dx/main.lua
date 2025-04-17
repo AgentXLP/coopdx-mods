@@ -1,6 +1,6 @@
 -- name: Weather Cycle DX
 -- incompatible: weather
--- description: Weather Cycle DX v1.1.1\nBy \\#ec7731\\Agent X\n\n\\#dcdcdc\\This mod adds a weather cycle system with cloudy skies, rain, and storms to sm64coopdx. It uses Day Night Cycle DX as a base library, meaning you need\nto have the mod enabled in order to use this one. There is also a toggleable\nAurora Borealis that starts after midnight.\n\nSpecial thanks to Floralys for the original concept.\nSpecial thanks to \\#344ee1\\eros71\\#dcdcdc\\ for saving the mod!
+-- description: Weather Cycle DX v1.1.2\nBy \\#ec7731\\Agent X\n\n\\#dcdcdc\\This mod adds a weather cycle system with cloudy skies, rain, and storms to sm64coopdx. It uses Day Night Cycle DX as a base library, meaning you need\nto have the mod enabled in order to use this one. There is also a toggleable\nAurora Borealis that starts after midnight.\n\nSpecial thanks to Floralys for the original concept.\nSpecial thanks to \\#344ee1\\eros71\\#dcdcdc\\ for saving the mod!
 
 if not check_dnc_compatible() then return end
 
@@ -8,7 +8,7 @@ if not check_dnc_compatible() then return end
 local mod_storage_load_number,math_random,mod_storage_load_bool,get_skybox,network_check_singleplayer_pause,maxf,set_override_envfx,network_is_server,get_network_area_timer,play_transition,obj_get_first_with_behavior_id,spawn_non_sync_object,play_sound,obj_count_objects_with_behavior_id,mod_storage_save_number,djui_chat_message_create,string_format,mod_storage_save_bool = mod_storage_load_number,math.random,mod_storage_load_bool,get_skybox,network_check_singleplayer_pause,maxf,set_override_envfx,network_is_server,get_network_area_timer,play_transition,obj_get_first_with_behavior_id,spawn_non_sync_object,play_sound,obj_count_objects_with_behavior_id,mod_storage_save_number,djui_chat_message_create,string.format,mod_storage_save_bool
 
 gGlobalSyncTable.wcEnabled = true
-gGlobalSyncTable.weatherType = mod_storage_load_number("weather_type")
+gGlobalSyncTable.weatherType = if_then_else(network_is_server(), mod_storage_load_number("weather_type"), WEATHER_CLEAR)
 gGlobalSyncTable.timeUntilWeatherChange = tonumber(mod_storage_load("time_until_weather_change")) or math_random(WEATHER_MIN_DURATION, WEATHER_MAX_DURATION)
 
 gWeatherState = {
@@ -16,7 +16,7 @@ gWeatherState = {
     transitionTimer = WEATHER_TRANSITION_TIME,
     timeUntilLightning = WEATHER_TRANSITION_TIME,
     flashTimer = 0,
-    aurora = if_then_else(mod_storage_load("aurora") == nil, true, mod_storage_load_bool("aurora"))
+    aurora = mod_storage_load_bool_2("aurora")
 }
 
 --- Returns whether or not the game should visually show the weather cycle
@@ -307,17 +307,28 @@ _G.weatherCycleApi = {
         WC_VERSION_MAJOR = WC_VERSION_MAJOR,
         WC_VERSION_MINOR = WC_VERSION_MINOR,
         WC_VERSION_PATCH = WC_VERSION_PATCH,
-        WC_VERSION = WC_VERSION,
+        WC_VERSION       = WC_VERSION,
 
-        SKYBOX_SCALE = SKYBOX_SCALE,
+        E_MODEL_WC_SKYBOX_CLOUDY = E_MODEL_WC_SKYBOX_CLOUDY,
+        E_MODEL_WC_SKYBOX_STORM  = E_MODEL_WC_SKYBOX_STORM,
+        E_MODEL_WC_RAIN_DROPLET  = E_MODEL_WC_RAIN_DROPLET,
+        E_MODEL_WC_LIGHTNING     = E_MODEL_WC_LIGHTNING,
+        E_MODEL_WC_AURORA        = E_MODEL_WC_AURORA,
+
+        SKYBOX_SCALE            = SKYBOX_SCALE,
         WEATHER_TRANSITION_TIME = WEATHER_TRANSITION_TIME,
+        WEATHER_MIN_DURATION    = WEATHER_MIN_DURATION,
+        WEATHER_MAX_DURATION    = WEATHER_MAX_DURATION,
 
+        DIR_BRIGHT = DIR_BRIGHT,
+
+        COLOR_WHITE  = COLOR_WHITE,
         COLOR_AURORA = COLOR_AURORA,
 
-        WEATHER_CLEAR = WEATHER_CLEAR,
+        WEATHER_CLEAR  = WEATHER_CLEAR,
         WEATHER_CLOUDY = WEATHER_CLOUDY,
-        WEATHER_RAIN = WEATHER_RAIN,
-        WEATHER_STORM = WEATHER_STORM
+        WEATHER_RAIN   = WEATHER_RAIN,
+        WEATHER_STORM  = WEATHER_STORM
     }
 }
 setmetatable(_G.weatherCycleApi, sReadonlyMetatable)
