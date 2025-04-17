@@ -1,21 +1,21 @@
 -- name: Environment Tint
 -- incompatible: light environment-tint
--- description: Environment Tint v1.2\nBy \\#ec7731\\AgentX\n\n\\#dcdcdc\\This mod tints your environment lighting based on the skybox, level, or region. It's a simple concept, but I think the results speak for themselves. Enjoy!
+-- description: Environment Tint v1.2.1\nBy \\#ec7731\\AgentX\n\n\\#dcdcdc\\This mod tints your environment lighting based on the skybox, level, or region. It's a simple concept, but I think the results speak for themselves. Enjoy!
 
 local TINT_DEFAULT = { color = { r = 255, g = 255, b = 255 }, lightingDir = { x = 0, y = 0, z = 0 } }
-local TINT_CASTLE  = { color = { r = 180, g = 220, b = 255 }, lightingDir = { x = 0, y = 0, z = 1 } }
+local TINT_CASTLE  = { color = { r = 180, g = 210, b = 255 }, lightingDir = { x = 0, y = 0, z = 1 } }
 local TINT_TTC     = { color = { r = 200, g = 255, b = 255 }, lightingDir = { x = 0, y = 1, z = 0 } }
 local TINT_PSS     = { color = { r = 255, g = 180, b = 120 }, lightingDir = { x = 0, y = 1, z = 0 } }
 
 local sTintTable = {
-    [BACKGROUND_OCEAN_SKY] =       { color = { r = 220, g = 255, b = 210 }, lightingDir = { x = 0, y = 1,     z = 1     } },
+    [BACKGROUND_OCEAN_SKY] =       { color = { r = 200, g = 230, b = 255 }, lightingDir = { x = 0, y = 1,     z = 1     } },
     [BACKGROUND_FLAMING_SKY] =     { color = { r = 255, g = 110, b = 50  }, lightingDir = { x = 0, y = -0.25, z = 0     } },
     [BACKGROUND_UNDERWATER_CITY] = { color = { r = 130, g = 150, b = 255 }, lightingDir = { x = 0, y = 0,     z = -0.25 } },
     [BACKGROUND_BELOW_CLOUDS] =    { color = { r = 200, g = 220, b = 255 }, lightingDir = { x = 0, y = 1,     z = 1     } },
     [BACKGROUND_SNOW_MOUNTAINS] =  { color = { r = 160, g = 220, b = 255 }, lightingDir = { x = 0, y = 1,     z = 0     } },
     [BACKGROUND_DESERT] =          { color = { r = 255, g = 200, b = 120 }, lightingDir = { x = 0, y = 0,     z = 0     } },
     [BACKGROUND_HAUNTED] =         { color = { r = 180, g = 150, b = 255 }, lightingDir = { x = 0, y = -1,    z = 0     } },
-    [BACKGROUND_GREEN_SKY] =       { color = { r = 140, g = 210, b = 140 }, lightingDir = { x = 0, y = -1,    z = 0     } },
+    [BACKGROUND_GREEN_SKY] =       { color = { r = 150, g = 210, b = 150 }, lightingDir = { x = 0, y = -0.5,  z = 0     } },
     [BACKGROUND_ABOVE_CLOUDS] =    { color = { r = 120, g = 200, b = 200 }, lightingDir = { x = 0, y = 1,     z = 0     } },
     [BACKGROUND_PURPLE_SKY] =      { color = { r = 255, g = 120, b = 255 }, lightingDir = { x = 0, y = 0,     z = 0     } }
 }
@@ -27,9 +27,8 @@ local function in_vanilla_level(levelNum)
 end
 
 --- @param color Color
---- @param tintSkybox boolean
 --- @param lightingDir Vec3f
-local function set_world_properties(color, tintSkybox, lightingDir)
+local function set_world_properties(color, lightingDir)
     set_lighting_color(0, color.r)
     set_lighting_color(1, color.g)
     set_lighting_color(2, color.b)
@@ -39,15 +38,6 @@ local function set_world_properties(color, tintSkybox, lightingDir)
     set_fog_color(0, color.r)
     set_fog_color(1, color.g)
     set_fog_color(2, color.b)
-    if tintSkybox then
-        set_skybox_color(0, color.r)
-        set_skybox_color(1, color.g)
-        set_skybox_color(2, color.b)
-    else
-        set_skybox_color(0, 255)
-        set_skybox_color(1, 255)
-        set_skybox_color(2, 255)
-    end
     set_lighting_dir(0, lightingDir.x)
     set_lighting_dir(1, lightingDir.y)
     set_lighting_dir(2, lightingDir.z)
@@ -80,7 +70,7 @@ local function update()
         end
     end
 
-    set_world_properties(tint.color, skybox == BACKGROUND_DESERT, tint.lightingDir)
+    set_world_properties(tint.color, tint.lightingDir)
 end
 
 local function on_hud_render_behind()
