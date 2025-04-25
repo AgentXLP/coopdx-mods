@@ -8,3 +8,6 @@ sm64_save_file.bin
 sm64config*.txt
 *-src
 baserom*
+*.c
+*.h
+*.png
