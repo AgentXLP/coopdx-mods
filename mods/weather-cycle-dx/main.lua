@@ -1,14 +1,14 @@
 -- name: Weather Cycle DX
--- incompatible: weather
--- description: Weather Cycle DX v1.1.2\nBy \\#ec7731\\Agent X\n\n\\#dcdcdc\\This mod adds a weather cycle system with cloudy skies, rain, and storms to sm64coopdx. It uses Day Night Cycle DX as a base library, meaning you need\nto have the mod enabled in order to use this one. There is also a toggleable\nAurora Borealis that starts after midnight.\n\nSpecial thanks to Floralys for the original concept.\nSpecial thanks to \\#344ee1\\eros71\\#dcdcdc\\ for saving the mod!
+-- incompatible: weather environment-tint
+-- description: Weather Cycle DX v1.1.3\nBy \\#ec7731\\Agent X\n\n\\#dcdcdc\\This mod adds a weather cycle system with cloudy skies, rain, and storms to sm64coopdx. It uses Day Night Cycle DX as a base library, meaning you need\nto have the mod enabled in order to use this one. There is also a toggleable\nAurora Borealis that starts after midnight.\n\nSpecial thanks to Floralys for the original concept.\nSpecial thanks to \\#344ee1\\eros71\\#dcdcdc\\ for saving the mod!
 
 if not check_dnc_compatible() then return end
 
 -- localize functions to improve performance
-local mod_storage_load_number,math_random,mod_storage_load_bool,get_skybox,network_check_singleplayer_pause,maxf,set_override_envfx,network_is_server,get_network_area_timer,play_transition,obj_get_first_with_behavior_id,spawn_non_sync_object,play_sound,obj_count_objects_with_behavior_id,mod_storage_save_number,djui_chat_message_create,string_format,mod_storage_save_bool = mod_storage_load_number,math.random,mod_storage_load_bool,get_skybox,network_check_singleplayer_pause,maxf,set_override_envfx,network_is_server,get_network_area_timer,play_transition,obj_get_first_with_behavior_id,spawn_non_sync_object,play_sound,obj_count_objects_with_behavior_id,mod_storage_save_number,djui_chat_message_create,string.format,mod_storage_save_bool
+local mod_storage_load_number,network_is_server,tonumber,math_random,get_skybox,error,network_check_singleplayer_pause,type,maxf,set_override_envfx,get_network_area_timer,play_transition,obj_get_first_with_behavior_id,spawn_non_sync_object,play_sound,obj_count_objects_with_behavior_id,mod_storage_save_number,vec3f_add,find_ceil_height,djui_chat_message_create,string_format,mod_storage_save_bool = mod_storage_load_number,network_is_server,tonumber,math.random,get_skybox,error,network_check_singleplayer_pause,type,maxf,set_override_envfx,get_network_area_timer,play_transition,obj_get_first_with_behavior_id,spawn_non_sync_object,play_sound,obj_count_objects_with_behavior_id,mod_storage_save_number,vec3f_add,find_ceil_height,djui_chat_message_create,string.format,mod_storage_save_bool
 
 gGlobalSyncTable.wcEnabled = true
-gGlobalSyncTable.weatherType = if_then_else(network_is_server(), mod_storage_load_number("weather_type"), WEATHER_CLEAR)
+gGlobalSyncTable.weatherType = if_then_else(network_is_server(), math.tointeger(mod_storage_load_number("weather_type")), WEATHER_CLEAR)
 gGlobalSyncTable.timeUntilWeatherChange = tonumber(mod_storage_load("time_until_weather_change")) or math_random(WEATHER_MIN_DURATION, WEATHER_MAX_DURATION)
 
 gWeatherState = {
@@ -34,42 +34,6 @@ end
 --- Returns whether or not Weather Cycle is enabled (also factoring in DNC)
 function is_wc_enabled()
     return _G.dayNightCycleApi.is_dnc_enabled() and gGlobalSyncTable.wcEnabled and _G.weatherCycleApi.enabled
-end
-
---- Gets the weather type
---- @return integer
-local function get_weather_type()
-    return gGlobalSyncTable.weatherType
-end
-
---- @param weatherType integer
---- Sets the weather type
-local function set_weather_type(weatherType)
-    if not isinteger(weatherType) then
-        error("set_weather_type: Parameter 'weatherType' must be an integer")
-        return
-    end
-
-    gGlobalSyncTable.weatherType = weatherType
-    gGlobalSyncTable.timeUntilWeatherChange = math_random(WEATHER_MIN_DURATION, WEATHER_MAX_DURATION)
-end
-
-local function weather_update()
-    if network_check_singleplayer_pause() then return end
-
-    local timeScale = _G.dayNightCycleApi.get_time_scale()
-    if timeScale == 0.0 then return end
-
-    if gGlobalSyncTable.timeUntilWeatherChange == 0 then
-        local weatherType = math_random(WEATHER_CLEAR, weatherTypeCount - 1)
-        while gGlobalSyncTable.weatherType == weatherType do
-            weatherType = math_random(WEATHER_CLEAR, weatherTypeCount - 1)
-        end
-
-        set_weather_type(weatherType)
-    elseif gGlobalSyncTable.timeUntilWeatherChange ~= -1 then
-        gGlobalSyncTable.timeUntilWeatherChange = maxf(gGlobalSyncTable.timeUntilWeatherChange - timeScale, 0)
-    end
 end
 
 local function update()
@@ -118,7 +82,7 @@ local function update()
         )
     end
 
-    local prevWeather = gWeatherTable[gWeatherState.prevWeatherType]
+    local prevWeather = get_prev_weather()
 
     -- spawn weather skybox
     if obj_get_first_with_behavior_id(bhvWCSkybox) == nil then
@@ -130,7 +94,7 @@ local function update()
         )
     end
 
-    local weather = gWeatherTable[gGlobalSyncTable.weatherType]
+    local weather = get_weather()
     if weather.updateFunc ~= nil then weather.updateFunc() end
     if not weather.rain then return end
 
@@ -187,6 +151,28 @@ local function on_exit()
     end
 end
 
+local function on_play_sound(soundBits, pos)
+    if not get_weather().rain then return soundBits end
+
+    for i = SOUND_TERRAIN_DEFAULT, SOUND_TERRAIN_ICE do
+        local sound = soundBits - (i << 16)
+        if sound == SOUND_ACTION_TERRAIN_STEP or sound == SOUND_ACTION_TERRAIN_STEP_TIPTOE or
+           sound == SOUND_ACTION_TERRAIN_LANDING or sound == SOUND_ACTION_TERRAIN_HEAVY_LANDING or
+           sound == SOUND_ACTION_METAL_STEP or sound == SOUND_ACTION_METAL_STEP_TIPTOE then
+            -- translate to world space
+            local soundPos = gLakituState.pos
+            vec3f_add(soundPos, pos)
+
+            -- check if there's any ceiling
+            if find_ceil_height(soundPos.x, soundPos.y, soundPos.z) == gLevelValues.cellHeightLimit then
+                return SOUND_ACTION_TERRAIN_STEP + (SOUND_TERRAIN_WATER << 16)
+            end
+        end
+    end
+
+    return soundBits
+end
+
 
 --- @param msg string
 local function on_set_command(msg)
@@ -201,13 +187,13 @@ local function on_set_command(msg)
 end
 
 local function on_query_command()
-    djui_chat_message_create("[Weather Cycle] Current weather: " .. gWeatherTable[gGlobalSyncTable.weatherType].name)
+    djui_chat_message_create("[Weather Cycle] Current weather: " .. get_weather().name)
     djui_chat_message_create("[Weather Cycle] Time until weather change: " .. if_then_else(gGlobalSyncTable.timeUntilWeatherChange == -1, "Unknown", format_time(gGlobalSyncTable.timeUntilWeatherChange)))
 end
 
 --- @param msg string
 local function on_weather_command(msg)
-    local args = split(msg)
+    local args = string_split(msg)
 
     if args[1] == "set" then
         if not network_is_server() then
@@ -341,6 +327,7 @@ gLevelValues.zoomOutCameraOnPause = false
 hook_event(HOOK_UPDATE, update)
 hook_event(HOOK_ON_LEVEL_INIT, on_level_init)
 hook_event(HOOK_ON_EXIT, on_exit)
+hook_event(HOOK_ON_PLAY_SOUND, on_play_sound)
 
 hook_chat_command("weather", "\\#00ffff\\[set|query]\\#dcdcdc\\ - The command handle for Weather Cycle DX", on_weather_command)
 

@@ -1,7 +1,7 @@
 if not check_dnc_compatible() then return end
 
 -- localize functions to improve performance
-local cur_obj_scale,obj_mark_for_deletion,obj_has_model_extended,obj_set_model_extended,vec3f_to_object_pos,calculate_yaw,math_random,sins,coss,maxf,find_water_level,collision_find_ceil,cur_obj_hide,find_floor_height,obj_scale_xyz,obj_set_pos,cur_obj_unhide,spawn_non_sync_object,play_sound,set_camera_shake_from_hit,cur_obj_update_floor_height_and_get_floor,obj_check_hitbox_overlap,set_mario_action,clampf,math_sin = cur_obj_scale,obj_mark_for_deletion,obj_has_model_extended,obj_set_model_extended,vec3f_to_object_pos,calculate_yaw,math.random,sins,coss,maxf,find_water_level,collision_find_ceil,cur_obj_hide,find_floor_height,obj_scale_xyz,obj_set_pos,cur_obj_unhide,spawn_non_sync_object,play_sound,set_camera_shake_from_hit,cur_obj_update_floor_height_and_get_floor,obj_check_hitbox_overlap,set_mario_action,clampf,math.sin
+local obj_scale,cur_obj_scale,obj_mark_for_deletion,obj_get_model_id_extended,obj_set_model_extended,vec3f_to_object_pos,calculate_yaw,math_random,sins,coss,maxf,find_water_level,collision_find_ceil,cur_obj_hide,find_floor_height,obj_scale_xyz,obj_set_pos,cur_obj_unhide,spawn_non_sync_object,play_sound,set_camera_shake_from_hit,cur_obj_update_floor_height_and_get_floor,obj_check_hitbox_overlap,set_mario_action,clampf,math_sin = obj_scale,cur_obj_scale,obj_mark_for_deletion,obj_get_model_id_extended,obj_set_model_extended,vec3f_to_object_pos,calculate_yaw,math.random,sins,coss,maxf,find_water_level,collision_find_ceil,cur_obj_hide,find_floor_height,obj_scale_xyz,obj_set_pos,cur_obj_unhide,spawn_non_sync_object,play_sound,set_camera_shake_from_hit,cur_obj_update_floor_height_and_get_floor,obj_check_hitbox_overlap,set_mario_action,clampf,math.sin
 
 --- @param o Object
 function bhv_wc_skybox_init(o)
@@ -16,8 +16,8 @@ function bhv_wc_skybox_loop(o)
         return
     end
 
-    local prevWeather = gWeatherTable[gWeatherState.prevWeatherType]
-    local weather = gWeatherTable[gGlobalSyncTable.weatherType]
+    local prevWeather = get_prev_weather()
+    local weather = get_weather()
 
     -- BITS specific changes
     local bits = in_vanilla_level(LEVEL_BITS)
@@ -37,12 +37,12 @@ end
 
 
 function get_rain_droplet_count()
-    return lerp_round(gWeatherTable[gWeatherState.prevWeatherType].rainAmount, gWeatherTable[gGlobalSyncTable.weatherType].rainAmount, gWeatherState.transitionTimer / WEATHER_TRANSITION_TIME)
+    return lerp_round(get_prev_weather().rainAmount, get_weather().rainAmount, gWeatherState.transitionTimer / WEATHER_TRANSITION_TIME)
 end
 
 --- @param o Object
 function bhv_wc_rain_droplet_init(o)
-    local weather = gWeatherTable[gGlobalSyncTable.weatherType]
+    local weather = get_weather()
     if not weather.rain then
         obj_mark_for_deletion(o)
         return
@@ -91,9 +91,9 @@ function bhv_wc_rain_droplet_loop(o)
         return
     end
 
-    local weather = gWeatherTable[gGlobalSyncTable.weatherType]
+    local weather = get_weather()
     if not weather.rain then
-        weather = gWeatherTable[gWeatherState.prevWeatherType]
+        weather = get_prev_weather()
         if not weather.rain then
             obj_mark_for_deletion(o)
             return

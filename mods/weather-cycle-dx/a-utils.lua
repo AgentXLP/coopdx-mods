@@ -1,7 +1,7 @@
 if not check_dnc_compatible() then return end
 
 -- localize functions to improve performance
-local djui_hud_get_color,djui_hud_set_color,djui_hud_print_text,djui_hud_measure_text,math_floor,math_ceil,string_format,table_insert,level_is_vanilla_level,math_random = djui_hud_get_color,djui_hud_set_color,djui_hud_print_text,djui_hud_measure_text,math.floor,math.ceil,string.format,table.insert,level_is_vanilla_level,math.random
+local djui_hud_get_color,djui_hud_set_color,djui_hud_print_text,djui_hud_measure_text,math_floor,string_format,table_insert,level_is_vanilla_level,type,math_random,mod_storage_load = djui_hud_get_color,djui_hud_set_color,djui_hud_print_text,djui_hud_measure_text,math.floor,string.format,table.insert,level_is_vanilla_level,type,math.random,mod_storage_load
 
 --- @param cond boolean
 --- Human readable ternary operator
@@ -41,7 +41,7 @@ end
 --- @return integer
 --- Rounds up or down depending on the decimal position of `x`
 function math_round(x)
-    return if_then_else(x - math_floor(x) >= 0.5, math_ceil(x), math_floor(x))
+    return math_floor(x + 0.5)
 end
 
 --- @param a number
@@ -112,7 +112,7 @@ end
 
 --- @param s string
 --- Splits a string into a table by spaces
-function split(s)
+function string_split(s)
     local result = {}
     for match in (s):gmatch(string_format("[^%s]+", " ")) do
         table_insert(result, match)
@@ -178,24 +178,10 @@ function any_player_in_vanilla_level(levelNum)
     return level_is_vanilla_level(levelNum) and any_player_in_level(levelNum)
 end
 
-local function tobool(value)
-    local type = type(value)
-    if type == "boolean" then
-        return value
-    elseif type == "number" then
-        return value == 1
-    elseif type == "string" then
-        return value == "true"
-    elseif type == "table" or type == "function" or type == "thread" or type == "userdata" then
-        return true
-    end
-    return false
-end
-
 --- @param key string
 --- `mod_storage_load_bool` except it returns true by default
 function mod_storage_load_bool_2(key)
     local value = mod_storage_load(key)
     if value == nil then return true end
-    return tobool(value)
+    return value == "true"
 end

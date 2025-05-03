@@ -1,7 +1,7 @@
 if not check_dnc_compatible() then return end
 
 -- localize functions to improve performance
-local math_random,obj_get_first_with_behavior_id,clamp = math.random,obj_get_first_with_behavior_id,clamp
+local math_random,obj_get_first_with_behavior_id,vec3f_mul,clamp = math.random,obj_get_first_with_behavior_id,vec3f_mul,clamp
 
 --- @param color Color
 local function dnc_set_lighting_color(color)
@@ -19,8 +19,8 @@ local function dnc_set_lighting_color(color)
         return COLOR_WHITE
     end
 
-    local prevWeather = gWeatherTable[gWeatherState.prevWeatherType]
-    local weather = gWeatherTable[gGlobalSyncTable.weatherType]
+    local prevWeather = get_prev_weather()
+    local weather = get_weather()
     local lightingColor = color_lerp(get_weather_color(prevWeather), get_weather_color(weather), gWeatherState.transitionTimer / WEATHER_TRANSITION_TIME)
     return color_mul(color, lightingColor)
 end
@@ -40,8 +40,8 @@ local function dnc_set_ambient_lighting_color(ambientColor)
         return COLOR_WHITE
     end
 
-    local prevWeather = gWeatherTable[gWeatherState.prevWeatherType]
-    local weather = gWeatherTable[gGlobalSyncTable.weatherType]
+    local prevWeather = get_prev_weather()
+    local weather = get_weather()
     local lightingColor = color_lerp(get_weather_color(prevWeather), get_weather_color(weather), gWeatherState.transitionTimer / WEATHER_TRANSITION_TIME)
     return color_mul(ambientColor, lightingColor)
 end
@@ -51,21 +51,21 @@ local function dnc_set_lighting_dir(dir)
     if not gGlobalSyncTable.wcEnabled or not show_weather_cycle() then return dir end
 
     if gWeatherState.flashTimer > 0 then
-        return DIR_BRIGHT
+        return { x = 0, y = DIR_BRIGHT, z = DIR_BRIGHT }
     end
 
-    local prevWeather = gWeatherTable[gWeatherState.prevWeatherType]
-    local weather = gWeatherTable[gGlobalSyncTable.weatherType]
+    local prevWeather = get_prev_weather()
+    local weather = get_weather()
     local lightingDir = lerp(prevWeather.lightingDir, weather.lightingDir, gWeatherState.transitionTimer / WEATHER_TRANSITION_TIME)
-    return dir * lightingDir
+    return vec3f_mul(dir, lightingDir)
 end
 
 --- @param intensity number
 local function dnc_set_fog_intensity(intensity)
     if not gGlobalSyncTable.wcEnabled or not show_weather_cycle() then return intensity end
 
-    local prevWeather = gWeatherTable[gWeatherState.prevWeatherType]
-    local weather = gWeatherTable[gGlobalSyncTable.weatherType]
+    local prevWeather = get_prev_weather()
+    local weather = get_weather()
     local fogIntensity = lerp(prevWeather.fogIntensity, weather.fogIntensity, gWeatherState.transitionTimer / WEATHER_TRANSITION_TIME)
     return (intensity + fogIntensity) * 0.5
 end
@@ -82,7 +82,7 @@ end
 
 --- @param shouldDelete boolean
 local function dnc_delete_at_dark(shouldDelete)
-    if gWeatherTable[gGlobalSyncTable.weatherType].rain then return true end
+    if get_weather().rain then return true end
     return shouldDelete
 end
 

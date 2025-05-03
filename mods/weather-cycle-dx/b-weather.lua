@@ -1,7 +1,7 @@
 if not check_dnc_compatible() then return end
 
 -- localize functions to improve performance
-local get_skybox,clamp,get_network_player_smallest_global,math_random,collision_find_floor,spawn_sync_object = get_skybox,clamp,get_network_player_smallest_global,math.random,collision_find_floor,spawn_sync_object
+local type,error,get_skybox,clamp,get_network_player_smallest_global,math_random,collision_find_floor,spawn_sync_object = type,error,get_skybox,clamp,get_network_player_smallest_global,math.random,collision_find_floor,spawn_sync_object
 
 --- @class Weather
 --- @field public name string
@@ -150,6 +150,54 @@ function get_weather_color(weather)
     return weather.color
 end
 
+--- Gets the weather type
+--- @return integer
+function get_weather_type()
+    return gGlobalSyncTable.weatherType
+end
+
+--- @return Weather
+--- Gets the current weather
+function get_weather()
+    return gWeatherTable[gGlobalSyncTable.weatherType]
+end
+
+--- @return Weather
+--- Gets the previous weather
+function get_prev_weather()
+    return gWeatherTable[gWeatherState.prevWeatherType]
+end
+
+--- @param weatherType integer
+--- Sets the weather type
+function set_weather_type(weatherType)
+    if not isinteger(weatherType) then
+        error("set_weather_type: Parameter 'weatherType' must be an integer")
+        return
+    end
+
+    gGlobalSyncTable.weatherType = weatherType
+    gGlobalSyncTable.timeUntilWeatherChange = math_random(WEATHER_MIN_DURATION, WEATHER_MAX_DURATION)
+end
+
+function weather_update()
+    if network_check_singleplayer_pause() then return end
+
+    local timeScale = _G.dayNightCycleApi.get_time_scale()
+    if timeScale == 0.0 then return end
+
+    if gGlobalSyncTable.timeUntilWeatherChange == 0 then
+        local weatherType = math_random(WEATHER_CLEAR, weatherTypeCount - 1)
+        while gGlobalSyncTable.weatherType == weatherType do
+            weatherType = math_random(WEATHER_CLEAR, weatherTypeCount - 1)
+        end
+
+        set_weather_type(weatherType)
+    elseif gGlobalSyncTable.timeUntilWeatherChange ~= -1 then
+        gGlobalSyncTable.timeUntilWeatherChange = maxf(gGlobalSyncTable.timeUntilWeatherChange - timeScale, 0)
+    end
+end
+
 --- Spawns lightning
 function lightning_update()
     if get_network_player_smallest_global().localIndex ~= 0 or get_skybox() == BACKGROUND_SNOW_MOUNTAINS then return end
@@ -179,6 +227,7 @@ function lightning_update()
     gWeatherState.timeUntilLightning = math_random(SECOND * 5, SECOND * if_then_else(gNetworkPlayers[0].currLevelNum == LEVEL_BOWSER_3, 10, 20))
     gWeatherState.flashTimer = 15
 end
+
 
 WEATHER_CLEAR = weather_register(
     "Clear", -- name

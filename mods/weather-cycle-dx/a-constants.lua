@@ -1,6 +1,3 @@
--- localize functions to improve performance
-local play_sound,djui_chat_message_create,math_tointeger,string_format,smlua_model_util_get_id = play_sound,djui_chat_message_create,math.tointeger,string.format,smlua_model_util_get_id
-
 --- Checks if DNC is enabled and the version is high enough
 function check_dnc_compatible()
     return _G.dayNightCycleApi ~= nil and _G.dayNightCycleApi.version ~= nil and _G.dayNightCycleApi.version >= 230
@@ -20,8 +17,8 @@ end
 
 WC_VERSION_MAJOR = 1
 WC_VERSION_MINOR = 1
-WC_VERSION_PATCH = 2
-WC_VERSION       = math_tointeger(string_format("%d%d%d", WC_VERSION_MAJOR, WC_VERSION_MINOR, WC_VERSION_PATCH))
+WC_VERSION_PATCH = 3
+WC_VERSION       = math.tointeger(string.format("%d%d%d", WC_VERSION_MAJOR, WC_VERSION_MINOR, WC_VERSION_PATCH))
 
 -- skybox constants
 E_MODEL_WC_SKYBOX_CLOUDY = smlua_model_util_get_id("wc_skybox_cloudy_geo")
