@@ -562,7 +562,7 @@ local function on_sunrise_changed(_, _, newVal)
 
     _G.dayNightCycleApi.constants.HOUR_SUNRISE_START = HOUR_SUNRISE_START
     _G.dayNightCycleApi.constants.HOUR_SUNRISE_END = HOUR_SUNRISE_END
-    _G.dayNightCycleApi.constants.HOUR_DAY_START = HOUR_NIGHT_START
+    _G.dayNightCycleApi.constants.HOUR_DAY_START = HOUR_DAY_START
 
     dnc_call_hook(DNC_HOOK_SUN_TIMES_CHANGED)
 end
