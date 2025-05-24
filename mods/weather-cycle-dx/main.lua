@@ -1,14 +1,14 @@
 -- name: Weather Cycle DX
 -- incompatible: weather environment-tint
--- description: Weather Cycle DX v1.1.3\nBy \\#ec7731\\Agent X\n\n\\#dcdcdc\\This mod adds a weather cycle system with cloudy skies, rain, and storms to sm64coopdx. It uses Day Night Cycle DX as a base library, meaning you need\nto have the mod enabled in order to use this one. There is also a toggleable\nAurora Borealis that starts after midnight.\n\nSpecial thanks to Floralys for the original concept.\nSpecial thanks to \\#344ee1\\eros71\\#dcdcdc\\ for saving the mod!
+-- description: Weather Cycle DX v1.1.4\nBy \\#ec7731\\Agent X\n\n\\#dcdcdc\\This mod adds a weather cycle system with cloudy skies, rain, and storms to sm64coopdx. It uses Day Night Cycle DX as a base library, meaning you need\nto have the mod enabled in order to use this one. There is also a toggleable\nAurora Borealis that starts after midnight.\n\nSpecial thanks to Floralys for the original concept.\nSpecial thanks to \\#344ee1\\eros71\\#dcdcdc\\ for saving the mod!
 
 if not check_dnc_compatible() then return end
 
 -- localize functions to improve performance
-local mod_storage_load_number,network_is_server,tonumber,math_random,get_skybox,error,network_check_singleplayer_pause,type,maxf,set_override_envfx,get_network_area_timer,play_transition,obj_get_first_with_behavior_id,spawn_non_sync_object,play_sound,obj_count_objects_with_behavior_id,mod_storage_save_number,vec3f_add,find_ceil_height,djui_chat_message_create,string_format,mod_storage_save_bool = mod_storage_load_number,network_is_server,tonumber,math.random,get_skybox,error,network_check_singleplayer_pause,type,maxf,set_override_envfx,get_network_area_timer,play_transition,obj_get_first_with_behavior_id,spawn_non_sync_object,play_sound,obj_count_objects_with_behavior_id,mod_storage_save_number,vec3f_add,find_ceil_height,djui_chat_message_create,string.format,mod_storage_save_bool
+local math_tointeger,mod_storage_load_number,network_is_server,math_random,tonumber,get_skybox,set_override_envfx,network_check_singleplayer_pause,get_network_area_timer,play_transition,obj_get_first_with_behavior_id,spawn_non_sync_object,play_sound,obj_count_objects_with_behavior_id,type,mod_storage_save_number,vec3f_add,find_ceil_height,string_format,djui_chat_message_create,mod_storage_save_bool,error = math.tointeger,mod_storage_load_number,network_is_server,math.random,tonumber,get_skybox,set_override_envfx,network_check_singleplayer_pause,get_network_area_timer,play_transition,obj_get_first_with_behavior_id,spawn_non_sync_object,play_sound,obj_count_objects_with_behavior_id,type,mod_storage_save_number,vec3f_add,find_ceil_height,string.format,djui_chat_message_create,mod_storage_save_bool,error
 
 gGlobalSyncTable.wcEnabled = true
-gGlobalSyncTable.weatherType = if_then_else(network_is_server(), math.tointeger(mod_storage_load_number("weather_type")), WEATHER_CLEAR)
+gGlobalSyncTable.weatherType = if_then_else(network_is_server(), math_tointeger(mod_storage_load_number("weather_type")), WEATHER_CLEAR)
 gGlobalSyncTable.timeUntilWeatherChange = tonumber(mod_storage_load("time_until_weather_change")) or math_random(WEATHER_MIN_DURATION, WEATHER_MAX_DURATION)
 
 gWeatherState = {
@@ -37,7 +37,6 @@ function is_wc_enabled()
 end
 
 local function update()
-    -- bugs with the snow effect have been eradicated
     set_override_envfx(ENVFX_MODE_NO_OVERRIDE)
 
     if not is_wc_enabled() then return end
@@ -156,9 +155,7 @@ local function on_play_sound(soundBits, pos)
 
     for i = SOUND_TERRAIN_DEFAULT, SOUND_TERRAIN_ICE do
         local sound = soundBits - (i << 16)
-        if sound == SOUND_ACTION_TERRAIN_STEP or sound == SOUND_ACTION_TERRAIN_STEP_TIPTOE or
-           sound == SOUND_ACTION_TERRAIN_LANDING or sound == SOUND_ACTION_TERRAIN_HEAVY_LANDING or
-           sound == SOUND_ACTION_METAL_STEP or sound == SOUND_ACTION_METAL_STEP_TIPTOE then
+        if sound == SOUND_ACTION_TERRAIN_STEP or sound == SOUND_ACTION_TERRAIN_STEP_TIPTOE then
             -- translate to world space
             local soundPos = gLakituState.pos
             vec3f_add(soundPos, pos)

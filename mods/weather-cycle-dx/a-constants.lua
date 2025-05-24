@@ -17,7 +17,7 @@ end
 
 WC_VERSION_MAJOR = 1
 WC_VERSION_MINOR = 1
-WC_VERSION_PATCH = 3
+WC_VERSION_PATCH = 4
 WC_VERSION       = math.tointeger(string.format("%d%d%d", WC_VERSION_MAJOR, WC_VERSION_MINOR, WC_VERSION_PATCH))
 
 -- skybox constants

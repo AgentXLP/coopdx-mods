@@ -1,7 +1,7 @@
 if not check_dnc_compatible() then return end
 
 -- localize functions to improve performance
-local math_random,obj_get_first_with_behavior_id,vec3f_mul,clamp = math.random,obj_get_first_with_behavior_id,vec3f_mul,clamp
+local math_random,obj_get_first_with_behavior_id,vec3f_mul,math_clamp = math.random,obj_get_first_with_behavior_id,vec3f_mul,math.clamp
 
 --- @param color Color
 local function dnc_set_lighting_color(color)
@@ -96,7 +96,7 @@ local function dnc_set_time(oldTime, newTime)
     gGlobalSyncTable.timeUntilWeatherChange = gGlobalSyncTable.timeUntilWeatherChange - diff
 
     if gWeatherState.transitionTimer < WEATHER_TRANSITION_TIME then
-        gWeatherState.transitionTimer = clamp(gWeatherState.transitionTimer + diff, 0, WEATHER_TRANSITION_TIME)
+        gWeatherState.transitionTimer = math_clamp(gWeatherState.transitionTimer + diff, 0, WEATHER_TRANSITION_TIME)
     end
 end
 

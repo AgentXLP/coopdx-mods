@@ -1,7 +1,7 @@
 if not check_dnc_compatible() then return end
 
 -- localize functions to improve performance
-local type,error,get_skybox,clamp,get_network_player_smallest_global,math_random,collision_find_floor,spawn_sync_object = type,error,get_skybox,clamp,get_network_player_smallest_global,math.random,collision_find_floor,spawn_sync_object
+local type,error,get_skybox,math_clamp,math_random,network_check_singleplayer_pause,math_max,get_network_player_smallest_global,collision_find_floor,spawn_sync_object = type,error,get_skybox,math.clamp,math.random,network_check_singleplayer_pause,math.max,get_network_player_smallest_global,collision_find_floor,spawn_sync_object
 
 --- @class Weather
 --- @field public name string
@@ -140,11 +140,11 @@ function get_weather_color(weather)
     if skybox == BACKGROUND_UNDERWATER_CITY then
         return { r = weather.color.r * 0.6, g = weather.color.g * 0.65, b = weather.color.b * 0.9 }
     elseif skybox == BACKGROUND_SNOW_MOUNTAINS then
-        return { r = clamp(weather.color.r * 1.1, 0, 255), g = clamp(weather.color.g * 1.4, 0, 255), b = clamp(weather.color.b * 1.7, 0, 255) }
+        return { r = math_clamp(weather.color.r * 1.1, 0, 255), g = math_clamp(weather.color.g * 1.4, 0, 255), b = math_clamp(weather.color.b * 1.7, 0, 255) }
     elseif skybox == BACKGROUND_HAUNTED then
         return { r = weather.color.r * 0.6, g = weather.color.g * 0.6, b = weather.color.b }
     elseif skybox == BACKGROUND_PURPLE_SKY then
-        return { r = clamp(weather.color.r * 1.75, 0, 255), g = clamp(weather.color.r * 1, 0, 255), b = clamp(weather.color.b * 2.0, 0, 255) }
+        return { r = math_clamp(weather.color.r * 1.75, 0, 255), g = math_clamp(weather.color.r * 1, 0, 255), b = math_clamp(weather.color.b * 2.0, 0, 255) }
     end
 
     return weather.color
@@ -194,7 +194,7 @@ function weather_update()
 
         set_weather_type(weatherType)
     elseif gGlobalSyncTable.timeUntilWeatherChange ~= -1 then
-        gGlobalSyncTable.timeUntilWeatherChange = maxf(gGlobalSyncTable.timeUntilWeatherChange - timeScale, 0)
+        gGlobalSyncTable.timeUntilWeatherChange = math_max(gGlobalSyncTable.timeUntilWeatherChange - timeScale, 0)
     end
 end
 

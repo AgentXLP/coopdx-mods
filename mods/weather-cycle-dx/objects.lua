@@ -1,7 +1,7 @@
 if not check_dnc_compatible() then return end
 
 -- localize functions to improve performance
-local obj_scale,cur_obj_scale,obj_mark_for_deletion,obj_get_model_id_extended,obj_set_model_extended,vec3f_to_object_pos,calculate_yaw,math_random,sins,coss,maxf,find_water_level,collision_find_ceil,cur_obj_hide,find_floor_height,obj_scale_xyz,obj_set_pos,cur_obj_unhide,spawn_non_sync_object,play_sound,set_camera_shake_from_hit,cur_obj_update_floor_height_and_get_floor,obj_check_hitbox_overlap,set_mario_action,clampf,math_sin = obj_scale,cur_obj_scale,obj_mark_for_deletion,obj_get_model_id_extended,obj_set_model_extended,vec3f_to_object_pos,calculate_yaw,math.random,sins,coss,maxf,find_water_level,collision_find_ceil,cur_obj_hide,find_floor_height,obj_scale_xyz,obj_set_pos,cur_obj_unhide,spawn_non_sync_object,play_sound,set_camera_shake_from_hit,cur_obj_update_floor_height_and_get_floor,obj_check_hitbox_overlap,set_mario_action,clampf,math.sin
+local obj_scale,cur_obj_scale,obj_mark_for_deletion,obj_get_model_id_extended,obj_set_model_extended,vec3f_to_object_pos,math_random,calculate_yaw,sins,coss,math_max,find_water_level,collision_find_ceil,cur_obj_hide,find_floor_height,obj_scale_xyz,obj_set_pos,cur_obj_unhide,spawn_non_sync_object,play_sound,set_camera_shake_from_hit,cur_obj_update_floor_height_and_get_floor,obj_check_hitbox_overlap,set_mario_action,math_clamp,math_sin = obj_scale,cur_obj_scale,obj_mark_for_deletion,obj_get_model_id_extended,obj_set_model_extended,vec3f_to_object_pos,math.random,calculate_yaw,sins,coss,math.max,find_water_level,collision_find_ceil,cur_obj_hide,find_floor_height,obj_scale_xyz,obj_set_pos,cur_obj_unhide,spawn_non_sync_object,play_sound,set_camera_shake_from_hit,cur_obj_update_floor_height_and_get_floor,obj_check_hitbox_overlap,set_mario_action,math.clamp,math.sin
 
 --- @param o Object
 function bhv_wc_skybox_init(o)
@@ -55,7 +55,7 @@ function bhv_wc_rain_droplet_init(o)
 
     local posX = pos.x + sins(rainYaw) * math_random(500, 2000) + vel.x * 20
     local posZ = pos.z + coss(rainYaw) * math_random(500, 2000) + vel.z * 20
-    local posY = maxf(pos.y, find_water_level(posX, posZ))
+    local posY = math_max(pos.y, find_water_level(posX, posZ))
 
     if not in_vanilla_level(LEVEL_DDD) or gNetworkPlayers[0].currAreaIndex ~= 2 then
         local sanity = 0
@@ -73,9 +73,9 @@ function bhv_wc_rain_droplet_init(o)
 
     o.oAction = 0
     o.oTimer = 0
-    o.oFloorHeight = maxf(find_floor_height(posX, posY, posZ), find_water_level(posX, posZ))
+    o.oFloorHeight = math_max(find_floor_height(posX, posY, posZ), find_water_level(posX, posZ))
     obj_scale_xyz(o, 0.1, weather.rainScaleY, 0.1)
-    obj_set_pos(o, posX, posY + math.random(700, 1000), posZ)
+    obj_set_pos(o, posX, posY + math_random(700, 1000), posZ)
     cur_obj_unhide()
 end
 
@@ -101,11 +101,11 @@ function bhv_wc_rain_droplet_loop(o)
     end
     o.oPosY = o.oPosY - weather.rainSpeed
     if o.oPosY < o.oFloorHeight then
-        for _ = 1, 3 do
+        for _ = 1, 2 do
             spawn_non_sync_object(
                 id_bhvWaterDropletSplash,
                 E_MODEL_SMALL_WATER_SPLASH,
-                o.oPosX + math.random(-100, 100), o.oFloorHeight, o.oPosZ + math.random(-100, 100),
+                o.oPosX + math_random(-100, 100), o.oFloorHeight, o.oPosZ + math_random(-100, 100),
                 nil
             )
         end
@@ -137,7 +137,7 @@ function bhv_wc_lightning_loop(o)
     cur_obj_update_floor_height_and_get_floor()
     -- set the grass on fire
     if o.oTimer == 1 then
-        if math.random(0, 1) ~= -1 and o.oFloor ~= nil and (o.oFloorType == SURFACE_NOISE_DEFAULT or o.oFloorType == SURFACE_NOISE_SLIPPERY or o.oFloorType == SURFACE_NOISE_VERY_SLIPPERY) then
+        if math_random(0, 1) ~= -1 and o.oFloor ~= nil and (o.oFloorType == SURFACE_NOISE_DEFAULT or o.oFloorType == SURFACE_NOISE_SLIPPERY or o.oFloorType == SURFACE_NOISE_VERY_SLIPPERY) then
             spawn_non_sync_object(
                 id_bhvFlameLargeBurningOut,
                 E_MODEL_RED_FLAME,
@@ -207,12 +207,12 @@ function bhv_wc_aurora_loop(o)
     o.oPosY = o.oPosY + 15000
 
     if minutes >= HOUR_SUNRISE_START and minutes <= HOUR_SUNRISE_END then
-        o.oOpacity = lerp_round(255, 0, clampf((minutes - HOUR_SUNRISE_START) / HOUR_SUNRISE_DURATION, 0, 1))
+        o.oOpacity = lerp_round(255, 0, math_clamp((minutes - HOUR_SUNRISE_START) / HOUR_SUNRISE_DURATION, 0, 1))
     elseif minutes >= 0 and minutes <= 1 then
         o.oOpacity = minutes * 255
     elseif minutes > 1 or minutes < HOUR_SUNRISE_START then
         o.oOpacity = 255
     end
 
-    o.oOpacity = clamp(o.oOpacity - 15 - math.sin(o.oTimer * 0.05 * _G.dayNightCycleApi.get_time_scale()) * 15, 0, 255)
+    o.oOpacity = math_clamp(o.oOpacity - 15 - math_sin(o.oTimer * 0.05 * _G.dayNightCycleApi.get_time_scale()) * 15, 0, 255)
 end
