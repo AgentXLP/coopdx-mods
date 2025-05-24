@@ -103,7 +103,7 @@ local function act_spectator(m)
         local right = { x = sins(m.faceAngle.y - 0x4000), y = 0, z = coss(m.faceAngle.y - 0x4000) }
         local dir = { x = forward.x * m.controller.stickY + right.x * m.controller.stickX, y = 0, z = forward.z * m.controller.stickY + right.z * m.controller.stickX }
         local speed = if_then_else((m.controller.buttonDown & B_BUTTON) ~= 0, 2, 1)
-        dir = vec3f_mul(dir, speed)
+        vec3f_mul(dir, speed)
 
         sPlayerFirstPerson.pos.x = sPlayerFirstPerson.pos.x + dir.x
         sPlayerFirstPerson.pos.z = sPlayerFirstPerson.pos.z + dir.z
