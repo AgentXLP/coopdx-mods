@@ -1855,7 +1855,7 @@ specialFunctions = [
     "math.log",
     "math.sqr",
     "math.clamp",
-    "math.hypot"
+    "math.hypot",
 
     "table.insert",
     "table.sort",
@@ -1863,7 +1863,7 @@ specialFunctions = [
     "table.unpack",
     "table.concat",
     "table.move",
-    "table.remove"
+    "table.remove",
 
     "string.byte",
     "string.char",
