@@ -1,9 +1,9 @@
 -- name: [PET] Propeller Fly Guy
--- description: [PET] Propeller Fly Guy\nBy \\#ec7731\\Agent X\n\n\\#dcdcdc\\This mod adds a fly guy pet that behaves like the propeller blocks from New Super Mario Bros. Wii.\n\nTo use the Propeller Fly Guy, first spawn one through the pets menu, grab him and jump in the air and then press\n[\\#3040ff\\A\\#dcdcdc\\]. You will propel upwards and eventually begin to descend. To slow your descent, press [\\#3040ff\\A\\#dcdcdc\\] in rapid succession. To speed up your descent, hold down [\\#3040ff\\Z\\#dcdcdc\\].
+-- description: [PET] Propeller Fly Guy v1.0.1\nBy \\#ec7731\\Agent X\n\n\\#dcdcdc\\This mod adds a fly guy pet that behaves like the propeller blocks from New Super Mario Bros. Wii.\n\nTo use the Propeller Fly Guy, first spawn one through the pets menu, grab him and jump in the air and then press\n[\\#3040ff\\A\\#dcdcdc\\]. You will propel upwards and eventually begin to descend. To slow your descent, press [\\#3040ff\\A\\#dcdcdc\\] in rapid succession. To speed up your descent, hold down [\\#3040ff\\Z\\#dcdcdc\\].
 -- pausable: true
 
 -- localize functions to improve performance
-local play_sound,djui_chat_message_create,audio_sample_load,smlua_model_util_get_id,allocate_mario_action,drop_and_set_mario_action,audio_sample_play,set_character_animation,update_lava_boost_or_twirling,clamp,math_abs,set_mario_particle_flags,perform_air_step,mario_bonk_reflection,lava_boost_on_wall,clampf,obj_has_model_extended,spawn_mist_particles,set_camera_shake_from_hit = play_sound,djui_chat_message_create,audio_sample_load,smlua_model_util_get_id,allocate_mario_action,drop_and_set_mario_action,audio_sample_play,set_character_animation,update_lava_boost_or_twirling,clamp,math.abs,set_mario_particle_flags,perform_air_step,mario_bonk_reflection,lava_boost_on_wall,clampf,obj_has_model_extended,spawn_mist_particles,set_camera_shake_from_hit
+local play_sound,djui_chat_message_create,audio_sample_load,smlua_model_util_get_id,allocate_mario_action,set_mario_action,drop_and_set_mario_action,audio_sample_play,set_character_animation,update_lava_boost_or_twirling,math_abs,math_clamp,set_mario_particle_flags,perform_air_step,mario_bonk_reflection,lava_boost_on_wall,obj_has_model_extended,spawn_mist_particles,set_camera_shake_from_hit = play_sound,djui_chat_message_create,audio_sample_load,smlua_model_util_get_id,allocate_mario_action,set_mario_action,drop_and_set_mario_action,audio_sample_play,set_character_animation,update_lava_boost_or_twirling,math.abs,math.clamp,set_mario_particle_flags,perform_air_step,mario_bonk_reflection,lava_boost_on_wall,obj_has_model_extended,spawn_mist_particles,set_camera_shake_from_hit
 
 if _G.wpets == nil then
     local first = false
@@ -17,10 +17,10 @@ if _G.wpets == nil then
     return
 end
 
-local SOUND_CUSTOM_FLY = audio_sample_load("fly.ogg")
-local SOUND_CUSTOM_FALL = audio_sample_load("fall.ogg")
-local SOUND_CUSTOM_SPIN = audio_sample_load("spin.ogg")
-local SOUND_CUSTOM_DRILL = audio_sample_load("drill.ogg")
+local SAMPLE_FLY = audio_sample_load("fly.ogg")
+local SAMPLE_FALL = audio_sample_load("fall.ogg")
+local SAMPLE_SPIN = audio_sample_load("spin.ogg")
+local SAMPLE_DRILL = audio_sample_load("drill.ogg")
 
 local E_MODEL_FLYGUY_PET = smlua_model_util_get_id("flyguy_pet_geo")
 
@@ -45,7 +45,7 @@ local PET_PROPEL_DRILL = -75
 
 --- @param cond boolean
 --- Human readable ternary operator
-function if_then_else(cond, ifTrue, ifFalse)
+local function if_then_else(cond, ifTrue, ifFalse)
     if cond then return ifTrue end
     return ifFalse
 end
@@ -64,7 +64,7 @@ local function act_pet_propel(m)
     end
 
     if m.actionTimer == 0 then
-        audio_sample_play(SOUND_CUSTOM_FLY, m.pos, 1)
+        audio_sample_play(SAMPLE_FLY, m.pos, 1)
     end
 
     set_character_animation(m, CHAR_ANIM_JUMP_WITH_LIGHT_OBJ)
@@ -79,15 +79,15 @@ local function act_pet_propel(m)
             m.actionState = 1
         end
     else
-        m.twirlYaw = m.twirlYaw + clamp(0x200 * math_abs(m.vel.y), 0, 0x2000)
+        m.twirlYaw = m.twirlYaw + math_clamp(0x200 * math_abs(m.vel.y), 0, 0x2000)
         if m.actionTimer % 10 == 0 and m.vel.y >= PET_PROPEL_FALL then
-            audio_sample_play(SOUND_CUSTOM_FALL, m.pos, 1)
+            audio_sample_play(SAMPLE_FALL, m.pos, 1)
             m.actionArg = 0
         end
 
         if (m.input & INPUT_A_PRESSED) ~= 0 and (m.input & INPUT_Z_DOWN) == 0 and m.vel.y <= PET_PROPEL_FALL then
             set_mario_particle_flags(m, PARTICLE_DUST, false)
-            audio_sample_play(SOUND_CUSTOM_SPIN, m.pos, 1)
+            audio_sample_play(SAMPLE_SPIN, m.pos, 1)
             m.vel.y = m.vel.y + PET_PROPEL_SPIN
         end
     end
@@ -112,11 +112,11 @@ local function act_pet_propel_gravity(m)
     if m.actionState == 0 then
         m.vel.y = m.vel.y - 1
     else
-        m.vel.y = clampf(m.vel.y - 2, if_then_else((m.input & INPUT_Z_DOWN) ~= 0, PET_PROPEL_DRILL, PET_PROPEL_FALL), if_then_else(m.vel.y > 0, 15, 0))
+        m.vel.y = math_clamp(m.vel.y - 2, if_then_else((m.input & INPUT_Z_DOWN) ~= 0, PET_PROPEL_DRILL, PET_PROPEL_FALL), if_then_else(m.vel.y > 0, 15, 0))
         if m.vel.y < PET_PROPEL_FALL then
             set_mario_particle_flags(m, PARTICLE_DUST, false)
             if m.actionArg == 0 then
-                audio_sample_play(SOUND_CUSTOM_DRILL, m.pos, 1)
+                audio_sample_play(SAMPLE_DRILL, m.pos, 1)
                 m.actionArg = 1
             end
         end
