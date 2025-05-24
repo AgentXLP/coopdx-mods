@@ -1,9 +1,9 @@
 -- name: Environment Tint
 -- incompatible: environment-tint
--- description: Environment Tint v1.3\nBy \\#ec7731\\AgentX\n\n\\#dcdcdc\\This mod tints your environment lighting based on the skybox, level, or region. It's a simple concept, but I think the results speak for themselves. Enjoy!
+-- description: Environment Tint v1.3.1\nBy \\#ec7731\\AgentX\n\n\\#dcdcdc\\This mod tints your environment lighting based on the skybox, level, or region. It's a simple concept, but I think the results speak for themselves. Enjoy!
 
 -- localize functions to improve performance
-local math_floor,level_is_vanilla_level,set_lighting_color,set_vertex_color,set_fog_color,set_lighting_dir,get_skybox,clampf,djui_hud_set_resolution,djui_hud_set_color,djui_hud_get_screen_height,djui_hud_get_screen_width,djui_hud_render_rect,find_poison_gas_level = math.floor,level_is_vanilla_level,set_lighting_color,set_vertex_color,set_fog_color,set_lighting_dir,get_skybox,clampf,djui_hud_set_resolution,djui_hud_set_color,djui_hud_get_screen_height,djui_hud_get_screen_width,djui_hud_render_rect,find_poison_gas_level
+local math_floor,level_is_vanilla_level,set_lighting_color,set_vertex_color,set_fog_color,set_lighting_dir,get_skybox,math_clamp,djui_hud_set_resolution,get_lighting_color,djui_hud_set_color,djui_hud_get_screen_width,djui_hud_get_screen_height,djui_hud_render_rect,find_poison_gas_level = math.floor,level_is_vanilla_level,set_lighting_color,set_vertex_color,set_fog_color,set_lighting_dir,get_skybox,math.clamp,djui_hud_set_resolution,get_lighting_color,djui_hud_set_color,djui_hud_get_screen_width,djui_hud_get_screen_height,djui_hud_render_rect,find_poison_gas_level
 
 local TINT_DEFAULT = { color = { r = 255, g = 255, b = 255 }, lightingDir = { x = 0, y = 0, z = 0 } }
 local TINT_CASTLE  = { color = { r = 180, g = 210, b = 255 }, lightingDir = { x = 0, y = 0, z = 1 } }
@@ -159,9 +159,9 @@ local function get_tint_intensity()
 
     local t = 0.0
     if minutes >= HOUR_SUNRISE_END and minutes <= HOUR_DAY_START then
-        t = clampf((minutes - HOUR_SUNRISE_END) / HOUR_SUNRISE_DURATION, 0, 1)
+        t = math_clamp((minutes - HOUR_SUNRISE_END) / HOUR_SUNRISE_DURATION, 0, 1)
     elseif minutes >= HOUR_SUNSET_START and minutes <= HOUR_SUNSET_END then
-        t = 1 - clampf((minutes - HOUR_SUNSET_START) / (HOUR_SUNSET_DURATION * 0.5), 0, 1)
+        t = 1 - math_clamp((minutes - HOUR_SUNSET_START) / (HOUR_SUNSET_DURATION * 0.5), 0, 1)
     elseif minutes > HOUR_DAY_START and minutes < HOUR_SUNSET_START then
         t = 1.0
     end
