@@ -1,3 +1,6 @@
+-- localize functions to improve performance
+local type = type
+
 --- @param cond boolean
 --- Human readable ternary operator
 function if_then_else(cond, ifTrue, ifFalse)

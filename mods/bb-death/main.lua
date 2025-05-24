@@ -1,9 +1,9 @@
 -- name: Breaking Bad Death Cutscene
 -- incompatible: death-cutscene bb-death arena
--- description: Breaking Bad Death Cutscene v1.0.3\nBy \\#ec7731\\AgentX\n\n\\#dcdcdc\\This mod replaces the normal death sequence with the final shot of Breaking Bad where the camera pans away from Walter White's body. Bubbling is automatically disabled and the sequence is only triggered by dying\nstanding, on your back, on your stomach, suffocating, being electrocuted or drowning.\n\nWhen a player dies, the music will play\nand get louder the closer you are to the body and quieter the farther away.\nThe vanilla music also fades out the closer you are to the body.\n\nPress [\\#3040ff\\A\\#dcdcdc\\] or [\\#3040ff\\B\\#dcdcdc\\] to skip the cutscene.\n\nRun /bb-gameover to toggle the death cutscene only playing if you have 0 lives left.
+-- description: Breaking Bad Death Cutscene v1.0.4\nBy \\#ec7731\\AgentX\n\n\\#dcdcdc\\This mod replaces the normal death sequence with the final shot of Breaking Bad where the camera pans away from Walter White's body. Bubbling is automatically disabled and the sequence is only triggered by dying\nstanding, on your back, on your stomach, suffocating, being electrocuted or drowning.\n\nWhen a player dies, the music will play\nand get louder the closer you are to the body and quieter the farther away.\nThe vanilla music also fades out the closer you are to the body.\n\nPress [\\#3040ff\\A\\#dcdcdc\\] or [\\#3040ff\\B\\#dcdcdc\\] to skip the cutscene.\n\nRun /bb-gameover to toggle the death cutscene only playing if you have 0 lives left.
 
 -- localize functions to improve performance
-local audio_stream_load,allocate_mario_action,set_character_anim_with_accel,vec3f_set,audio_stream_set_position,vec3f_copy,audio_stream_get_position,dist_between_objects,audio_stream_set_volume,fade_volume_scale,clampf,level_trigger_warp,get_current_background_music,stop_background_music,audio_stream_play,camera_unfreeze,hud_show,audio_stream_stop,sound_banks_enable,set_mario_action,camera_freeze,hud_hide,sound_banks_disable,djui_chat_message_create = audio_stream_load,allocate_mario_action,set_character_anim_with_accel,vec3f_set,audio_stream_set_position,vec3f_copy,audio_stream_get_position,dist_between_objects,audio_stream_set_volume,fade_volume_scale,clampf,level_trigger_warp,get_current_background_music,stop_background_music,audio_stream_play,camera_unfreeze,hud_show,audio_stream_stop,sound_banks_enable,set_mario_action,camera_freeze,hud_hide,sound_banks_disable,djui_chat_message_create
+local audio_stream_load,allocate_mario_action,mod_storage_load_bool,set_character_anim_with_accel,vec3f_set,audio_stream_set_position,vec3f_copy,audio_stream_get_position,dist_between_objects,audio_stream_set_volume,fade_volume_scale,math_clamp,level_trigger_warp,stop_background_music,get_current_background_music,audio_stream_play,camera_unfreeze,hud_show,audio_stream_stop,sound_banks_enable,set_mario_action,camera_freeze,hud_hide,sound_banks_disable,mod_storage_save_bool = audio_stream_load,allocate_mario_action,mod_storage_load_bool,set_character_anim_with_accel,vec3f_set,audio_stream_set_position,vec3f_copy,audio_stream_get_position,dist_between_objects,audio_stream_set_volume,fade_volume_scale,math.clamp,level_trigger_warp,stop_background_music,get_current_background_music,audio_stream_play,camera_unfreeze,hud_show,audio_stream_stop,sound_banks_enable,set_mario_action,camera_freeze,hud_hide,sound_banks_disable,mod_storage_save_bool
 
 local STREAM_BABY_BLUE = audio_stream_load("baby_blue.ogg")
 
@@ -36,15 +36,15 @@ local function is_dnc_mod_enabled()
 end
 
 --- @param m MarioState
---- He's dead, Jim.
 local function act_bb_death(m)
     set_character_anim_with_accel(m, CHAR_ANIM_DYING_ON_BACK, 0)
-    m.marioObj.header.gfx.animInfo.animFrame = 55
+    m.marioObj.header.gfx.animInfo.animFrame = 55 -- make sure he's still
     m.marioBodyState.eyeState = MARIO_EYES_DEAD
     if m.playerIndex == 0 then
         vec3f_set(m.marioObj.header.gfx.angle, 0, 0x8000, 0)
 
-        if (m.controller.buttonPressed & (A_BUTTON | B_BUTTON)) ~= 0 and sCutsceneState.timer < 1740 then
+        -- skip cutscene
+        if (m.controller.buttonPressed & (A_BUTTON | B_BUTTON)) ~= 0 and sCutsceneState.timer < 1740 then -- 58 seconds
             sCutsceneState.timer = 1740
             audio_stream_set_position(STREAM_BABY_BLUE, 55)
         end
@@ -85,7 +85,7 @@ local function update()
         end
 
         -- calculate music volume
-        local volume = clampf((600 / nearestDist), 0, 1)
+        local volume = math_clamp((600 / nearestDist), 0, 1)
         audio_stream_set_volume(STREAM_BABY_BLUE, volume)
         fade_volume_scale(SEQ_PLAYER_LEVEL, (1 - volume) * 127, 1)
 
@@ -182,6 +182,7 @@ local function on_death(m)
     return true
 end
 
+--- @param dataTable table
 local function on_packet_receive(dataTable)
     if gNetworkPlayers[0].currLevelNum ~= dataTable.level or gNetworkPlayers[0].currAreaIndex ~= dataTable.area or gNetworkPlayers[0].currActNum ~= dataTable.act then return end
     if gMarioStates[0].action == ACT_BB_DEATH then return end
