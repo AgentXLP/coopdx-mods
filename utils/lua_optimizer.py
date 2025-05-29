@@ -1856,6 +1856,12 @@ specialFunctions = [
     "math.sqr",
     "math.clamp",
     "math.hypot",
+    "math.sign",
+    "math.sign0",
+    "math.lerp",
+    "math.invlerp",
+    "math.remap",
+    "math.round",
 
     "table.insert",
     "table.sort",
@@ -1864,6 +1870,8 @@ specialFunctions = [
     "table.concat",
     "table.move",
     "table.remove",
+    "table.copy",
+    "table.deepcopy",
 
     "string.byte",
     "string.char",
