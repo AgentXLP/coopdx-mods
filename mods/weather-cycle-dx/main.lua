@@ -33,7 +33,7 @@ end
 
 --- Returns whether or not Weather Cycle is enabled (also factoring in DNC)
 function is_wc_enabled()
-    return _G.dayNightCycleApi.is_dnc_enabled() and gGlobalSyncTable.wcEnabled and _G.weatherCycleApi.enabled
+    return _G.dayNightCycleApi.is_dnc_enabled() and gGlobalSyncTable.wcEnabled and weatherCycleApi.enabled
 end
 
 local function update()
@@ -72,7 +72,7 @@ local function update()
     -- who goes in front of the other, transparency wise...
     -- interesting!
     local skybox = get_skybox()
-    if gWeatherState.aurora and _G.weatherCycleApi.aurora and not _G.dayNightCycleApi.is_static_skybox(skybox) and obj_get_first_with_behavior_id(bhvWCAurora) == nil then
+    if gWeatherState.aurora and weatherCycleApi.aurora and not _G.dayNightCycleApi.is_static_skybox(skybox) and obj_get_first_with_behavior_id(bhvWCAurora) == nil then
         spawn_non_sync_object(
             bhvWCAurora,
             E_MODEL_WC_AURORA,
@@ -242,7 +242,7 @@ end
 
 --- @param value boolean
 local function on_set_wc_enabled(_, value)
-    if _G.weatherCycleApi.lockWeather then
+    if weatherCycleApi.lockWeather then
         play_sound(SOUND_MENU_CAMERA_BUZZ, gGlobalSoundSource)
         djui_chat_message_create("\\#ffa0a0\\[Weather Cycle] The Weather Cycle settings have been locked by another mod.")
         return
@@ -253,7 +253,7 @@ end
 
 --- @param value boolean
 local function on_set_aurora(_, value)
-    if _G.weatherCycleApi.lockWeather then
+    if weatherCycleApi.lockWeather then
         play_sound(SOUND_MENU_CAMERA_BUZZ, gGlobalSoundSource)
         djui_chat_message_create("\\#ffa0a0\\[Weather Cycle] The Weather Cycle settings have been locked by another mod.")
         return

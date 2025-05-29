@@ -1,6 +1,6 @@
 -- name: Noclip
 -- incompatible: noclip
--- description: Noclip v1.1.4\nBy \\#ec7731\\Agent X\\#dcdcdc\\\n\nThis mod is a utility mod that improves\nACT_DEBUG_FREE_MOVE and makes it easily accessible without the development build.
+-- description: Noclip v1.1.5\nBy \\#ec7731\\Agent X\\#dcdcdc\\\n\nThis mod is a utility mod that improves\nACT_DEBUG_FREE_MOVE and makes it easily accessible without the development build.
 -- pausable: true
 
 local cur_obj_scale,network_local_index_from_global,obj_mark_for_deletion,vec3f_to_object_pos,load_object_collision_model,set_first_person_enabled,set_mario_action,set_character_anim_with_accel,set_character_animation,vec3f_add,vec3f_copy,vec3f_length,vec3s_set,cur_obj_hide,cur_obj_unhide,obj_get_first_with_behavior_id,obj_get_next_with_same_behavior_id,spawn_non_sync_object,djui_chat_message_create = cur_obj_scale,network_local_index_from_global,obj_mark_for_deletion,vec3f_to_object_pos,load_object_collision_model,set_first_person_enabled,set_mario_action,set_character_anim_with_accel,set_character_animation,vec3f_add,vec3f_copy,vec3f_length,vec3s_set,cur_obj_hide,cur_obj_unhide,obj_get_first_with_behavior_id,obj_get_next_with_same_behavior_id,spawn_non_sync_object,djui_chat_message_create
@@ -86,7 +86,7 @@ local function act_noclip(m)
         return set_mario_action(m, if_then_else(m.pos.y <= m.waterLevel - 100, ACT_WATER_IDLE, ACT_IDLE), 0)
     end
 
-    local vel = { x = 0, y = 0, z = 0 }
+    local vel = gVec3fZero()
     local speed = if_then_else((m.controller.buttonDown & B_BUTTON) ~= 0, 1, 4)
 
     if m.intendedMag > 0 then

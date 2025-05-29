@@ -1,7 +1,7 @@
 if not check_dnc_compatible() then return end
 
 -- localize functions to improve performance
-local math_random,obj_get_first_with_behavior_id,vec3f_mul,math_clamp = math.random,obj_get_first_with_behavior_id,vec3f_mul,math.clamp
+local math_random,obj_get_first_with_behavior_id,math_lerp,vec3f_mul,math_clamp = math.random,obj_get_first_with_behavior_id,math.lerp,vec3f_mul,math.clamp
 
 --- @param color Color
 local function dnc_set_lighting_color(color)
@@ -56,7 +56,7 @@ local function dnc_set_lighting_dir(dir)
 
     local prevWeather = get_prev_weather()
     local weather = get_weather()
-    local lightingDir = lerp(prevWeather.lightingDir, weather.lightingDir, gWeatherState.transitionTimer / WEATHER_TRANSITION_TIME)
+    local lightingDir = math_lerp(prevWeather.lightingDir, weather.lightingDir, gWeatherState.transitionTimer / WEATHER_TRANSITION_TIME)
     return vec3f_mul(dir, lightingDir)
 end
 
@@ -66,7 +66,7 @@ local function dnc_set_fog_intensity(intensity)
 
     local prevWeather = get_prev_weather()
     local weather = get_weather()
-    local fogIntensity = lerp(prevWeather.fogIntensity, weather.fogIntensity, gWeatherState.transitionTimer / WEATHER_TRANSITION_TIME)
+    local fogIntensity = math_lerp(prevWeather.fogIntensity, weather.fogIntensity, gWeatherState.transitionTimer / WEATHER_TRANSITION_TIME)
     return (intensity + fogIntensity) * 0.5
 end
 

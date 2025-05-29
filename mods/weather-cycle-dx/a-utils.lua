@@ -1,7 +1,7 @@
 if not check_dnc_compatible() then return end
 
 -- localize functions to improve performance
-local djui_hud_get_color,djui_hud_set_color,djui_hud_print_text,djui_hud_measure_text,math_floor,string_format,table_insert,level_is_vanilla_level,type,math_random,mod_storage_load = djui_hud_get_color,djui_hud_set_color,djui_hud_print_text,djui_hud_measure_text,math.floor,string.format,table.insert,level_is_vanilla_level,type,math.random,mod_storage_load
+local djui_hud_get_color,djui_hud_set_color,djui_hud_print_text,djui_hud_measure_text,math_lerp,math_round,string_format,table_insert,math_floor,level_is_vanilla_level,type,math_random,mod_storage_load = djui_hud_get_color,djui_hud_set_color,djui_hud_print_text,djui_hud_measure_text,math.lerp,math.round,string.format,table.insert,math.floor,level_is_vanilla_level,type,math.random,mod_storage_load
 
 --- @param cond boolean
 --- Human readable ternary operator
@@ -37,27 +37,12 @@ function djui_hud_print_centered_text(message, x, y, scale)
     djui_hud_print_text(message, x - (measure * 0.5) * scale, y, scale)
 end
 
---- @param x number
---- @return integer
---- Rounds up or down depending on the decimal position of `x`
-function math_round(x)
-    return math_floor(x + 0.5)
-end
-
---- @param a number
---- @param b number
---- @param t number
---- Linearly interpolates between two points using a delta
-function lerp(a, b, t)
-    return a * (1 - t) + b * t
-end
-
 --- @param a number
 --- @param b number
 --- @param t number
 --- Linearly interpolates between two points using a delta but rounds the final value
 function lerp_round(a, b, t)
-    return math_round(lerp(a, b, t))
+    return math_round(math_lerp(a, b, t))
 end
 
 --- @param a Color
@@ -130,8 +115,8 @@ end
 --- @param timestamp integer
 --- Formats the timestamp (in frames) into a time string formatted like XX:XX
 function format_time(timestamp)
-    local minutes = math.floor(timestamp / MINUTE)
-    local seconds = math.floor(timestamp / SECOND) % 60
+    local minutes = math_floor(timestamp / MINUTE)
+    local seconds = math_floor(timestamp / SECOND) % 60
     return string_format("%d:%02d", minutes, seconds)
 end
 

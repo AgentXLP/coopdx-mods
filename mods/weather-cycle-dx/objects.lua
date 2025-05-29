@@ -1,7 +1,7 @@
 if not check_dnc_compatible() then return end
 
 -- localize functions to improve performance
-local obj_scale,cur_obj_scale,obj_mark_for_deletion,obj_get_model_id_extended,obj_set_model_extended,vec3f_to_object_pos,math_random,calculate_yaw,sins,coss,math_max,find_water_level,collision_find_ceil,cur_obj_hide,find_floor_height,obj_scale_xyz,obj_set_pos,cur_obj_unhide,spawn_non_sync_object,play_sound,set_camera_shake_from_hit,cur_obj_update_floor_height_and_get_floor,obj_check_hitbox_overlap,set_mario_action,math_clamp,math_sin = obj_scale,cur_obj_scale,obj_mark_for_deletion,obj_get_model_id_extended,obj_set_model_extended,vec3f_to_object_pos,math.random,calculate_yaw,sins,coss,math.max,find_water_level,collision_find_ceil,cur_obj_hide,find_floor_height,obj_scale_xyz,obj_set_pos,cur_obj_unhide,spawn_non_sync_object,play_sound,set_camera_shake_from_hit,cur_obj_update_floor_height_and_get_floor,obj_check_hitbox_overlap,set_mario_action,math.clamp,math.sin
+local obj_scale,cur_obj_scale,obj_mark_for_deletion,obj_get_model_id_extended,obj_set_model_extended,vec3f_to_object_pos,math_lerp,math_random,calculate_yaw,sins,coss,math_max,find_water_level,collision_find_ceil,cur_obj_hide,find_floor_height,obj_scale_xyz,obj_set_pos,cur_obj_unhide,spawn_non_sync_object,play_sound,set_camera_shake_from_hit,cur_obj_update_floor_height_and_get_floor,obj_check_hitbox_overlap,set_mario_action,math_clamp,math_sin = obj_scale,cur_obj_scale,obj_mark_for_deletion,obj_get_model_id_extended,obj_set_model_extended,vec3f_to_object_pos,math.lerp,math.random,calculate_yaw,sins,coss,math.max,find_water_level,collision_find_ceil,cur_obj_hide,find_floor_height,obj_scale_xyz,obj_set_pos,cur_obj_unhide,spawn_non_sync_object,play_sound,set_camera_shake_from_hit,cur_obj_update_floor_height_and_get_floor,obj_check_hitbox_overlap,set_mario_action,math.clamp,math.sin
 
 --- @param o Object
 function bhv_wc_skybox_init(o)
@@ -32,7 +32,7 @@ function bhv_wc_skybox_loop(o)
 
     vec3f_to_object_pos(o, gLakituState.pos)
 
-    o.oFaceAngleYaw = o.oFaceAngleYaw + lerp(prevWeather.skyboxRotSpeed, weather.skyboxRotSpeed, gWeatherState.transitionTimer / WEATHER_TRANSITION_TIME)
+    o.oFaceAngleYaw = o.oFaceAngleYaw + math_lerp(prevWeather.skyboxRotSpeed, weather.skyboxRotSpeed, gWeatherState.transitionTimer / WEATHER_TRANSITION_TIME)
 end
 
 
@@ -181,7 +181,7 @@ function bhv_wc_aurora_loop(o)
         obj_mark_for_deletion(o)
         return
     end
-    if not gWeatherState.aurora or not _G.weatherCycleApi.aurora then
+    if not gWeatherState.aurora or not weatherCycleApi.aurora then
         if o.oTimer > 30 then
             o.oTimer = 0
         end

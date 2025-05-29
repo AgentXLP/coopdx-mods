@@ -3,7 +3,7 @@
 -- description: Environment Tint v1.3.1\nBy \\#ec7731\\AgentX\n\n\\#dcdcdc\\This mod tints your environment lighting based on the skybox, level, or region. It's a simple concept, but I think the results speak for themselves. Enjoy!
 
 -- localize functions to improve performance
-local math_floor,level_is_vanilla_level,set_lighting_color,set_vertex_color,set_fog_color,set_lighting_dir,get_skybox,math_clamp,djui_hud_set_resolution,get_lighting_color,djui_hud_set_color,djui_hud_get_screen_width,djui_hud_get_screen_height,djui_hud_render_rect,find_poison_gas_level = math.floor,level_is_vanilla_level,set_lighting_color,set_vertex_color,set_fog_color,set_lighting_dir,get_skybox,math.clamp,djui_hud_set_resolution,get_lighting_color,djui_hud_set_color,djui_hud_get_screen_width,djui_hud_get_screen_height,djui_hud_render_rect,find_poison_gas_level
+local math_lerp,math_round,level_is_vanilla_level,set_lighting_color,set_vertex_color,set_fog_color,set_lighting_dir,get_skybox,math_clamp,djui_hud_set_resolution,get_lighting_color,djui_hud_set_color,djui_hud_get_screen_width,djui_hud_get_screen_height,djui_hud_render_rect,find_poison_gas_level = math.lerp,math.round,level_is_vanilla_level,set_lighting_color,set_vertex_color,set_fog_color,set_lighting_dir,get_skybox,math.clamp,djui_hud_set_resolution,get_lighting_color,djui_hud_set_color,djui_hud_get_screen_width,djui_hud_get_screen_height,djui_hud_render_rect,find_poison_gas_level
 
 local TINT_DEFAULT = { color = { r = 255, g = 255, b = 255 }, lightingDir = { x = 0, y = 0, z = 0 } }
 local TINT_CASTLE  = { color = { r = 180, g = 210, b = 255 }, lightingDir = { x = 0, y = 0, z = 1 } }
@@ -39,27 +39,12 @@ local sTintTable = {
     [BACKGROUND_PURPLE_SKY] =      { color = { r = 255, g = 120, b = 255 }, lightingDir = { x = 0, y = 0,     z = 0     } }
 }
 
---- @param x number
---- @return integer
---- Rounds up or down depending on the decimal position of `x`
-local function math_round(x)
-    return math_floor(x + 0.5)
-end
-
---- @param a number
---- @param b number
---- @param t number
---- Linearly interpolates between two points using a delta
-local function lerp(a, b, t)
-    return a * (1 - t) + b * t
-end
-
 --- @param a number
 --- @param b number
 --- @param t number
 --- Linearly interpolates between two points using a delta but rounds the final value
 local function lerp_round(a, b, t)
-    return math_round(lerp(a, b, t))
+    return math_round(math_lerp(a, b, t))
 end
 
 --- @param a Color
@@ -92,9 +77,9 @@ end
 --- Linearly interpolates between two Vec3fs using a delta
 local function vec3f_lerp(a, b, t)
     return {
-        x = lerp(a.x, b.x, t),
-        y = lerp(a.y, b.y, t),
-        z = lerp(a.z, b.z, t)
+        x = math_lerp(a.x, b.x, t),
+        y = math_lerp(a.y, b.y, t),
+        z = math_lerp(a.z, b.z, t)
     }
 end
 
