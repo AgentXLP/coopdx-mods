@@ -3,7 +3,7 @@
 ## Naming Conventions:
 
 ### Mod Codename:
-Come up with an acronym for your mod name, this will its codename.
+Come up with an acronym for your mod name, this will be its codename.
 
 Examples:
 | Name | Acronym |

@@ -140,18 +140,18 @@ end
 function obj_check_hitbox_overlap_xyz(o1, o2, x2, y2, z2)
     if o1 == nil or o2 == nil then return false end
 
-    local o1H = maxf(o1.hitboxHeight, o1.hurtboxHeight) -- object 1 hitbox height
-    local o1R = maxf(o1.hitboxRadius, o1.hurtboxRadius) -- object 1 hitbox radius
-    local o2H = maxf(o2.hitboxHeight, o2.hurtboxHeight) -- object 2 hitbox height
-    local o2R = maxf(o2.hitboxRadius, o2.hurtboxRadius) -- object 2 hitbox radius
+    local o1H = math.max(o1.hitboxHeight, o1.hurtboxHeight) -- object 1 hitbox height
+    local o1R = math.max(o1.hitboxRadius, o1.hurtboxRadius) -- object 1 hitbox radius
+    local o2H = math.max(o2.hitboxHeight, o2.hurtboxHeight) -- object 2 hitbox height
+    local o2R = math.max(o2.hitboxRadius, o2.hurtboxRadius) -- object 2 hitbox radius
 
     -- calculate the distance between the cylinder centers in the xz-plane
-    local distanceXZ = math.sqrt(sqrf(x2 - o1.oPosX) + sqrf(z2 - o1.oPosZ))
+    local distanceXZ = math.sqrt((x2 - o1.oPosX)^2 + (z2 - o1.oPosZ)^2)
 
     -- check for collision in the xz-plane (ignoring height)
     if distanceXZ <= o1R + o2R then
         -- check for collision in the y-axis (height)
-        if math.abs(y2 - o1.oPosY) <= maxf(o1H, o2H) * 0.5 then
+        if math.abs(y2 - o1.oPosY) <= math.max(o1H, o2H) * 0.5 then
             return true
         end
     end

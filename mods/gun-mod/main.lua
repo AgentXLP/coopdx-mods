@@ -1,6 +1,6 @@
 -- name: Gun Mod DX
 -- incompatible: weapon
--- description: Gun Mod DX v3.0.2\nBy \\#ec7731\\Agent X\\#dcdcdc\\\nSpecial thanks to \\#f296af\\PeachyPeach\\#dcdcdc\\\n\nThis is a rewritten & overhauled version of my original Gun Mod for sm64ex-coop. I thought this would make a good mod to bundle with sm64coopdx. If you have two pistols, you are able to dual wield them as well!\n\nPress [\\#3040ff\\Y\\#dcdcdc\\] to shoot\nPress [\\#3040ff\\X\\#dcdcdc\\] to reload\nRun \\#00ffff\\/gm help\\#dcdcdc\\ for help
+-- description: Gun Mod DX v3.0.3\nBy \\#ec7731\\Agent X\\#dcdcdc\\\nSpecial thanks to \\#f296af\\PeachyPeach\\#dcdcdc\\\n\nThis is a rewritten & overhauled version of my original Gun Mod for sm64ex-coop. I thought this would make a good mod to bundle with sm64coopdx. If you have two pistols, you are able to dual wield them as well!\n\nPress [\\#3040ff\\Y\\#dcdcdc\\] to shoot\nPress [\\#3040ff\\X\\#dcdcdc\\] to reload\nRun \\#00ffff\\/gm help\\#dcdcdc\\ for help
 
 gGlobalSyncTable.gunModEnabled = true
 
