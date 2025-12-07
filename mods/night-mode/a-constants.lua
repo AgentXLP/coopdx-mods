@@ -1,7 +1,7 @@
 -- version
 NM_VERSION_MAJOR = 1
 NM_VERSION_MINOR = 0
-NM_VERSION_PATCH = 0
+NM_VERSION_PATCH = 1
 NM_VERSION = math.tointeger(string.format("%d%d%d", NM_VERSION_MAJOR, NM_VERSION_MINOR, NM_VERSION_PATCH))
 
 E_MODEL_NM_TTC_VOID   = smlua_model_util_get_id("nm_ttc_void_geo")

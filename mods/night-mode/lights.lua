@@ -8,6 +8,9 @@
 --- @field public radius number
 --- @field public intensity number
 
+-- localize functions to improve performance
+local level_is_vanilla_level,get_id_from_behavior,le_set_light_pos,le_set_light_color,le_set_light_radius,le_set_light_intensity = level_is_vanilla_level,get_id_from_behavior,le_set_light_pos,le_set_light_color,le_set_light_radius,le_set_light_intensity
+
 local gLightData = {}
 
 --- @param x number
@@ -412,7 +415,6 @@ end
 --- Gets the behavior parameters for an object light if they exist
 function get_object_light_params(o)
     local bhv = get_id_from_behavior(o.behavior)
-    if gCoinBhvs[bhv] ~= nil and not coinLights then return nil end
     return gLightData.objectLights[bhv]
 end
 

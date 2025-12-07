@@ -1,3 +1,6 @@
+-- localize functions to improve performance
+local sins,coss,calculate_pitch,vec3f_sub,set_lighting_dir = sins,coss,calculate_pitch,vec3f_sub,set_lighting_dir
+
 --- @param vec Vec3f
 --- @param rotate Vec3f
 --- Rotates `dest` around the Z, Y, and X axes

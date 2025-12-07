@@ -1,3 +1,6 @@
+-- localize functions to improve performance
+local string_format,table_insert,mod_storage_load,math_clamp,math_round,set_fog_color,set_lighting_color,set_vertex_color,level_is_vanilla_level,gfx_get_display_list,gfx_get_command,gfx_get_vertex_buffer,vtx_get_next_vertex,gfx_get_op,gfx_get_next_command,math_lerp,spawn_non_sync_object,obj_set_face_angle = string.format,table.insert,mod_storage_load,math.clamp,math.round,set_fog_color,set_lighting_color,set_vertex_color,level_is_vanilla_level,gfx_get_display_list,gfx_get_command,gfx_get_vertex_buffer,vtx_get_next_vertex,gfx_get_op,gfx_get_next_command,math.lerp,spawn_non_sync_object,obj_set_face_angle
+
 --- @param cond boolean
 --- Human readable ternary operator
 function if_then_else(cond, ifTrue, ifFalse)
@@ -41,10 +44,10 @@ end
 
 --- @param s string
 --- Splits a string into a table by spaces
-function string.split(s)
+function string_split(s)
     local result = {}
-    for match in (s):gmatch(string.format("[^%s]+", " ")) do
-        table.insert(result, match)
+    for match in (s):gmatch(string_format("[^%s]+", " ")) do
+        table_insert(result, match)
     end
     return result
 end
@@ -90,9 +93,9 @@ function update_rainbow_color(speed)
         end
 	})
 
-	rainbowColor.r = math.clamp(math.round(rainbowColor.r), 0, 255)
-    rainbowColor.g = math.clamp(math.round(rainbowColor.g), 0, 255)
-    rainbowColor.b = math.clamp(math.round(rainbowColor.b), 0, 255)
+	rainbowColor.r = math_clamp(math_round(rainbowColor.r), 0, 255)
+    rainbowColor.g = math_clamp(math_round(rainbowColor.g), 0, 255)
+    rainbowColor.b = math_clamp(math_round(rainbowColor.b), 0, 255)
 	return rainbowColor
 end
 
@@ -174,7 +177,7 @@ end
 --- @param t number
 --- Linearly interpolates between two points using a delta but rounds the final value
 function lerp_round(a, b, t)
-    return math.round(math.lerp(a, b, t))
+    return math_round(math_lerp(a, b, t))
 end
 
 --- @param a Color
@@ -195,9 +198,9 @@ end
 --- @return Vec3f
 function vec3f_lerp(a, b, t)
     return {
-        x = math.lerp(a.x, b.x, t),
-        y = math.lerp(a.y, b.y, t),
-        z = math.lerp(a.z, b.z, t)
+        x = math_lerp(a.x, b.x, t),
+        y = math_lerp(a.y, b.y, t),
+        z = math_lerp(a.z, b.z, t)
     }
 end
 

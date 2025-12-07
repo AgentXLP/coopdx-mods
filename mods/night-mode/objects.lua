@@ -1,3 +1,6 @@
+-- localize functions to improve performance
+local get_id_from_behavior,cur_obj_set_behavior,find_floor_height,le_remove_light,obj_mark_for_deletion,le_set_light_intensity,obj_set_model_extended,le_set_light_color,obj_has_model_extended,obj_copy_pos,le_set_light_pos,le_add_light,sins,coss,get_first_person_enabled,vec3f_dist,vec3f_to_object_pos = get_id_from_behavior,cur_obj_set_behavior,find_floor_height,le_remove_light,obj_mark_for_deletion,le_set_light_intensity,obj_set_model_extended,le_set_light_color,obj_has_model_extended,obj_copy_pos,le_set_light_pos,le_add_light,sins,coss,get_first_person_enabled,vec3f_dist,vec3f_to_object_pos
+
 local sFlameBhvs = {
     [id_bhvFireParticleSpawner]       = true,
     [id_bhvFlame]                     = true,

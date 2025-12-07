@@ -1,3 +1,6 @@
+-- localize functions to improve performance
+local bhv_mad_piano_update,cur_obj_init_animation_with_sound,cur_obj_push_mario_away_from_cylinder,obj_get_nearest_object_with_behavior_id,dist_between_objects,cur_obj_hide,audio_stream_pause,fade_volume_scale,cur_obj_unhide,audio_stream_play,math_clamp,audio_stream_set_volume,set_mario_action,sound_banks_disable,audio_stream_stop,level_trigger_warp,smlua_anim_util_set_animation,audio_stream_set_looping,sound_banks_enable,audio_sample_play,djui_hud_set_resolution,djui_hud_set_filter,djui_hud_get_screen_width,djui_hud_get_screen_height,djui_hud_set_color,string_format,djui_hud_render_rect = bhv_mad_piano_update,cur_obj_init_animation_with_sound,cur_obj_push_mario_away_from_cylinder,obj_get_nearest_object_with_behavior_id,dist_between_objects,cur_obj_hide,audio_stream_pause,fade_volume_scale,cur_obj_unhide,audio_stream_play,math.clamp,audio_stream_set_volume,set_mario_action,sound_banks_disable,audio_stream_stop,level_trigger_warp,smlua_anim_util_set_animation,audio_stream_set_looping,sound_banks_enable,audio_sample_play,djui_hud_set_resolution,djui_hud_set_filter,djui_hud_get_screen_width,djui_hud_get_screen_height,djui_hud_set_color,string.format,djui_hud_render_rect
+
 local pianoPlaying = false
 local jumpscareTimer = -1
 
@@ -204,7 +207,7 @@ function bhv_nm_apparition_loop(o)
     end
 
     local dist = dist_between_objects(o, gMarioStates[0].marioObj)
-    local volume = math.clamp(600 / dist, 0, 1)
+    local volume = math_clamp(600 / dist, 0, 1)
     audio_stream_set_volume(STREAM_PIANO, volume)
     fade_volume_scale(SEQ_PLAYER_LEVEL, (1 - volume) * 127, 1)
 
@@ -259,7 +262,7 @@ function spooky_mode_on_hud_render()
 
     if jumpscareTimer < 29 then
         djui_hud_set_color(255, 255, 255, 255)
-        djui_hud_render_texture(get_texture_info(string.format("nm_jumpscare_%02d", jumpscareTimer + 1)), 0, 0, width / 1024, height / 512)
+        djui_hud_render_texture(get_texture_info(string_format("nm_jumpscare_%02d", jumpscareTimer + 1)), 0, 0, width / 1024, height / 512)
     else
         djui_hud_set_color(0, 0, 0, 255)
         djui_hud_render_rect(0, 0, width, height)

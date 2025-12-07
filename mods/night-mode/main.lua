@@ -1,8 +1,11 @@
 -- name: Night Mode
 -- incompatible: night-mode light environment-tint
--- description: Night Mode\nBy \\#ec7731\\Agent X\n\n\\#dcdcdc\\This mod adds a night mode to the game in a similar fashion to Day Night\nCycle, however it uses the lighting engine to have realtime point lighting on everything. Press D-Pad down to activate the flashlight, it may look a little janky.\n\nSpecial thanks to MaiskX3 for night time sequences.
+-- description: Night Mode v1.0.1\nBy \\#ec7731\\Agent X\n\n\\#dcdcdc\\This mod adds a night mode to the game in a similar fashion to Day Night\nCycle, however it uses the lighting engine to have realtime point lighting on everything. Press D-Pad down to activate the flashlight, it may look a little janky.\n\nSpecial thanks to MaiskX3 for night time sequences.
 
 -- require("lib/light-editor")
+
+-- localize functions to improve performance
+local le_set_ambient_color,set_fog_intensity,set_override_skybox,le_set_light_pos,le_set_light_color,le_set_light_radius,le_set_light_intensity,math_clamp,dist_between_object_and_point,set_override_envfx,audio_stream_get_position,is_game_paused,audio_stream_set_volume,audio_sample_play,obj_get_first_with_behavior_id,obj_get_next_with_same_behavior_id,spawn_non_sync_object,le_remove_light,obj_mark_for_deletion,obj_set_angle,obj_scale,le_add_light,save_file_get_flags,set_background_music,mod_storage_save_bool,djui_chat_message_create,error,set_override_far,smlua_audio_utils_replace_sequence,smlua_text_utils_course_name_replace,smlua_text_utils_act_name_replace,network_is_server = le_set_ambient_color,set_fog_intensity,set_override_skybox,le_set_light_pos,le_set_light_color,le_set_light_radius,le_set_light_intensity,math.clamp,dist_between_object_and_point,set_override_envfx,audio_stream_get_position,is_game_paused,audio_stream_set_volume,audio_sample_play,obj_get_first_with_behavior_id,obj_get_next_with_same_behavior_id,spawn_non_sync_object,le_remove_light,obj_mark_for_deletion,obj_set_angle,obj_scale,le_add_light,save_file_get_flags,set_background_music,mod_storage_save_bool,djui_chat_message_create,error,set_override_far,smlua_audio_utils_replace_sequence,smlua_text_utils_course_name_replace,smlua_text_utils_act_name_replace,network_is_server
 
 gCoinBhvs = {
     [id_bhvCoinFormationSpawn]    = true,
@@ -68,7 +71,7 @@ local function update()
         local color = color_lerp(
             COLOR_BLUE,
             COLOR_RED,
-            1 - (math.clamp(dist_between_object_and_point(gMarioStates[0].marioObj, -4850, 720, -3670) / 2000, 0, 1))
+            1 - (math_clamp(dist_between_object_and_point(gMarioStates[0].marioObj, -4850, 720, -3670) / 2000, 0, 1))
         )
         le_set_light_color(0, color.r, color.g, color.b)
     elseif in_vanilla_level(LEVEL_BBH) then

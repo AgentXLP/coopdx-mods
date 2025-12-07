@@ -46,4 +46,22 @@ bhvUWLevelCutscene = 0
 bhvUWDialogPrompt = 0
 
 --- @type BehaviorId
-bhvUWSoulFlame = 0
+bhvUWPlaque = 0
+
+--- @type BehaviorId
+bhvUWCutsceneStar = 0
+
+--- @type BehaviorId
+bhvUWLightTower = 0
+
+--- @type BehaviorId
+bhvUWLightTowerStar = 0
+
+--- @type BehaviorId
+bhvUWRegionLight = 0
+
+--- @type BehaviorId
+bhvUWSpring = 0
+
+--- @type BehaviorId
+bhvUWSpringChild = 0
