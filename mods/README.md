@@ -34,3 +34,7 @@ This mod is a utility mod that renders your action and forward velocity to the s
 ## Environment Tint
 
 This mod tints your environment lighting based on the skybox. It's a very simple concept and execution, but I think the results look pretty nice.
+
+## Hugging DX
+
+This mod adds hugging other players. It's fundamentally very simple but this is a remake of an old mod I made in 2022 but *better* now. You just go up to someone and a text prompt will show up instructing you to press Y to hug. Hugging someone will also heal you and them. I made this as a commission for my friend occam.

@@ -8,6 +8,9 @@ function if_then_else(cond, ifTrue, ifFalse)
     return ifFalse
 end
 
+--- @param param any
+--- @param caseTable table
+--- Lua switch case
 function switch(param, caseTable)
     local case = caseTable[param]
     if case then return case() end

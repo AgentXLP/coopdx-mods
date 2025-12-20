@@ -65,3 +65,24 @@ bhvUWSpring = 0
 
 --- @type BehaviorId
 bhvUWSpringChild = 0
+
+--- @type BehaviorId
+bhvUWBargainer = 0
+
+--- @type BehaviorId
+bhvUWLightOrb = 0
+
+--- @type BehaviorId
+bhvUWRisingCastle = 0
+
+--- @type BehaviorId
+bhvUWCastleWater = 0
+
+--- @type BehaviorId
+bhvUWNoiseStorm = 0
+
+--- @type BehaviorId
+bhvUWOldMan = 0
+
+--- @type BehaviorId
+bhvUWRegionSpawnpoint = 0

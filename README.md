@@ -17,8 +17,6 @@ To download single file mods click on the link and then press the "Raw" button t
 
 [Door Bust](./mods/door-bust.lua)
 
-[Flood](./mods/flood/flood.zip)
-
 [Day Night Cycle DX](./mods/day-night-cycle/day-night-cycle.zip)
 
 [Super Mario 64: The Underworld](./mods/underworld/underworld.zip)
@@ -32,3 +30,9 @@ To download single file mods click on the link and then press the "Raw" button t
 [[PET] Propeller Fly Guy](./mods/pet-propeller-flyguy/pet-propeller-flyguy.zip)
 
 [Weather Cycle DX](./mods/weather-cycle-dx/weather-cycle-dx.zip)
+
+[Environment Tint](./mods/environment-tint.lua)
+
+[Night Mode](./mods/night-mode/night-mode.zip)
+
+[Hugging DX](./mods/hugging-dx.lua)
