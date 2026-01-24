@@ -86,3 +86,18 @@ bhvUWOldMan = 0
 
 --- @type BehaviorId
 bhvUWRegionSpawnpoint = 0
+
+--- @type BehaviorId
+bhvUWHUDPrompt = 0
+
+--- @type BehaviorId
+bhvUWFlameParticle = 0
+
+--- @type BehaviorId
+bhvUWSun = 0
+
+--- @type BehaviorId
+bhvUWArrow = 0
+
+--- @type BehaviorId
+bhvUWLightning = 0
