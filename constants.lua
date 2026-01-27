@@ -101,3 +101,6 @@ bhvUWArrow = 0
 
 --- @type BehaviorId
 bhvUWLightning = 0
+
+--- @type BehaviorId
+bhvUWTower = 0
