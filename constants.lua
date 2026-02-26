@@ -104,3 +104,36 @@ bhvUWLightning = 0
 
 --- @type BehaviorId
 bhvUWTower = 0
+
+--- @type BehaviorId
+bhvUWFlyingDorrie = 0
+
+--- @type BehaviorId
+bhvUWZombie = 0
+
+--- @type BehaviorId
+bhvUWSwingingLight = 0
+
+--- @type BehaviorId
+bhvUWNoiseMesh = 0
+
+--- @type BehaviorId
+bhvUWApparition = 0
+
+--- @type BehaviorId
+bhvUWLaser = 0
+
+--- @type BehaviorId
+bhvUWBlueCoin = 0
+
+--- @type BehaviorId
+bhvUWEnemyFlag = 0
+
+--- @type BehaviorId
+bhvUWSticker = 0
+
+--- @type BehaviorId
+bhvUWPyramid = 0
+
+--- @type BehaviorId
+bhvUWNoiseOrb = 0

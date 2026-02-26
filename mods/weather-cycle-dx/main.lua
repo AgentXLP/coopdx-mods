@@ -1,6 +1,6 @@
 -- name: Weather Cycle DX
 -- incompatible: weather environment-tint
--- description: Weather Cycle DX v1.1.4\nBy \\#ec7731\\Agent X\n\n\\#dcdcdc\\This mod adds a weather cycle system with cloudy skies, rain, and storms to sm64coopdx. It uses Day Night Cycle DX as a base library, meaning you need\nto have the mod enabled in order to use this one. There is also a toggleable\nAurora Borealis that starts after midnight.\n\nSpecial thanks to Floralys for the original concept.\nSpecial thanks to \\#344ee1\\eros71\\#dcdcdc\\ for saving the mod!
+-- description: Weather Cycle DX v1.1.5\nBy \\#ec7731\\Agent X\n\n\\#dcdcdc\\This mod adds a weather cycle system with cloudy skies, rain, and storms to sm64coopdx. It uses Day Night Cycle DX as a base library, meaning you need\nto have the mod enabled in order to use this one. There is also a toggleable\nAurora Borealis that starts after midnight.\n\nSpecial thanks to Floralys for the original concept.\nSpecial thanks to \\#344ee1\\eros71\\#dcdcdc\\ for saving the mod!
 
 if not check_dnc_compatible() then return end
 
@@ -10,6 +10,7 @@ local math_tointeger,mod_storage_load_number,network_is_server,math_random,tonum
 gGlobalSyncTable.wcEnabled = true
 gGlobalSyncTable.weatherType = if_then_else(network_is_server(), math_tointeger(mod_storage_load_number("weather_type")), WEATHER_CLEAR)
 gGlobalSyncTable.timeUntilWeatherChange = tonumber(mod_storage_load("time_until_weather_change")) or math_random(WEATHER_MIN_DURATION, WEATHER_MAX_DURATION)
+gGlobalSyncTable.lightningDamage = mod_storage_load_bool_2("lightning_damage")
 
 gWeatherState = {
     prevWeatherType = WEATHER_CLEAR,
@@ -252,6 +253,18 @@ local function on_set_wc_enabled(_, value)
 end
 
 --- @param value boolean
+local function on_set_lightning_damage(_, value)
+    if weatherCycleApi.lockWeather then
+        play_sound(SOUND_MENU_CAMERA_BUZZ, gGlobalSoundSource)
+        djui_chat_message_create("\\#ffa0a0\\[Weather Cycle] The Weather Cycle settings have been locked by another mod.")
+        return
+    end
+
+    gGlobalSyncTable.lightningDamage = value
+    mod_storage_save_bool("lightning_damage", value)
+end
+
+--- @param value boolean
 local function on_set_aurora(_, value)
     if weatherCycleApi.lockWeather then
         play_sound(SOUND_MENU_CAMERA_BUZZ, gGlobalSoundSource)
@@ -261,6 +274,22 @@ local function on_set_aurora(_, value)
 
     gWeatherState.aurora = value
     mod_storage_save_bool("aurora", value)
+end
+
+local function on_set_weather_clear()
+    on_set_command("clear")
+end
+
+local function on_set_weather_cloudy()
+    on_set_command("cloudy")
+end
+
+local function on_set_weather_rain()
+    on_set_command("rain")
+end
+
+local function on_set_weather_storm()
+    on_set_command("storm")
 end
 
 local sReadonlyMetatable = {
@@ -330,9 +359,20 @@ hook_chat_command("weather", "\\#00ffff\\[set|query]\\#dcdcdc\\ - The command ha
 
 hook_on_sync_table_change(gGlobalSyncTable, "weatherType", 0, on_weather_type_changed)
 
+-- hook_mod_menu_text(string.format("Version %d.%d.%d", WC_VERSION_MAJOR, WC_VERSION_MINOR, WC_VERSION_PATCH))
+
 if network_is_server() then
     hook_mod_menu_checkbox("Enable Weather Cycle", gGlobalSyncTable.wcEnabled, on_set_wc_enabled)
+    hook_mod_menu_checkbox("Lightning Damage", gGlobalSyncTable.lightningDamage, on_set_lightning_damage)
 end
 
 hook_mod_menu_checkbox("Aurora Borealis", gWeatherState.aurora, on_set_aurora)
+
+if network_is_server() then
+    hook_mod_menu_button("Set Weather To Clear", on_set_weather_clear)
+    hook_mod_menu_button("Set Weather To Cloudy", on_set_weather_cloudy)
+    hook_mod_menu_button("Set Weather To Rain", on_set_weather_rain)
+    hook_mod_menu_button("Set Weather To Storm", on_set_weather_storm)
+end
+
 hook_mod_menu_button("Query Weather", on_query_command)

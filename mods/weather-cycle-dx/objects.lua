@@ -154,6 +154,8 @@ function bhv_wc_lightning_loop(o)
         )
     end
 
+    if not gGlobalSyncTable.lightningDamage then return end
+
     --- @type MarioState
     local m = gMarioStates[0]
     local submerged = (m.action & ACT_GROUP_MASK) == ACT_GROUP_SUBMERGED
