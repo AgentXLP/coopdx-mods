@@ -137,3 +137,27 @@ bhvUWPyramid = 0
 
 --- @type BehaviorId
 bhvUWNoiseOrb = 0
+
+--- @type BehaviorId
+bhvUWTeleportPad = 0
+
+--- @type BehaviorId
+bhvUWCapSwitchBase = 0
+
+--- @type BehaviorId
+bhvUWCapSwitch = 0
+
+--- @type BehaviorId
+bhvUWCutsceneShockwave = 0
+
+--- @type BehaviorId
+bhvUWNoiseAttack = 0
+
+--- @type BehaviorId
+bhvUWShockwave = 0
+
+--- @type BehaviorId
+bhvNDFlood = 0
+
+--- @type BehaviorId
+bhvNDSkybox = 0
