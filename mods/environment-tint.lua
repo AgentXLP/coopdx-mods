@@ -1,13 +1,9 @@
 -- name: Environment Tint
 -- incompatible: environment-tint
--- description: Environment Tint v1.3.3\nBy \\#ec7731\\AgentX\n\n\\#dcdcdc\\This mod tints your environment lighting based on the skybox, level, or region. It's a simple concept, but I think the results speak for themselves. Enjoy!
+-- description: Environment Tint v1.3.2\nBy \\#ec7731\\AgentX\n\n\\#dcdcdc\\This mod tints your environment lighting based on the skybox, level, or region. It's a simple concept, but I think the results speak for themselves. Enjoy!
 
 -- localize functions to improve performance
 local math_lerp,math_round,level_is_vanilla_level,set_lighting_color,set_vertex_color,set_fog_color,set_lighting_dir,get_skybox,math_clamp,djui_hud_set_resolution,get_lighting_color,djui_hud_set_color,djui_hud_get_screen_width,djui_hud_get_screen_height,djui_hud_render_rect,find_poison_gas_level = math.lerp,math.round,level_is_vanilla_level,set_lighting_color,set_vertex_color,set_fog_color,set_lighting_dir,get_skybox,math.clamp,djui_hud_set_resolution,get_lighting_color,djui_hud_set_color,djui_hud_get_screen_width,djui_hud_get_screen_height,djui_hud_render_rect,find_poison_gas_level
-
-local function check_dnc_compatible()
-    return _G.dayNightCycleApi ~= nil and _G.dayNightCycleApi.version ~= nil and _G.dayNightCycleApi.version >= 260
-end
 
 local TINT_DEFAULT = { color = { r = 255, g = 255, b = 255 }, lightingDir = { x = 0, y = 0, z = 0 } }
 local TINT_CASTLE  = { color = { r = 180, g = 210, b = 255 }, lightingDir = { x = 0, y = 0, z = 1 } }
@@ -19,7 +15,7 @@ local COLOR_JRB_WATER = { r = 0,   g = 100, b = 130 }
 local COLOR_LAVA      = { r = 255, g = 20,  b = 0   }
 local COLOR_POISON    = { r = 150, g = 200, b = 0   }
 
-if check_dnc_compatible() then
+if _G.dayNightCycleApi ~= nil then
     HOUR_SUNRISE_END      = _G.dayNightCycleApi.constants.HOUR_SUNRISE_END
     HOUR_SUNRISE_DURATION = _G.dayNightCycleApi.constants.HOUR_SUNRISE_DURATION
 
@@ -211,7 +207,7 @@ local function on_hud_render_behind()
     end
 end
 
-if check_dnc_compatible() then
+if _G.dayNightCycleApi ~= nil then
     _G.dayNightCycleApi.dnc_hook_event(_G.dayNightCycleApi.constants.DNC_HOOK_SET_LIGHTING_COLOR, dnc_set_lighting_color)
     _G.dayNightCycleApi.dnc_hook_event(_G.dayNightCycleApi.constants.DNC_HOOK_SET_AMBIENT_LIGHTING_COLOR, dnc_set_lighting_color)
     _G.dayNightCycleApi.dnc_hook_event(_G.dayNightCycleApi.constants.DNC_HOOK_SET_LIGHTING_DIR, dnc_set_lighting_dir)
