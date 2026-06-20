@@ -1,6 +1,6 @@
 --- Checks if DNC is enabled and the version is high enough
 function check_dnc_compatible()
-    return _G.dayNightCycleApi ~= nil and _G.dayNightCycleApi.version ~= nil and _G.dayNightCycleApi.version >= 230
+    return _G.dayNightCycleApi ~= nil and _G.dayNightCycleApi.version ~= nil and _G.dayNightCycleApi.version >= 260
 end
 
 if not check_dnc_compatible() then
@@ -9,15 +9,15 @@ if not check_dnc_compatible() then
         if not first then
             first = true
             play_sound(SOUND_MENU_CAMERA_BUZZ, gGlobalSoundSource)
-            djui_chat_message_create("\\#ffa0a0\\Weather Cycle DX requires Day Night Cycle v2.3 or higher to be enabled. Please rehost with it enabled.")
+            djui_chat_message_create("\\#ffa0a0\\Weather Cycle DX requires Day Night Cycle v2.6 or higher to be enabled. Please rehost with it enabled.")
         end
     end)
     return
 end
 
 WC_VERSION_MAJOR = 1
-WC_VERSION_MINOR = 1
-WC_VERSION_PATCH = 5
+WC_VERSION_MINOR = 2
+WC_VERSION_PATCH = 0
 WC_VERSION       = math.tointeger(string.format("%d%d%d", WC_VERSION_MAJOR, WC_VERSION_MINOR, WC_VERSION_PATCH))
 
 -- skybox constants

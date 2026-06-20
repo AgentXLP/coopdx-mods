@@ -187,9 +187,13 @@ function weather_update()
     if timeScale == 0.0 then return end
 
     if gGlobalSyncTable.timeUntilWeatherChange == 0 then
-        local weatherType = math_random(WEATHER_CLEAR, weatherTypeCount - 1)
-        while gGlobalSyncTable.weatherType == weatherType do
-            weatherType = math_random(WEATHER_CLEAR, weatherTypeCount - 1)
+        -- 50% chance its just clear, weather can be annoying
+        local weatherType = WEATHER_CLEAR
+        if math.random(1, 2) == 1 then
+            weatherType = math_random(WEATHER_CLOUDY, weatherTypeCount - 1)
+            while gGlobalSyncTable.weatherType == weatherType do
+                weatherType = math_random(WEATHER_CLOUDY, weatherTypeCount - 1)
+            end
         end
 
         set_weather_type(weatherType)
@@ -200,7 +204,9 @@ end
 
 --- Spawns lightning
 function lightning_update()
+    if not show_weather_cycle() then return end
     if get_network_player_smallest_global().localIndex ~= 0 or get_skybox() == BACKGROUND_SNOW_MOUNTAINS then return end
+    if not gNetworkPlayers[0].currAreaSyncValid then return end
 
     if gWeatherState.timeUntilLightning > 0 then
         gWeatherState.timeUntilLightning = gWeatherState.timeUntilLightning - 1

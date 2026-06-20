@@ -163,6 +163,18 @@ function any_player_in_vanilla_level(levelNum)
     return level_is_vanilla_level(levelNum) and any_player_in_level(levelNum)
 end
 
+--- @param levelNum LevelNum
+--- Counts how many players are inside of a level
+function count_players_in_level(levelNum)
+    local count = 0
+    for i = 0, MAX_PLAYERS - 1 do
+        if gNetworkPlayers[i].connected and gNetworkPlayers[i].currLevelNum == levelNum then
+            count = count + 1
+        end
+    end
+    return count
+end
+
 --- @param key string
 --- `mod_storage_load_bool` except it returns true by default
 function mod_storage_load_bool_2(key)

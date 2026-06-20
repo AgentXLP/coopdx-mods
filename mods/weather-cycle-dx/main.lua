@@ -1,6 +1,6 @@
 -- name: Weather Cycle DX
--- incompatible: weather environment-tint
--- description: Weather Cycle DX v1.1.5\nBy \\#ec7731\\Agent X\n\n\\#dcdcdc\\This mod adds a weather cycle system with cloudy skies, rain, and storms to sm64coopdx. It uses Day Night Cycle DX as a base library, meaning you need\nto have the mod enabled in order to use this one. There is also a toggleable\nAurora Borealis that starts after midnight.\n\nSpecial thanks to Floralys for the original concept.\nSpecial thanks to \\#344ee1\\eros71\\#dcdcdc\\ for saving the mod!
+-- incompatible: weather
+-- description: Weather Cycle DX v1.2\nBy \\#ec7731\\Agent X\n\n\\#dcdcdc\\This mod adds a weather cycle system with cloudy skies, rain, and storms to sm64coopdx. It uses Day Night Cycle DX as a base library, meaning you need\nto have the mod enabled in order to use this one. There is also a toggleable\nAurora Borealis that starts after midnight.\n\nSpecial thanks to Floralys for the original concept.\nSpecial thanks to \\#344ee1\\eros71\\#dcdcdc\\ for saving the mod!
 
 if not check_dnc_compatible() then return end
 
@@ -126,10 +126,10 @@ local function on_level_init()
 
     local level = gNetworkPlayers[0].currLevelNum
     if gNetworkPlayers[0].currActNum ~= 99 then
-        if in_vanilla_level(LEVEL_BITS) then
+        if in_vanilla_level(LEVEL_BITS) and count_players_in_level(LEVEL_BITS) == 1 then
             gGlobalSyncTable.weatherType = WEATHER_RAIN
             gGlobalSyncTable.timeUntilWeatherChange = -1
-        elseif in_vanilla_level(LEVEL_BOWSER_3) then
+        elseif in_vanilla_level(LEVEL_BOWSER_3) and count_players_in_level(LEVEL_BOWSER_3) == 1 then
             gGlobalSyncTable.weatherType = WEATHER_STORM
             gGlobalSyncTable.timeUntilWeatherChange = -1
             gWeatherState.timeUntilLightning = 150
@@ -153,6 +153,7 @@ end
 
 local function on_play_sound(soundBits, pos)
     if not get_weather().rain then return soundBits end
+    if not show_weather_cycle() then return soundBits end
 
     for i = SOUND_TERRAIN_DEFAULT, SOUND_TERRAIN_ICE do
         local sound = soundBits - (i << 16)

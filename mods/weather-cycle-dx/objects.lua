@@ -30,7 +30,7 @@ function bhv_wc_skybox_loop(o)
 
     o.oOpacity = lerp_round(prevWeather.opacity, opacity, gWeatherState.transitionTimer / WEATHER_TRANSITION_TIME)
 
-    vec3f_to_object_pos(o, gLakituState.pos)
+    vec3f_to_object_pos(o, gMarioStates[0].pos)
 
     o.oFaceAngleYaw = o.oFaceAngleYaw + math_lerp(prevWeather.skyboxRotSpeed, weather.skyboxRotSpeed, gWeatherState.transitionTimer / WEATHER_TRANSITION_TIME)
 end
