@@ -14,7 +14,7 @@ function bhv_dnc_skybox_loop(o)
         return
     end
 
-    vec3f_to_object_pos(o, gLakituState.pos)
+    vec3f_to_object_pos(o, gMarioStates[0].pos)
 
     local skybox = get_skybox()
 

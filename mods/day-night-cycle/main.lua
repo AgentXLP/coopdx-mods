@@ -1,13 +1,26 @@
 -- name: Day Night Cycle DX
 -- incompatible: light day-night-cycle
--- description: Day Night Cycle DX v2.5.2\nBy \\#ec7731\\Agent X\n\n\\#dcdcdc\\This mod adds a fully featured day & night cycle system with night, sunrise, day and sunset to sm64coopdx. It includes an API and hook system for interfacing with several components of the mod externally. This mod was originally made for sm64ex-coop but has been practically rewritten for sm64coopdx.\n\nDays last 24 minutes and with the /time command, you can get/set the time or change your settings.\n\nThere is also now a new menu in the pause menu for Day Night Cycle DX!\n\nSpecial thanks to \\#e06de4\\MaiskX3\\#dcdcdc\\ for the night time music.\nSpecial thanks to \\#00ffff\\AngelicMiracles\\#dcdcdc\\ for the sunset, sunrise and night time skyboxes.\nSpecial thanks to \\#344ee1\\eros71\\#dcdcdc\\ for salvaging\nthe mod files.
+-- description: Day Night Cycle DX v2.6\nBy \\#ec7731\\Agent X\n\n\\#dcdcdc\\This mod adds a fully featured day & night cycle system with night, sunrise, day and sunset to sm64coopdx. It includes an API and hook system for interfacing with several components of the mod externally. This mod was originally made for sm64ex-coop but has been practically rewritten for sm64coopdx.\n\nDays last 24 minutes and with the /time command, you can get/set the time or change your settings.\n\nThere is also now a new menu in the pause menu for Day Night Cycle DX!\n\nSpecial thanks to \\#e06de4\\MaiskX3\\#dcdcdc\\ for the night time music.\nSpecial thanks to \\#00ffff\\AngelicMiracles\\#dcdcdc\\ for the sunset, sunrise and night time skyboxes.\nSpecial thanks to \\#344ee1\\eros71\\#dcdcdc\\ for salvaging\nthe mod files.
 
 -- localize functions to improve performance
 local network_is_server,mod_storage_load,tonumber,math_floor,type,error,table_insert,get_skybox,set_lighting_dir,set_lighting_color,set_vertex_color,set_fog_color,set_fog_intensity,network_check_singleplayer_pause,network_player_connected_count,obj_get_first_with_behavior_id,spawn_non_sync_object,obj_scale,math_lerp,set_lighting_color_ambient,le_set_ambient_color,djui_hud_set_resolution,djui_hud_set_font,hud_is_hidden,hud_get_value,djui_hud_get_screen_width,djui_hud_measure_text,djui_hud_get_screen_height,djui_hud_set_color,play_sound,djui_chat_message_create,string_format,mod_storage_save_number,mod_storage_save_bool,get_date_and_time = network_is_server,mod_storage_load,tonumber,math.floor,type,error,table.insert,get_skybox,set_lighting_dir,set_lighting_color,set_vertex_color,set_fog_color,set_fog_intensity,network_check_singleplayer_pause,network_player_connected_count,obj_get_first_with_behavior_id,spawn_non_sync_object,obj_scale,math.lerp,set_lighting_color_ambient,le_set_ambient_color,djui_hud_set_resolution,djui_hud_set_font,hud_is_hidden,hud_get_value,djui_hud_get_screen_width,djui_hud_measure_text,djui_hud_get_screen_height,djui_hud_set_color,play_sound,djui_chat_message_create,string.format,mod_storage_save_number,mod_storage_save_bool,get_date_and_time
 
+local og_set_lighting_dir = set_lighting_dir
+local og_set_lighting_color = set_lighting_color
+local og_set_lighting_color_ambient = set_lighting_color_ambient
+local og_set_fog_color = set_fog_color
+local og_set_vertex_color = set_vertex_color
+
 local init = false
 local timeModifier = 0
 local displayTime = mod_storage_load_bool_2("display_time")
+
+local sLuaLightingDir          = gVec3fZero()
+
+local sLuaLightingColor        = { r = 255, g = 255, b = 255 }
+local sLuaAmbientLightingColor = { r = 255, g = 255, b = 255 }
+local sLuaFogColor             = { r = 255, g = 255, b = 255 }
+local sLuaVertexColor          = { r = 255, g = 255, b = 255 }
 
 local sDncHooks = {
     [DNC_HOOK_SET_LIGHTING_COLOR] = {},
@@ -21,7 +34,8 @@ local sDncHooks = {
     [DNC_HOOK_SET_TIME] = {},
     [DNC_HOOK_SET_SKYBOX_MODEL] = {},
     [DNC_HOOK_SUN_TIMES_CHANGED] = {},
-    [DNC_HOOK_ON_HUD_RENDER_BEHIND] = {}
+    [DNC_HOOK_ON_HUD_RENDER_BEHIND] = {},
+    [DNC_HOOK_SET_LE_COLOR] = {},
 }
 
 gGlobalSyncTable.dncEnabled = true
@@ -50,9 +64,15 @@ end
 --- @param hookEventType integer
 function dnc_call_hook(hookEventType, ...)
     if sDncHooks[hookEventType] == nil then return end
+
     local ret = nil
-    for hook in ipairs(sDncHooks[hookEventType]) do
-        ret = sDncHooks[hookEventType][hook](...)
+    for hook, _ in ipairs(sDncHooks[hookEventType]) do
+        local output = sDncHooks[hookEventType][hook](...)
+        if ret == nil then
+            ret = output
+        elseif type(ret) == "table" and type(output) == "table" and ret.r ~= nil and ret.g ~= nil and ret.b ~= nil then
+            ret = color_lerp(ret, output, get_darkness_factor())
+        end
     end
     return ret
 end
@@ -66,6 +86,16 @@ end
 --- Checks if a skybox is always static while still running lighting code
 function is_static_skybox(skybox)
     return skybox == BACKGROUND_HAUNTED or skybox == BACKGROUND_PURPLE_SKY
+end
+
+--- Returns the skybox ID with some processing to fallback in case of a custom skybox and handling DDD
+--- @return integer
+function dnc_get_skybox()
+    local skybox = get_skybox()
+    if skybox >= BACKGROUND_CUSTOM then skybox = BACKGROUND_OCEAN_SKY end
+    if not dayNightCycleApi.dddCeiling and in_vanilla_level(LEVEL_DDD) then skybox = BACKGROUND_OCEAN_SKY end
+
+    return skybox
 end
 
 --- Returns whether or not the game should visually show the day night cycle
@@ -82,15 +112,15 @@ local function reset_lighting()
     set_lighting_dir(0, 0)
     set_lighting_dir(1, 0)
     set_lighting_dir(2, 0)
-    set_lighting_color(0, 255)
-    set_lighting_color(1, 255)
-    set_lighting_color(2, 255)
-    set_vertex_color(0, 255)
-    set_vertex_color(1, 255)
-    set_vertex_color(2, 255)
-    set_fog_color(0, 255)
-    set_fog_color(1, 255)
-    set_fog_color(2, 255)
+    og_set_lighting_color(0, 255)
+    og_set_lighting_color(1, 255)
+    og_set_lighting_color(2, 255)
+    og_set_vertex_color(0, 255)
+    og_set_vertex_color(1, 255)
+    og_set_vertex_color(2, 255)
+    og_set_fog_color(0, 255)
+    og_set_fog_color(1, 255)
+    og_set_fog_color(2, 255)
     set_fog_intensity(1)
 end
 
@@ -108,9 +138,7 @@ local function update()
     init = true
 
     -- spawn skyboxes
-    local skybox = get_skybox()
-    if skybox >= BACKGROUND_CUSTOM then skybox = BACKGROUND_OCEAN_SKY end
-    if not dayNightCycleApi.dddCeiling and in_vanilla_level(LEVEL_DDD) then skybox = BACKGROUND_OCEAN_SKY end
+    local skybox = dnc_get_skybox()
     if obj_get_first_with_behavior_id(bhvDNCSkybox) == nil and skybox ~= -1 and obj_get_first_with_behavior_id(bhvDNCNoSkybox) == nil then
         if show_day_night_cycle() and not is_static_skybox(skybox) then
             -- spawn day, sunset and night skyboxes
@@ -225,32 +253,48 @@ local function update()
     local overrideLightingDir = dnc_call_hook(DNC_HOOK_SET_LIGHTING_DIR, lightingDir)
     if overrideLightingDir ~= nil and type(overrideLightingDir) == "table" then lightingDir = overrideLightingDir end
 
-    set_lighting_dir(0, lightingDir.x)
-    set_lighting_dir(1, lightingDir.y)
-    set_lighting_dir(2, lightingDir.z)
+    local vertexColor = color_lerp(color, ambientColor, 0.5)
+
+    -- very hacky
+    local lightingDirTemp = gVec3fZero()
+    vec3f_copy(lightingDirTemp, sLuaLightingDir)
+    vec3f_add(lightingDirTemp, lightingDir)
+    vec3f_copy(lightingDir, lightingDirTemp)
+
+    -- there are now two systems for achieving simultaneous color manipulation of the world
+    -- this one being much easier
+    color = color_mul(color, sLuaLightingColor)
+    ambientColor = color_mul(ambientColor, sLuaAmbientLightingColor)
+    vertexColor = color_mul(vertexColor, sLuaVertexColor)
+    fogColor = color_mul(fogColor, sLuaFogColor)
+
+    og_set_lighting_dir(0, lightingDir.x)
+    og_set_lighting_dir(1, lightingDir.y)
+    og_set_lighting_dir(2, lightingDir.z)
     -- make the castle still 25% lit
     if in_vanilla_level(LEVEL_CASTLE) then
         color = color_lerp(COLOR_DAY, color, 0.75)
     end
-    set_lighting_color(0, color.r)
-    set_lighting_color(1, color.g)
-    set_lighting_color(2, color.b)
-    set_lighting_color_ambient(0, ambientColor.r)
-    set_lighting_color_ambient(1, ambientColor.g)
-    set_lighting_color_ambient(2, ambientColor.b)
-    local mix = color_lerp(color, ambientColor, 0.5)
-    set_vertex_color(0, mix.r)
-    set_vertex_color(1, mix.g)
-    set_vertex_color(2, mix.b)
-    set_fog_color(0, fogColor.r)
-    set_fog_color(1, fogColor.g)
-    set_fog_color(2, fogColor.b)
+    og_set_lighting_color(0, color.r)
+    og_set_lighting_color(1, color.g)
+    og_set_lighting_color(2, color.b)
+    og_set_lighting_color_ambient(0, ambientColor.r)
+    og_set_lighting_color_ambient(1, ambientColor.g)
+    og_set_lighting_color_ambient(2, ambientColor.b)
+    og_set_vertex_color(0, vertexColor.r)
+    og_set_vertex_color(1, vertexColor.g)
+    og_set_vertex_color(2, vertexColor.b)
+    og_set_fog_color(0, fogColor.r)
+    og_set_fog_color(1, fogColor.g)
+    og_set_fog_color(2, fogColor.b)
     set_fog_intensity(fogIntensity)
 
     -- lighting engine compatibility
-    if obj_get_first_with_behavior_id(id_bhvAmbientLight) ~= nil then
-        mix = color_lerp(color, COLOR_WHITE, 0.5) -- make the color less intense
-        le_set_ambient_color(mix.r, mix.g, mix.b)
+    if le_is_enabled() then
+        local leColor = color_lerp(color, COLOR_WHITE, 0.5) -- make the color less intense
+        local overrideLeColor = dnc_call_hook(DNC_HOOK_SET_LE_COLOR, table_clone(leColor))
+        if overrideLeColor ~= nil and type(overrideLeColor) == "table" then leColor = overrideLeColor end
+        le_set_ambient_color(leColor.r, leColor.g, leColor.b)
     end
 end
 
@@ -662,7 +706,9 @@ _G.dayNightCycleApi = {
     set_sun_hours = set_sun_hours,
     delete_at_dark = delete_at_dark,
     is_static_skybox = is_static_skybox,
+    dnc_get_skybox = dnc_get_skybox,
     show_day_night_cycle = show_day_night_cycle,
+    get_darkness_factor = get_darkness_factor,
     should_play_night_music = should_play_night_music,
     night_music_register = night_music_register,
     dnc_hook_event = dnc_hook_event,
@@ -753,11 +799,84 @@ _G.dayNightCycleApi = {
         -- * Called when sunrise and sunset times are changed
         DNC_HOOK_SUN_TIMES_CHANGED = DNC_HOOK_SUN_TIMES_CHANGED,
         -- * Called during HOOK_ON_HUD_RENDER_BEHIND before anything is rendered
-        DNC_HOOK_ON_HUD_RENDER_BEHIND = DNC_HOOK_ON_HUD_RENDER_BEHIND
+        DNC_HOOK_ON_HUD_RENDER_BEHIND = DNC_HOOK_ON_HUD_RENDER_BEHIND,
+        -- * Called whenever the lighting engine color is calculated, if enabled
+        -- * Parameters: `Color` leColor
+        -- * Return: `Color`
+        DNC_HOOK_SET_LE_COLOR = DNC_HOOK_SET_LE_COLOR
     }
 }
 setmetatable(_G.dayNightCycleApi, sReadonlyMetatable)
 setmetatable(_G.dayNightCycleApi.constants, sReadonlyMetatable)
+
+
+
+--- @param index integer
+--- @param color boolean
+local function index_to_letter(index, color)
+    if index == 1 then
+        return if_then_else(color, "g", "y")
+    elseif index == 2 then
+        return if_then_else(color, "b", "z")
+    end
+
+    return if_then_else(color, "r", "x")
+end
+
+--- @param index integer
+--- @param value number
+function set_lighting_dir(index, value)
+    if index < 0 or index > 2 then return end
+
+    local letter = index_to_letter(index, false)
+    sLuaLightingColor[letter] = value
+end
+
+--- @param index integer
+--- @param value integer
+function set_lighting_color(index, value)
+    if index < 0 or index > 2 then return end
+    value = math.u8(value)
+
+    local letter = index_to_letter(index, true)
+    sLuaLightingColor[letter] = value
+end
+
+--- @param index integer
+--- @param value integer
+function set_lighting_color_ambient(index, value)
+    if index < 0 or index > 2 then return end
+    value = math.u8(value)
+
+    local letter = index_to_letter(index, true)
+    sLuaAmbientLightingColor[letter] = value
+end
+
+--- @param index integer
+--- @param value integer
+function set_fog_color(index, value)
+    if index < 0 or index > 2 then return end
+    value = math.u8(value)
+
+    local letter = index_to_letter(index, true)
+    sLuaFogColor[letter] = value
+end
+
+--- @param index integer
+--- @param value integer
+function set_vertex_color(index, value)
+    if index < 0 or index > 2 then return end
+    value = math.u8(value)
+
+    local letter = index_to_letter(index, true)
+    sLuaVertexColor[letter] = value
+end
+
+_G.set_lighting_dir = set_lighting_dir
+_G.set_lighting_color = set_lighting_color
+_G.set_lighting_color_ambient = set_lighting_color_ambient
+_G.set_fog_color = set_fog_color
+_G.set_vertex_color = set_vertex_color
 
 night_music_register(SEQ_LEVEL_GRASS, "night_level_grass")
 night_music_register(SEQ_LEVEL_INSIDE_CASTLE, "night_level_inside_castle")

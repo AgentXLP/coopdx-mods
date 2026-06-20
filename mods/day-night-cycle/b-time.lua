@@ -175,6 +175,29 @@ function update_night_music()
     end
 end
 
+--- Returns the delta of lighting change.
+--- Useful for making certain effects only apply at one kind of lighting
+--- * If it's bright outside, 0.0
+--- * If it's sunset, 1.0
+--- * If it's night, 1.0
+--- * If it's sunrise, 1.0
+--- @return number
+function get_darkness_factor()
+    local minutes = if_then_else(is_static_skybox(dnc_get_skybox()), 12, get_time_minutes())
+
+    if minutes >= HOUR_SUNRISE_START and minutes <= HOUR_SUNRISE_END then
+        return 1.0 - ((minutes - HOUR_SUNRISE_START) / HOUR_SUNRISE_DURATION)
+    elseif minutes > HOUR_SUNRISE_END and minutes < HOUR_SUNSET_START then
+        return 0.0
+    elseif minutes >= HOUR_SUNSET_START and minutes <= HOUR_SUNSET_END then
+        return (minutes - HOUR_SUNSET_START) / HOUR_SUNSET_DURATION
+    elseif minutes > HOUR_SUNSET_END or minutes < HOUR_SUNRISE_START then
+        return 1.0
+    end
+
+    return 0.0
+end
+
 --- @param obj Object
 --- Function to delete an object if it's dark out, meant to be used in behaviors
 function delete_at_dark(obj)

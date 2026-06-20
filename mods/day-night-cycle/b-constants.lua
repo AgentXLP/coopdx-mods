@@ -1,7 +1,7 @@
 -- version
 DNC_VERSION_MAJOR = 2
-DNC_VERSION_MINOR = 5
-DNC_VERSION_PATCH = 2
+DNC_VERSION_MINOR = 6
+DNC_VERSION_PATCH = 0
 DNC_VERSION = math.tointeger(string.format("%d%d%d", DNC_VERSION_MAJOR, DNC_VERSION_MINOR, DNC_VERSION_PATCH))
 
 -- skybox constants
@@ -96,6 +96,8 @@ FOG_INTENSITY_NORMAL = 1.0
 FOG_INTENSITY_DENSE = 1.02
 
 -- colors
+COLOR_WHITE                = { r = 255, g = 255, b = 255 }
+
 COLOR_NIGHT                = { r = 90,  g = 100, b = 150 }
 COLOR_AMBIENT_NIGHT        = { r = 70,  g = 90,  b = 150 }
 COLOR_SUNRISE              = { r = 255, g = 250, b = 100 }
@@ -123,3 +125,4 @@ DNC_HOOK_SET_TIME                   = 8
 DNC_HOOK_SET_SKYBOX_MODEL           = 9
 DNC_HOOK_SUN_TIMES_CHANGED          = 10
 DNC_HOOK_ON_HUD_RENDER_BEHIND       = 11
+DNC_HOOK_SET_LE_COLOR               = 12

@@ -113,3 +113,15 @@ function check_common_hud_render_cancels()
            gNetworkPlayers[0].currLevelNum == LEVEL_ENDING or
            action == ACT_END_PEACH_CUTSCENE or action == ACT_END_WAVING_CUTSCENE or action == ACT_CREDITS_CUTSCENE
 end
+
+--- @param a Color
+--- @param b Color
+--- @return Color
+--- Multiplies two colors together
+function color_mul(a, b)
+    return {
+        r = a.r * (b.r / 255),
+        g = a.g * (b.g / 255),
+        b = a.b * (b.b / 255)
+    }
+end
