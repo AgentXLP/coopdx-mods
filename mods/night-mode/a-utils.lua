@@ -69,6 +69,10 @@ local rainbowColor = { r = 255, g = 0, b = 0 }
 --- @return Color
 --- Updates and returns a rainbow color
 function update_rainbow_color(speed)
+    if dnc_check() then
+        speed = speed * _G.dayNightCycleApi.get_time_scale()
+    end
+
 	switch(rainbowState, {
 		[0] = function()
 			rainbowColor.r = rainbowColor.r + speed

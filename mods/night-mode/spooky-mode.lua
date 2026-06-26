@@ -271,6 +271,4 @@ function spooky_mode_on_hud_render()
     jumpscareTimer = jumpscareTimer + 1
 end
 
--- gLevelValues.entryLevel = LEVEL_BBH
-
 hook_event(HOOK_ON_HUD_RENDER, spooky_mode_on_hud_render)

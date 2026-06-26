@@ -1,6 +1,6 @@
 -- name: Night Mode
 -- incompatible: night-mode light environment-tint
--- description: Night Mode v1.0.1\nBy \\#ec7731\\Agent X\n\n\\#dcdcdc\\This mod adds a night mode to the game in a similar fashion to Day Night\nCycle, however it uses the lighting engine to have realtime point lighting on everything. Press D-Pad down to activate the flashlight, it may look a little janky.\n\nSpecial thanks to MaiskX3 for night time sequences.
+-- description: Night Mode v1.0.2\nBy \\#ec7731\\Agent X\n\n\\#dcdcdc\\This mod adds a night mode to the game in a similar fashion to Day Night\nCycle, however it uses the lighting engine to have realtime point lighting on everything. Press D-Pad down to activate the flashlight, it may look a little janky.\n\nSpecial thanks to MaiskX3 for night time sequences.
 
 -- require("lib/light-editor")
 
@@ -20,7 +20,17 @@ gGlobalSyncTable.spookyMode = mod_storage_load_bool_2("spooky_mode")
 
 coinLights = true
 
+local function check_dnc_compatible()
+    return _G.dayNightCycleApi ~= nil and _G.dayNightCycleApi.version ~= nil and _G.dayNightCycleApi.version >= 260
+end
+
+function dnc_check()
+    return check_dnc_compatible() and _G.dayNightCycleApi.is_dnc_enabled()
+end
+
 local function setup_environment()
+    if dnc_check() then return end
+
     if in_vanilla_level(LEVEL_BBH) then
         le_set_ambient_color(0, 0, 0)
     else
@@ -82,10 +92,12 @@ local function update()
         le_set_light_color(0, color.r, color.g, color.b)
     end
 
-    if (gMarioStates[0].area.terrainType == TERRAIN_SNOW or in_vanilla_level(LEVEL_LLL) or in_vanilla_level(LEVEL_BITFS)) and gNetworkPlayers[0].currAreaIndex == 1 then
-        set_override_envfx(ENVFX_SNOW_BLIZZARD)
-    else
-        set_override_envfx(ENVFX_MODE_NO_OVERRIDE)
+    if not dnc_check() then
+        if (gMarioStates[0].area.terrainType == TERRAIN_SNOW or in_vanilla_level(LEVEL_LLL) or in_vanilla_level(LEVEL_BITFS)) and gNetworkPlayers[0].currAreaIndex == 1 then
+            set_override_envfx(ENVFX_SNOW_BLIZZARD)
+        else
+            set_override_envfx(ENVFX_MODE_NO_OVERRIDE)
+        end
     end
 
     shading_update()
@@ -141,7 +153,7 @@ local function on_level_init()
     setup_environment()
 
     -- spawn vanilla level specific objects
-    if in_vanilla_level(LEVEL_TTC) then
+    if in_vanilla_level(LEVEL_TTC) and not dnc_check() then
         local void = spawn_object(id_bhvStaticObject, E_MODEL_NM_TTC_VOID, 0, 500, 0)
         void.header.gfx.skipInViewCheck = true
         obj_set_angle(void, 0x4000, 0, 0)
@@ -166,6 +178,7 @@ end
 local function on_warp()
     if gMarioStates[0].action == ACT_TELEPORT_FADE_OUT then return end
 
+    -- setup the environment for every level
     setup_environment()
 
     -- map lights
@@ -221,6 +234,16 @@ local function on_set_coin_lights(_, value)
     coinLights = value
 end
 
+
+--- @param leColor Color
+local function dnc_set_le_color(leColor)
+    if in_vanilla_level(LEVEL_BBH) then
+        return COLOR_BLACK
+    end
+
+    return leColor
+end
+
 local sReadonlyMetatable = {
     __index = function(table, key)
         return rawget(table, key)
@@ -272,6 +295,10 @@ freeze_lava_dl("bowser_2_seg7_dl_07001930", 15, 17)
 freeze_lava_dl("bowser_2_seg7_dl_07001930", 15, 24)
 
 nullify_dl_alpha(gfx_get_from_name("bbh_seg7_dl_0700D7E0"))
+
+if check_dnc_compatible() then
+    _G.dayNightCycleApi.dnc_hook_event(_G.dayNightCycleApi.constants.DNC_HOOK_SET_LE_COLOR, dnc_set_le_color)
+end
 
 hook_event(HOOK_UPDATE, update)
 hook_event(HOOK_MARIO_UPDATE, mario_update)
