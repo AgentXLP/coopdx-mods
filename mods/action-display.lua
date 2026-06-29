@@ -1,7 +1,9 @@
 -- name: Action Display
--- description: Action Display\nBy \\#ec7731\\Agent X\\#dcdcdc\\\n\nThis mod is a utility mod that renders your action and forward velocity to the\nscreen.
+-- category: utility
+-- description: Action Display v1.0.1\nBy \\#ec7731\\Agent X\\#dcdcdc\\\n\nThis mod is a utility mod that renders your action and forward velocity to the\nscreen.
 -- pausable: true
 
+-- localize functions to improve performance
 local djui_hud_set_resolution,djui_hud_set_font,djui_hud_set_color,djui_hud_print_text,math_floor = djui_hud_set_resolution,djui_hud_set_font,djui_hud_set_color,djui_hud_print_text,math.floor
 
 local sActionTable = {
