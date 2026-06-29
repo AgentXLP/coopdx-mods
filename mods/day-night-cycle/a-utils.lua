@@ -1,5 +1,5 @@
 -- localize functions to improve performance
-local mod_storage_load,string_format,table_insert,type,math_ceil,math_lerp,math_round,level_is_vanilla_level,djui_hud_get_color,djui_hud_set_color,djui_hud_print_text,obj_get_first_with_behavior_id = mod_storage_load,string.format,table.insert,type,math.ceil,math.lerp,math.round,level_is_vanilla_level,djui_hud_get_color,djui_hud_set_color,djui_hud_print_text,obj_get_first_with_behavior_id
+local mod_storage_load,string_format,table_insert,type,math_ceil,math_lerp,math_round,level_is_vanilla_level,djui_hud_get_color,djui_hud_set_color,obj_get_first_with_behavior_id = mod_storage_load,string.format,table.insert,type,math.ceil,math.lerp,math.round,level_is_vanilla_level,djui_hud_get_color,djui_hud_set_color,obj_get_first_with_behavior_id
 
 --- @param key string
 --- `mod_storage_load_bool` except it returns true by default
