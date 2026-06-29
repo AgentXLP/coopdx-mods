@@ -114,6 +114,7 @@ local function mario_update(m)
     door = obj_get_nearest_object_with_behavior_id(m.marioObj, id_bhvDoor)
     local starDoor = obj_get_nearest_object_with_behavior_id(m.marioObj, id_bhvStarDoor)
     local warpDoor = obj_get_nearest_object_with_behavior_id(m.marioObj, id_bhvDoorWarp)
+    --- @type Object|nil
     local targetDoor = door
     if warpDoor ~= nil or starDoor ~= nil then
         if dist_between_objects(m.marioObj, starDoor) < dist_between_objects(m.marioObj, door) then
