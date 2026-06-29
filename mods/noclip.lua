@@ -117,7 +117,7 @@ local function act_noclip(m)
         cur_obj_unhide()
     end
 
-    if m.playerIndex == 0 and SM64COOPDX_VERSION ~= nil then
+    if m.playerIndex == 0 then
         set_first_person_enabled(firstPersonEnabled)
     end
 
