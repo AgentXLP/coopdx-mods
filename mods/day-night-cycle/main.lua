@@ -110,9 +110,9 @@ function show_day_night_cycle()
 end
 
 local function reset_lighting()
-    set_lighting_dir(0, 0)
-    set_lighting_dir(1, 0)
-    set_lighting_dir(2, 0)
+    og_set_lighting_dir(0, 0)
+    og_set_lighting_dir(1, 0)
+    og_set_lighting_dir(2, 0)
     og_set_lighting_color(0, 255)
     og_set_lighting_color(1, 255)
     og_set_lighting_color(2, 255)
