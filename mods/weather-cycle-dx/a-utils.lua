@@ -1,7 +1,7 @@
 if not check_dnc_compatible() then return end
 
 -- localize functions to improve performance
-local djui_hud_get_color,djui_hud_set_color,djui_hud_print_text,djui_hud_measure_text,math_lerp,math_round,string_format,table_insert,math_floor,level_is_vanilla_level,type,math_random,mod_storage_load = djui_hud_get_color,djui_hud_set_color,djui_hud_print_text,djui_hud_measure_text,math.lerp,math.round,string.format,table.insert,math.floor,level_is_vanilla_level,type,math.random,mod_storage_load
+local djui_hud_get_color,djui_hud_set_color,djui_hud_measure_text,math_lerp,math_round,string_format,table_insert,math_floor,level_is_vanilla_level,type,math_random,mod_storage_load = djui_hud_get_color,djui_hud_set_color,djui_hud_measure_text,math.lerp,math.round,string.format,table.insert,math.floor,level_is_vanilla_level,type,math.random,mod_storage_load
 
 --- @param cond boolean
 --- Human readable ternary operator
