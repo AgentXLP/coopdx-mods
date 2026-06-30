@@ -161,3 +161,42 @@ bhvNDFlood = 0
 
 --- @type BehaviorId
 bhvNDSkybox = 0
+
+--- @type BehaviorId
+bhvNDRainDroplet = 0
+
+--- @type BehaviorId
+bhvNDAcidRain = 0
+
+--- @type BehaviorId
+bhvNDTornado = 0
+
+--- @type BehaviorId
+bhvNDHeat = 0
+
+--- @type BehaviorId
+bhvNDCold = 0
+
+--- @type BehaviorId
+bhvNDFog = 0
+
+--- @type BehaviorId
+bhvNDMiasma = 0
+
+--- @type BehaviorId
+bhvNDMeteorShower = 0
+
+--- @type BehaviorId
+bhvNDMeteor = 0
+
+--- @type BehaviorId
+bhvNDShockwave = 0
+
+--- @type BehaviorId
+bhvNDCorpse = 0
+
+--- @type BehaviorId
+bhvNDThunderstorm = 0
+
+--- @type BehaviorId
+bhvNDLightning = 0
