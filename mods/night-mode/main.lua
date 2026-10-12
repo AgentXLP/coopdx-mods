@@ -1,7 +1,7 @@
 -- name: Night Mode
 -- category: graphics
 -- incompatible: night-mode light
--- description: Night Mode v1.0.3\nBy \\#ec7731\\Agent X\n\n\\#dcdcdc\\This mod adds a night mode to the game in a similar fashion to Day Night\nCycle, however it uses the lighting engine to have realtime point lighting on everything. Press D-Pad down to activate the flashlight, it may look a little janky.\n\nSpecial thanks to MaiskX3 for night time sequences.
+-- description: Night Mode v1.0.3\nBy \\#ec7731\\Agent X\n\n\\#\\This mod adds a night mode to the game in a similar fashion to Day Night\nCycle, however it uses the lighting engine to have realtime point lighting on everything. Press D-Pad down to activate the flashlight, it may look a little janky.\n\nSpecial thanks to MaiskX3 for night time sequences.
 
 -- require("lib/light-editor")
 

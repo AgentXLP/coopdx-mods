@@ -335,7 +335,7 @@ function hurt_yoshi(_, bulletObj)
     bullet_ricochet(bulletObj)
     bulletObj.oAction = 2
 
-    djui_chat_message_create("\\#a0ffa0\\Yoshi\\#dcdcdc\\: no lol")
+    djui_chat_message_create("\\#a0ffa0\\Yoshi\\#\\: no lol")
     play_sound(SOUND_MENU_MESSAGE_APPEAR, gGlobalSoundSource)
     return false
 end

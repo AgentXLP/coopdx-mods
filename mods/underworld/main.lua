@@ -1,6 +1,6 @@
 -- name: Super Mario 64: The Underworld
 -- incompatible: romhack gamemode light
--- description: Super Mario 64: The Underworld v1.1.2\nBy \\#ec7731\\Agent X\\#dcdcdc\\\n\nMario is pulled into another land some call The Underworld...\nHe must make his way through this condemned land and help in both the escape of\nhimself and someone he thinks he can trust\nfrom the Underworld.\nThis is a 30 star romhack with a fully custom cutscene system, dialog system and boss fight entirely in Lua created for the sm64ex-coop level competition.\n\nSpecial thanks to \\#005500\\Squishy\\#dcdcdc\\ for the compass textures
+-- description: Super Mario 64: The Underworld v1.1.2\nBy \\#ec7731\\Agent X\\#\\\n\nMario is pulled into another land some call The Underworld...\nHe must make his way through this condemned land and help in both the escape of\nhimself and someone he thinks he can trust\nfrom the Underworld.\nThis is a 30 star romhack with a fully custom cutscene system, dialog system and boss fight entirely in Lua created for the sm64ex-coop level competition.\n\nSpecial thanks to \\#005500\\Squishy\\#\\ for the compass textures
 -- ignore-script-warnings: true
 
 STREAM_EARTHQUAKE = audio_stream_load("earthquake.mp3")

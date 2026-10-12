@@ -1,6 +1,6 @@
 -- name: Action Display
 -- category: utility
--- description: Action Display v1.0.1\nBy \\#ec7731\\Agent X\\#dcdcdc\\\n\nThis mod is a utility mod that renders your action and forward velocity to the\nscreen.
+-- description: Action Display v1.0.1\nBy \\#ec7731\\Agent X\\#\\\n\nThis mod is a utility mod that renders your action and forward velocity to the\nscreen.
 -- pausable: true
 
 -- localize functions to improve performance

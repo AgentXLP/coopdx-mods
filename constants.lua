@@ -1,4 +1,33 @@
--- This is for the VSCode Lua plugin.
+--- This is for the VSCode Lua plugin.
+
+--- @diagnostic disable: missing-return
+
+--- @param filename string
+--- @return ModAudio
+--- Loads an audio sample by `filename` (with extension)
+function audio_sample_load(filename) end
+--- @param filename string
+--- @return ModAudio
+--- Loads an audio stream by `filename` (with extension)
+function audio_stream_load(filename) end
+audio_sample_play = audio_play
+audio_stream_play = audio_play
+audio_sample_destroy = audio_destroy
+audio_stream_destroy = audio_destroy
+audio_sample_stop = audio_stop
+audio_stream_stop = audio_stop
+audio_stream_pause = audio_pause
+audio_stream_get_position = audio_get_position
+audio_stream_set_position = audio_set_position
+audio_stream_get_looping = audio_get_looping
+audio_stream_set_looping = audio_set_looping
+audio_stream_set_loop_points = audio_set_loop_points
+audio_stream_get_frequency = audio_get_frequency
+audio_stream_set_frequency = audio_set_frequency
+audio_stream_get_volume = audio_get_volume
+audio_stream_set_volume = audio_set_volume
+audio_stream_get_volume_channel = audio_get_volume_channel
+audio_stream_set_volume_channel = audio_set_volume_channel
 
 --- @type BehaviorId
 bhvDNCSkybox = 0
@@ -130,9 +159,6 @@ bhvUWBlueCoin = 0
 bhvUWEnemyFlag = 0
 
 --- @type BehaviorId
-bhvUWSticker = 0
-
---- @type BehaviorId
 bhvUWPyramid = 0
 
 --- @type BehaviorId
@@ -155,6 +181,34 @@ bhvUWNoiseAttack = 0
 
 --- @type BehaviorId
 bhvUWShockwave = 0
+
+--- @type BehaviorId
+bhvUWStaticCollisionObject = 0
+
+--- @type BehaviorId
+bhvUWStaticCollisionObject2 = 0
+
+--- @type BehaviorId
+bhvUWBossArena = 0
+
+--- @type BehaviorId
+bhvUWBossArenaGodrays = 0
+
+--- @type BehaviorId
+bhvUWCrashingCastle = 0
+
+--- @type BehaviorId
+bhvUWLightningSpawner = 0
+
+--- @type BehaviorId
+bhvUWEnemyFlagManager = 0
+
+--- @type BehaviorId
+bhvUWMerchant = 0
+
+--- @type BehaviorId
+bhvUWRainDroplet = 0
+
 
 --- @type BehaviorId
 bhvNDFlood = 0

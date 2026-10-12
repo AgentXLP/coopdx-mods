@@ -138,7 +138,7 @@ end
 
 
 local function on_create_command(msg)
-    local values = string.split(msg)
+    local values = string_split(msg)
     local posX      = tonumber(values[1]) or math.floor(gMarioStates[0].pos.x)
     local posY      = tonumber(values[2]) or math.floor(gMarioStates[0].pos.y)
     local posZ      = tonumber(values[3]) or math.floor(gMarioStates[0].pos.z)
@@ -178,7 +178,7 @@ local function on_pos_command(msg)
         return true
     end
 
-    local values = string.split(msg)
+    local values = string_split(msg)
     local posX = math.floor(tonumber(values[1]) or gMarioStates[0].pos.x)
     local posY = math.floor(tonumber(values[2]) or gMarioStates[0].pos.y)
     local posZ = math.floor(tonumber(values[3]) or gMarioStates[0].pos.z)
@@ -195,7 +195,7 @@ local function on_col_command(msg)
         return true
     end
 
-    local values = string.split(msg)
+    local values = string_split(msg)
     local colR = tonumber(values[1]) or 255
     local colG = tonumber(values[2]) or 255
     local colB = tonumber(values[3]) or 255
@@ -228,7 +228,7 @@ local function on_int_command(msg)
     local int = tonumber(msg) or 2.0
     le_set_light_intensity(currLight, int)
 
-    djui_chat_message_create(string.format("Set light intensity to %d.", int))
+    djui_chat_message_create(string.format("Set light intensity to %f.", int))
     return true
 end
 
@@ -261,7 +261,7 @@ local function on_goto_command()
 end
 
 local function on_ambient_command(msg)
-    local values = string.split(msg)
+    local values = string_split(msg)
     local colR = tonumber(values[1]) or 255
     local colG = tonumber(values[2]) or 255
     local colB = tonumber(values[3]) or 255

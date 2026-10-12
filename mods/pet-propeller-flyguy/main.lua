@@ -1,5 +1,5 @@
 -- name: [PET] Propeller Fly Guy
--- description: [PET] Propeller Fly Guy v1.0.1\nBy \\#ec7731\\Agent X\n\n\\#dcdcdc\\This mod adds a fly guy pet that behaves like the propeller blocks from New Super Mario Bros. Wii.\n\nTo use the Propeller Fly Guy, first spawn one through the pets menu, grab him and jump in the air and then press\n[\\#3040ff\\A\\#dcdcdc\\]. You will propel upwards and eventually begin to descend. To slow your descent, press [\\#3040ff\\A\\#dcdcdc\\] in rapid succession. To speed up your descent, hold down [\\#3040ff\\Z\\#dcdcdc\\].
+-- description: [PET] Propeller Fly Guy v1.0.1\nBy \\#ec7731\\Agent X\n\n\\#\\This mod adds a fly guy pet that behaves like the propeller blocks from New Super Mario Bros. Wii.\n\nTo use the Propeller Fly Guy, first spawn one through the pets menu, grab him and jump in the air and then press\n[\\#3040ff\\A\\#\\]. You will propel upwards and eventually begin to descend. To slow your descent, press [\\#3040ff\\A\\#\\] in rapid succession. To speed up your descent, hold down [\\#3040ff\\Z\\#\\].
 -- pausable: true
 
 -- localize functions to improve performance
